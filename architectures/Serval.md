@@ -82,15 +82,13 @@ This represents what the application developer is really interested in: the func
 
 ##### Flow
 
-Referring to an application depending on a service as the host, and the service as the peer. The means of communication may differ between the service and the host
+Let an application depending on a service be the host, and the service be the peer. The means of communication may differ between the peer and the host  (maybe over HTTP2, over QUIC, over TCP/IP, over UDP, using VLAN, whatever). Every flow is assigned a unique identifier in the form of a flowID. 
+
+Why is this useful? Between the peer and the host, we may want to use multiple flows to send data between them. It doesn't cost much to assign a flowID to a flow, and we now have a way to address flows.
+
+###### Flow Control
 
 ##### Network Address
-
-
-
-##### User-Space Control Plane
-
-##### Service-Level Data Plane
 
 ##### Service Access
 
@@ -98,7 +96,8 @@ Referring to an application depending on a service as the host, and the service 
 
 ##### Multiplicity
 
-
+### What is the difference between Control Plane and Data Plane
+### And what do we get by dividing it up
 
 ### Another cool feature: Late binding
 
@@ -127,11 +126,5 @@ That's a pretty interesting claim. If flow is what I think it means (a connectio
 ### Extensions
 
 #### Content Addressed Services
-
-The 
-
-### Relevance to Matrix
-
-
 
 [^1]: Could be DNS lookup; A HTTP Echo Server that takes a HTTP request and echoes your payload in the HTTP response; A proxy that connects to some peer machine you want on your behalf, forwarding data that you send to the peer and the same in the other direction.]

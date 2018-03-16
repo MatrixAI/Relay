@@ -30,23 +30,16 @@ The blog post on L4 vs. L7 provides the following example:
 > - The L4 load balancer makes a single outgoing TCP connection for each incoming TCP connection, resulting in two incoming and two outgoing connections.
 > - However, client A sends 1 request per minute (RPM) over its connection, while client B sends 50 requests per second (RPS) over its connection.
 
-
-
 What do we gain by operating at L7?
 
-
-
 ### Transparent Network to Applications
+
+### Threading Model
+Envoy uses 
 
 > The network should be transparent to applications. When network and application problems do occur it should be easy to determine the source of the problem.
 
 How is network transparency for applications achieved in the Envoy model?
-
-
-
-
-
-
 
 [OSI Model]: http://1.bp.blogspot.com/-yPHtWF43D8c/TY-PxT-KqNI/AAAAAAAAAAo/1OaBHHrsEKE/s1600/osi-model-7-layers.png
 [L4 Load Balancer]: https://cdn-images-1.medium.com/max/800/1*1PjTpM3hLnm3iEAd4-_AaQ.png
