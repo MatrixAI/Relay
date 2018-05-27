@@ -1,0 +1,154 @@
+SCION Five Years Later
+https://arxiv.org/pdf/1508.01651.pdf
+Paper is in papers/ directory should online pdf become unavailable
+
+~ TLDR is at bottom ~
+
+_______________________________________________________________________
+
+- point to point communication that remains _high available_ despite
+  adversary presence
+- transparency and control over forwarding paths
+  - containing packet path in header?
+- transparency and control over trust roots (CAs)
+  - lack of transparency to users - end host path selection results in
+  simpler forwarding plane and more efficient routers
+- introduction of state into packet headers
+  - reasoning behind this is that memory lookups (routing table lookups)
+  are very slow compared to just doing computations (like AES?)
+  - packet needs to be protected cryptographically - can protect against
+  router state exhaustion attacks it seems
+- PKI (public key infrastructure), what we rely on so much right now,
+  is based off trusting a small number of people/organisations
+- trust architecture which supports a global trust root between
+  distrusting entities
+- make new stuff deployable
+
+- SCION tries to find the bare minimum that a global, interoperable
+  communication system should have. Things like efficient distribution can
+  be added on at higher levels.
+  Sticks with IP's best effort motto Isolates security  to only things that
+  affect the network - malicious components
+
+- ISD -> isolated domain
+         basically a section of the Internet controlled by one ISP
+- AS -> autonomous system
+- ISD Core -> AS that administers the ISD
+- TRC -> Trust Root Configuration, policy which governs the ISD
+- PCB -> path construction beacon
+      -> appears to be a packet which, as it passes through nodes,
+         gets links appended. Just keeps track of its path down from
+         Core to leaf nodes
+        -> Nothing seems to stop higher up nodes from distributing false
+           information or
+           simply nothing at all I think to resolve that, the hope is
+           that since there are so many routes, each node underneath
+           a malicious node will have multiple paths to go through in
+           order to avoid bad paths
+
+           To really stop a lower AS from communicating with a Core,
+           there needs to be a lot of collusion between higher level ASes
+- PCFS -> path carried forwarding state
+
+maybe I'm hitting the  m e a t  of the paper now
+
+- inter and intra ISD routing - packets contain AS-level path information
+  so we dont need border routers to maintain
+  inter-domain routing tables
+- through inter-domain PCB transmissions, each Core AS learns paths
+  to all other Core ASes??  - PCFS is different to source routing as the
+  source node doesn't need to search a graph
+
+- Control plane
+  beacon servers -> discover path information
+                    something something something Border Gateway Protocol?
+
+                    works to create disjoint paths for max availability
+
+                    page 9 of the paper has a good diagram which I wont
+                    convert to ascii for the sake of my sanity
+
+                    Inter-ISD beaconing is the same as intra-ISD beaconing
+                    except the packets only travel between Core ASes THE
+                    PAPER HIGHLIGHTS THAT THIS ISN'T SCALABLE SIMILAR
+                    TO BGP
+  path servers -> disseminate path information
+                  store mappings from AS identifiers to sets of announced
+                  path segments
+
+                  path selection from AS to AS appears to consist of
+                  3 sections:
+                    Up-segment    -> path from AS to an ISD Core
+                    Core-segment  -> path between ISD Cores Down-segment
+                    -> path between ISD Core to AS
+
+                  This allows a path between 2 ASes to consist of an
+                  up and down segment of any size if there's a link or
+                  shortcut (doesn't have to reach a Core AS).
+  certificate servers -> assist validating received information
+                         keep cached copies of TRC files from ISD Core
+                         and copies of other ASes certs and manage certs
+                         and keys for intra-AS communication
+- with the path in the packet, border routers don't need to contain
+  extra information about routing tables as the set path is specified.
+  Also allows responders to either pick their own path or to simply invert
+  the given path.
+- PCBs are sent based on a local timer - 10 or 15 seconds
+    Sounds like a lot of extra traffic on the network to me...
+- paths are static... which isn't amazing
+  but paths are distributed kind of frequently meaning that there'll be
+  many choices if one link fails but one link failing in a path means
+  that path can't be used..  but there *should* be many paths to pick from
+
+The  m e a t  above is the control layer. It just distributes information
+about paths and the network.  The data plane is where PCFS comes in.
+
+- A SCION packet contains at least a path - This way, we can actually
+allow hosts that are using different protocols (IPv4, IPv6) to communicate
+  with each other
+
+- Current internet trust model follows `monopoly` and `oligarchy`
+  monopoly - one overlord to rule them all oligarchy - a few equally
+  valid overlords to rule them all
+- SCION attempts to mitigate this by isolating authorities to individuals
+  ISDs. If something gets compromised within an ISD, oh no, but at least
+  all other ISDs aren't compromised
+
+- path validation, anonymity, privacy and DDos protection
+  - on the note with anonymity/privacy, the path selection thing kind
+  of appears similar to TOR
+
+The rest of the paper goes on to describe possible security threats,
+some case studies and examples and some other architectures/protocols.
+
+_________________________________________________________________________
+
+TLDR!!!
+
+- Each ISP's zone is split up as it alread is. We'll also have a few
+  core nodes managing this zone.
+- Everything is connected in a sort of tree (in the diagrams at least.
+  The core nodes are in charge of communicating between ISPs and zones
+- Every now and then (10? 15? seconds) core nodes will send a kind of
+  beacon packet down. As nodes receive and forward it, they will append
+  themselves to the path which the packet has traversed.
+- This beacon packet serves as an indicator of available paths within
+  the zone.
+- Interzone paths are established in much the same fashion except only
+  core nodes need to keep track of it.
+- ADVANTAGE OF THIS
+  allowing each node to keep track of available paths allows nodes to
+  pick their own paths to their end destination. Destination node can
+  also simply reverse the path or select a new one.
+  
+  Allows communication between hosts using different protocols, as long
+  as the final bridging nodes are able to connect and have the same
+  network stack.
+
+  Attempts to delegate trust to zone providers rather than some corp
+  sitting on the web.
+- DISADVANTAGES
+  Looks a tad like TOR. If it is anything like TOR, it's a tad slower
+  than what people are used to.
+
+  Beacon packets seem to add a lot of network traffic.
