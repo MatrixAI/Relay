@@ -191,9 +191,12 @@ We see the word `flow` a lot in this paper. I'm taking it to be the exchange of 
     - flow identifier -> identify the flow associated with a socket
     - network addresses -> identify interfaces on a host
 - late binding of services to hosts
+  - diagram at the top of page 7 of the paper demonstrates the late binding - an application sends out a request for a service and the return of the request contains the address of the host to communication with
+  - this is in contrast to current DNS resolution where applications request an IP or domain (which gets resolved to an IP before a request then gets sent out to the IP)
 - communication over active sockets using _service names_
   A host becomes a `singleton group` .... instead of being just a single host, it can be part of a group of hosts that all perform the same service?
 - IP anycast
+  - send out a request which can be matched by any (eg. the closest) host
 - TCP/IP relies on
   <source IP, source port, destination IP, destination port, protocol>
   to demultiplex packets to sockets. This kinda prevents any mobility as if one thing changes, the socket is disrupted.
@@ -215,7 +218,7 @@ We see the word `flow` a lot in this paper. I'm taking it to be the exchange of 
 - figure 5 on page 7 of the paper indicates an example how establishing a Serval connection based on serviceID works
   The paper says that the initial establishment may have a bit of an extra delay but data packets are unaffected
 
-- this all sounds very much like a load balancer..? 
+- this all sounds very much like a server dedicated as a load balancer..?  or as an extension to DNS
 - IP : finds hosts by ip addresses
   TCP: finds applications via ports
   
@@ -231,3 +234,8 @@ We see the word `flow` a lot in this paper. I'm taking it to be the exchange of 
   .......
   Is this what Serval is kinda doing?
 
+Before continuing, let me do a bit of brushing up on Border Gateway Protocol
+- used as the connecting protocol between ISPs or network providers
+- layer 4 protocol which sits on top of TCP
+- high level summary is that BGP helps to choose a path through the internet intercepting the least number of Autonomous Systems (network providers)
+- updates a router's routing table for IP packets to go through as optimal of a route as the router can manage

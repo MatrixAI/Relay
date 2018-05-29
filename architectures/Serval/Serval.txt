@@ -1,0 +1,108 @@
+SERVAL: service-centric networking
+
+- first thing the paper does is say today's network stack doesn't suit
+  mobile and multi-homed devices. But hey it still suits things that don't
+  need to change quite well.  - hosts have addresses that are dependent
+  on the network topology
+  
+  - we _want_ a way to address a service ?_or interface_? with a topology
+    independent address
+- current workarounds are load balancers and manual changes to DNS
+  configs etc.  - proposes a SERVICE ACCESS LAYER (SAL) which sits on top
+  of an unchanged network layer - splitting of data and control plane -
+  Mobile IP seems fun
+
+Issues with today's network stack - hosts cannot spread a connection
+over multiple interfaces or paths - overloading of meaning on addresses
+  - to identify interfaces (IP) - demultiplex packets (port) - identify
+    sockets (source:destination tuples) - differentiate service endpoints
+    (IP:port) - identify application protocols (ports... kinda)
+
+- Services require external knowledge or assumptions to use. For example,
+HTTP runs on port 80. It's kind of known by everyone and assumed but
+nothing stops someone from running a HTTP server on 443 if they really
+want.  - caching makes failover and updating slow
+
+We see the word `flow` a lot in this paper. I'm taking it to be the
+exchange of data on a socket/port. Eg. a TCP flow would be along the
+lines of syn, synack, ack, data exchange... etc.
+
+- Serval provides a service-aware network stack
+  - apps communicate on _service names_ rather than addresses and ports
+    - service name -> identify a service (serviceID)
+                   -> corresponds to a group of 1+ possibly changing
+                   processes offering the same service
+
+                          /--> < Service_a >
+                         /
+  |------|              /
+  |client| ---> ServiceID ---> < Service_a >
+  |------|               \
+                          \--> < Service_a >
+
+                   -> ServiceID abstraction hides how the network to the
+                   service is structured. Kind of acts as an implicit
+                   load balancer from what I can tell
+
+
+    - flow identifier -> identify the flow associated with a socket -
+    network addresses -> identify interfaces on a host
+- late binding of services to hosts
+  - diagram at the top of page 7 of the paper demonstrates the late
+  binding - an application sends out a request for a service and the
+  return of the request contains the address of the host to communication
+  with - this is in contrast to current DNS resolution where applications
+  request an IP or domain (which gets resolved to an IP before a request
+  then gets sent out to the IP)
+- communication over active sockets using _service names_
+  A host becomes a `singleton group` .... instead of being just a
+  single host, it can be part of a group of hosts that all perform the
+  same service?
+- IP anycast
+  - send out a request which can be matched by any (eg. the closest) host
+- TCP/IP relies on
+  <source IP, source port, destination IP, destination port, protocol>
+  to demultiplex packets to sockets. This kinda prevents any mobility
+  as if one thing changes, the socket is disrupted.
+- a service instance listens on a serviceID - example packet with Serval
+  stuff in it
+
+  (network layer)     | src addr | dest addr | ...
+                      | source flowID | dest flowID | trans prot |
+                      flags | | seq # | ack # | nonce | serviceID |
+  (transport layer)   | app prot | ....
+
+- by ignoring the five-tuple for flow identification, Serval supports
+  both IPv4 and IPv6 and whatever else there is - applications interact
+  with a SAL port much the same way they do with TCP:IP ports
+  s = socket(PF_SERVAL) bind(s, serviceID) sendDatagram(s, serviceID,
+  data)
+
+  note how now applications aren't talking directly via TCP/IP sockets
+  so if anything in the 5-tuple changes, everything's still fine... from
+  the application's point of view
+- figure 5 on page 7 of the paper indicates an example how establishing
+  a Serval connection based on serviceID works
+  The paper says that the initial establishment may have a bit of an
+  extra delay but data packets are unaffected
+
+- this all sounds very much like a server dedicated as a load balancer..?
+  or as an extension to DNS - IP : finds hosts by ip addresses
+  TCP: finds applications via ports
+
+  Currently, the stack looks like IP:PORT but if we depend on another
+  abstraction, it could look like IP:FLOW , FLOW:PORT meaning that as
+  long as FLOW stays the same, 2 machines can change ip addresses and
+  ports and they'd stil lbe able to talk.
+
+  The downside with this obviously is that attackers, if able to grab
+  the FLOW, they can impersonate either end. Hence security is kinda
+  bad as is.  .......  Is this what Serval is kinda doing?
+
+Before continuing, let me do a bit of brushing up on Border Gateway
+Protocol - used as the connecting protocol between ISPs or network
+providers - layer 4 protocol which sits on top of TCP - high level summary
+is that BGP helps to choose a path through the internet intercepting
+the least number of Autonomous Systems (network providers) - updates
+a router's routing table for IP packets to go through as optimal of a
+route as the router can manage
