@@ -1,0 +1,37 @@
+< What relay aims to achieve (as far as I understand): >
+
+https://github.com/MatrixAI/Architect/issues/3
+This github issue demonstrates how the Architect language will be
+structured. In case issue gets removed:
+
+A = Automaton {
+  -- METADATA
+  -- PROTOCOLSPEC
+  -- DEPENDENCIES
+  -- STATESPEC
+  -- ARTIFACTSPEC
+}
+
+Specifically, Automaton's don't depend directly on each other but on their
+protocol specifications - as long as the protocols they rely on are
+compatible with each other, the Automatons can communicate with each other.
+
+Eg.
+Let's have 2 systems which depend on each other.
+A = Automaton { ... Dependencies: prot_spec_1 ... }
+B = Automaton { ... Dependencies: prot_spec_1 ... }
+
+There is no hard dependency from A onto B or vice versa - they both depend
+on prot_spec_1 and whatever other protocols they need. Seeing as they're
+both compatible with prot_spec_1, the automatons are able to communicate
+with each other.
+
+From this we have situations where many instances of A and/or many
+instances of B are deployed. For A to now talk to B, A needs to find any B
+which it can communicate with and vice versa. These instances may be
+ephemeral if whoever deploys the instances wishes.
+
+Relay aims to provide a way (in the situation above) for instances of A and
+B to locate each other while keeping network topologies and implementations
+hidden from the high level implementation and to provide failover in cases
+of service updating, host crashes etc.
