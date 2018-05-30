@@ -1,0 +1,15 @@
+Control, Data/Forwarding planes
+
+Control Plane
+> Functions are system configuration, management and exchange of routing
+table information
+> Routers exchange information with other routers and builds a routing
+table based on the routing protocol
+> Drawing network topology
+> Decides where traffic is sent
+
+Data Plane/Forwarding plane
+> The 2 terms data/forwarding seem to be interchangeable
+> Forwards the data to the next hop in the path according to control plane
+logic
+

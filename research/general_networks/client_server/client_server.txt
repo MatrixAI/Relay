@@ -1,0 +1,27 @@
+
+       .__  .__               __            
+  ____ |  | |__| ____   _____/  |_          
+_/ ___\|  | |  |/ __ \ /    \   __\  ______ 
+\  \___|  |_|  \  ___/|   |  \  |   /_____/ 
+ \___  >____/__|\___  >___|  /__|           
+  ___\/_ ___________\/_  __\/__________     
+ /  ___// __ \_  __ \  \/ // __ \_  __ \    
+ \___ \\  ___/|  | \/\   /\  ___/|  | \/    
+/____  >\___  >__|    \_/  \___  >__|       
+     \/     \/                 \/           
+
+The client-server idea pops up a lot... everyone keeps saying how modern
+networks and its uses are moving away from the client-server model.
+
+Client-server architecture means that both parties at the end of the
+communication channel have very different roles. It was (it still kind of
+is) the prevalent way the internet works. - i think.
+
+Works very well for web pages and applications - the developers have a high
+level of control over what happens where, when and how. Data centres and
+large corps have the resources for high speed connections to the internet.
+Clients don't need to have tech knowledge to configure anything. Simply
+connect via web browser/app and viola.
+
+
+

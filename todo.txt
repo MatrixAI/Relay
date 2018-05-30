@@ -1,0 +1,10 @@
+# Current TODO List
+- Review the Weaveworks Service Discovery Module
+- Review Overlay Networks
+- Review micro DNS mechanism in Weaveworks
+- IPFS / Libp2p
+- https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture
+- zerotier
+- OSI model
+- layering is harmful?? -> RFC 3439
+- Multicast, PubSub

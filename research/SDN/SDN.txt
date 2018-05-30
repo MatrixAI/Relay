@@ -1,0 +1,53 @@
+SDNs (Software Defined Networks)
+papers in /papers/SDN
+http://networkstatic.net/time-to-ditch-the-definition-of-sdn/
+https://networkengineering.stackexchange.com/questions/14734/whats-the-
+difference-between-a-traditional-switch-and-openflow-switch#20017
+
+- split data and control planes
+  - both Serval and Scion both are suggesting this
+  - I see _OPENFLOW_
+    - This is also in the readings to do 
+- SDN:
+  - Directly programmable - network control is directly programmable
+    because it's decoupled from forwarding functions
+  - Agile - abstracting control from forwarding lets admins adjust
+    network-wide traffic flow
+  - Centrally managed - network intelligence is logically centralised in
+    software controllers *which have a global overview of the network*
+  - Programmatically configured
+  - Open standards-based and vendor-neutral
+
+- Key things driving the need for a new network paradigm:
+  - Changing traffic patterns
+    - client talks to 1 server which communicates with a few machines
+      before returning
+  - consumerization
+    - access to corp nets with mobile devices
+  - cloud services
+  - bandwidth required for services
+    - big data transfers/high demend on servers
+- Limitations of current network tech:
+  - Network cannot dynamically adapt to changing traffic, application and
+    user demands
+  - inconsistent policies and difficulty of making sure policies are
+    consistent across all devices on a network
+  - vendor and hardware dependent
+
+- SDN controllers maintain a global view of the network
+
+- OpenFlow is an implementation of a SDN Controller
+  - it is a wire protocol that can be used to program an IP forwarding
+    table
+
+- SDN is a *paradigm* about changing the way we manage networks
+- Having a *central server* or really anything that is *conscious* /
+  knowledgeable of network flow allows rules about how traffic flows (eg.
+  non-important traffic can take a slightly slower route in order for
+  important traffic to travel faster) to be defined
+- SDN can test packets against a firewall. If packets are accepted, then
+  further packets can potentially be assumed to be safe and bypass the
+  firewall
+- Control plane level load balancing
+
+
