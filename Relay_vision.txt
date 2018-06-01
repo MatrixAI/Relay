@@ -31,7 +31,21 @@ instances of B are deployed. For A to now talk to B, A needs to find any B
 which it can communicate with and vice versa. These instances may be
 ephemeral if whoever deploys the instances wishes.
 
+---------------------------------------------------------------------------
+
 Relay aims to provide a way (in the situation above) for instances of A and
 B to locate each other while keeping network topologies and implementations
 hidden from the high level implementation and to provide failover in cases
 of service updating, host crashes etc.
+
+Relay also aims to provide a way for admins to easily orchestrate changes
+to a system. These changes may include redeployment and management of
+broken boxes, deployment of new boxes, updates etc. as well as lower level
+functionalities such as managing traffic flow and load balancing. Such
+management needs to be able to be performed at both high (network/service)
+and low (per box) levels.
+
+Relay should also allow easy location of content and resources by machines
+in the network. For example, a request for a service or content should look
+like "i want CONTENT_A" rather than "i want CONTENT_A from IP_OF_MACHINE_C
+from PORT_C".

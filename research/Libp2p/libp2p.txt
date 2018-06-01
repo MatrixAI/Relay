@@ -1,0 +1,56 @@
+Libp2p Specs
+https://github.com/libp2p/specs
+
+- dialer-listener vs. client-server
+- Section 2 (state of the art current network stacks) actually lists a
+  bunch of protocols for different purposes
+- libp2p is transport protocol independent and can even run on internet
+  architectures other than IP
+- following are examples of libp2p multiaddr
+  a self-describing address format
+
+# IPFS over TCP over IPv6 (typical TCP)
+/ip6/fe80::8823:6dff:fee7:f172/tcp/4001/ipfs/
+QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+
+# IPFS over uTP over UDP over IPv4 (UDP-shimmed transport)
+/ip4/162.246.145.218/udp/4001/utp/ipfs/
+QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+
+# IPFS over Ethernet (no IP)
+/ether/ac:fd:ec:0b:7c:fe/ipfs/
+QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+
+- multi-multiplexing??
+  - each node can be doing many things over many protocols connecting to
+    many other machines
+- NAT traversal
+- allowing various network topologies to run:
+  (?centralised, decentralised, distributed?)
+  unstructured, structured, hybrid, centralised
+
+- "Networks change and applications need to have a way to use the network
+  in such a way that it is agnostic (independent?) to its topology, naming
+  appears to solve this issues." -> section 3.9
+
+- libp2p's architecture
++----------------------------------------------------------------------+
+|                             libp2p                                   |
++----------------------------------------------------------------------+
++--------------++---------++--------------------------++---------------+
+| Peer Routing ||  Swarm  || Distributed Record Store ||  Discovery    |
++--------------++---------++--------------------------++---------------+
+  
+  peer routing - mechanism which decides which peers to use for routing
+                 messages
+  swarm        - handles everything that is involved with 'opening a
+                 stream'. eg. protocol muxing, stream muxing, NAT
+                 traversal and connection relaying while being
+                 multi-transport.
+  distributed
+  record store - a system to store and distribute records.
+                 Records are small entries used by other systems for
+
+                 Similar role to DNS
+  Discovery    - Finding/identifying other peers
+- Each subsystem has a well-known interface

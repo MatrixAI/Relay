@@ -1,0 +1,82 @@
+Internet Layer Anti-pattern
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+RFC 3439
+This was published in 2002 so it's a bit old. However when reading, a lot
+of it appears to be applicable.
+
+- refers to RFC 1958 which describes the underlying principles of internet
+  architecture
+
+- Simplicity principle - make things simple
+
+- the IP layer should be as simple as possible. State management and
+  anything that requires even slightly more complexity should be managed by
+  the endpoints. no brainer right....?....
+  
+  The state management mentioned here has nothing to do with routing state
+  and the likes
+- "core vs. ent-point" state interaction
+- Systems of different sizes exhibit different characteristics and must be
+  taken into account
+
+- small changes in large systems often have huge consequences
+  Amplification Principle
+- An example of this amplification would be increased interconnectivity
+  resulting in slowing BGP routing
+
+- Coupling principle
+  As things get larger, the exhibit increased interdependence between
+  components.
+  The more events that simultaneously occur, the more likely that two or
+  more of them will interact.
+
+- injecting randomness is one way to attempt to reduce coupling
+  or perhaps inject coupling? 
+- As an overview, layers in networking implements at least on of:
+  > Error control
+    ~ Makes the channel more reliable eg. tcp reliable transport 
+  > Flow control
+    ~ avoids flooding slow peers
+  > Fragmentation
+    ~ diving large chunks into small pieces and the reassembly
+  > Multiplexing
+    ~ multiplex high level sessions on a single low level session
+  > Connection Setup
+    ~ handshaking
+  > Addressing/naming
+    ~ locating and managing identifiers for entities
+- Layering of networks implies that the functions of each layer have to be
+  completed before data can shift to another layer
+- That means that optimzations of each layer/feature has to be done
+  separately
+- OSI model has heaps of interlayer dependencies - hop-to-hop vs end-to-end
+  error checking, timestamp duplication, lower level packet sizes etc.
+
+-    "It is always possible to agglutinate multiple separate problems
+      into a single complex interdependent solution.  In most cases
+      this is a bad idea."
+
+- Law of diminishing returns
+  If one factor of production is increased while others remain constant,
+  overall returns will decrease or flatten out after a while.
+  
+  Other side (kind of) is to optimize the most used component.
+
+- Layering "X over Y" can be successful if X and Y share "isopmorphisms"
+  If X's data and possibly control mechanisms can be encapsulated in Y,
+  then the layering is useful.
+  
+  The RFC doesn't mention TCP/IP yet it mentions other things lower down
+  the networking stack like Ethernet over L2TPv3
+
+- multiprotocol BGP [rfc 2283] ?
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+http://devmethodologies.blogspot.com/2012/10/the-layer-anti-pattern.html
+
+- layers that wrap things or provide extra functionality are generally
+  speaking bad - the module now does multiple things
+- top-down vs bottom-up vs modularity
