@@ -1,0 +1,62 @@
+IPTABLES, FIREWALLS, ROUTING
+https://www.digitalocean.com/community/tutorials/a-deep-dive-into-
+iptables-and-netfilter-architecture
+
+- linux uses iptables to figure out where packets need to go and whether
+  they should be allowed or dropped
+- I run arch linux. To check my ip tables, i run
+  `sudo iptables -nvL`
+- iptables is a stateful firewall
+
+- The following netfilter hooks are available. As packets progress through
+  the kernel's network stack, various hooks will be triggered.
+  NF_IP_PRE_ROUTING
+    triggered by incoming traffic soon after entering the network stack and
+    before any routing decisions have been made
+  NF_IP_LOCAL_IN
+    hook is triggered after incoming traffic is routed and is destined for
+    the local system
+  NF_IP_FORWARD
+    hook is triggered after incoming traffic is routed and is to be
+    forwarded to another host
+  NF_IP_LOCAL_OUT
+    triggered as soon as locally created outbound packet hits the network
+    stack
+  NF_IP_POST_ROUTING
+    triggered as soon as any outbound/forwarded traffic is about to leave
+
+- The following chains are availeble:
+  PREROUTING
+    triggers NF_IP_PRE_ROUTING
+  INPUT
+    triggers NF_IP_LOCAL_IN
+  FORWARD
+    triggers NF_IP_FORWARD
+  OUTPUT
+    triggers NF_IP_LOCAL_OUT
+  POSTROUTING
+    triggers NF_IP_POST_ROUTING
+
+- The tables available are:
+  Filter
+    Whether to let a packet continue to its destination.
+  NAT
+    Implement network address translation rules. Determines how to modify
+    packets.
+  Mangle
+    To edit IP headers. Allows the adding of an internal mark to the packet
+    for the kernel to use in other tables.
+  Raw
+    Provide a mechanism for marking packets in order to opt-out of
+    connection tracking (iptables is stateful and so tracks connections)
+  Security
+    Put security marks on packets (can be per packet or per connection) so
+    security systems can handle the packets as per policy.
+
+  Each table will have multiple chains depending on the policies. When
+  there are multiple chains associated with the same hook, there will be a
+  priority level assigned to each chain. The chain with the highest
+  priority will be completely evaluated before moving on etc.
+
+- users can define their own chains but these chains can only be reached
+  by jumping to it from a rule

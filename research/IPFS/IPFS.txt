@@ -1,0 +1,106 @@
+IPFS
+
+- multihash -> a selfdescribing naming format for hashes of content
+  Similar to Libp2p self-describing addresses (listed below) 
+
+  # IPFS over TCP over IPv6 (typical TCP)
+  /ip6/fe80::8823:6dff:fee7:f172/tcp/4001/ipfs/
+  QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+  
+  # IPFS over uTP over UDP over IPv4 (UDP-shimmed transport)
+  /ip4/162.246.145.218/udp/4001/utp/ipfs/
+  QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+  
+  # IPFS over Ethernet (no IP)
+  /ether/ac:fd:ec:0b:7c:fe/ipfs/
+  QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+  
+  The multihash format is slightly different but achieves something
+  similar.
+  
+  # sha1 - 0x11 - sha1("multihash")
+  111488c2f11fb2ce392acb5b2986e640211c4690073e # sha1 in hex
+  CEKIRQXRD6ZM4OJKZNNSTBXGIAQRYRUQA47A==== # sha1 in base32
+  5dsgvJGnvAfiR3K6HCBc4hcokSfmjj # sha1 in base58
+  ERSIwvEfss45KstbKYbmQCEcRpAHPg== # sha1 in base64
+
+  # sha2-256 0x12 - sha2-256("multihash")
+  # sha2-256 in hex
+  12209cbc07c3f991725836a3aa2a581ca2029198aa420b9d99bc0e131d9f3e2cbe47
+  # sha256 in base32
+  CIQJZPAHYP4ZC4SYG2R2UKSYDSRAFEMYVJBAXHMZXQHBGHM7HYWL4RY=
+  QmYtUc4iTCbbfVSDNKvtQqrfyezPPnFvE33wFmutw9PBBk # sha256 in base58
+  EiCcvAfD+ZFyWDajqipYHKICkZiqQgudmbwOEx2fPiy+Rw== # sha256 in base64
+  
+  Explanation: each hash function has a designated code
+  sha1 -> 0x11
+  sha2-256 -> 0x12
+  This code is at the start of each hash and then followed by the length
+  of the hash and then the hash itself.
+
+  The first 2 bytes of the multihash describe the format of the following
+  hash
+- in-band transmission of control data
+- no lockin of anything. easily upgradable
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ASIDE ON MERKLE TREES AND MERKLE DAGS
+a hash tree or Merkle tree is a tree in which every leaf node is labelled
+with the hash of a data block and every non-leaf node is labelled with the
+cryptographic hash of the labels of its child nodes.
+
+DAG -> directed acyclic graph
+a finite graph where if you start at vertex v, there's no way to get back
+to v.
+
+------------------------------------------------------
+|  https://github.com/jbenet/random-ideas/issues/20  |
+------------------------------------------------------
+
+This is an interesting discussion by jbenet on the IPFS tree structure and
+some potential attacks against it, mitigations and other implementations or
+proposals on the structure.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IPFS layers
+
+naming
+------
+merkledag
+---------
+exchange
+--------
+routing
+-------
+network
+-------
+
+interestingly, the tree structure is a layer in the network stack
+
+- network
+  current network stack, NAT traversal, libp2p stuff
+- routing
+  peer routing and content routing
+  Things that could work here are DHTs, DNS, mDNS, SNR
+- exchange
+  block transfers
+  bitswap/bittorrent, http etc.
+- merkledag
+  "thin waist" of authenticated datastructres??
+  examples of other things that use a merkledaggy thing - git, bitcoin,
+  unixfs
+
+  Eg. to resolve /ipfs/QmdpMvUptHuGysVn6mj69K53EhitFd2LzeHCmHrHasHjVX/
+                  test/foo
+      We'd resolve the hash, then find the link to the node 'test' and then
+      resolve the link to foo
+
+- IPFS content is permanent.... do we want that?
+
+-------------------------------------------------------------------------
+https://decentralized.blog/ten-terrible-attempts-to-make-ipfs-human
+-friendly.html
+-------------------------------------------------------------------------
+
+A blog post about attempting to make IPFS more human friendly and slightly
+easier to manage when publishing content that will change.

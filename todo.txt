@@ -2,10 +2,10 @@
 - Review the Weaveworks Service Discovery Module
 - Review Overlay Networks
 - Review micro DNS mechanism in Weaveworks
-- IPFS
-- https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture
+- SFS and other distributed file systems
+- Filecoin
 - zerotier
 - OSI model
-- Multicast, PubSub, Anycast, Unicast
+- Multicast, PubSub, Anycast, Unicast, mDNS, SNR
 - RFC 5128 State of Peer-to-Peer (P2P) Communication across Network Address Translators (NATs)
 - visit Docker and other container services
