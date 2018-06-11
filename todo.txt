@@ -8,4 +8,7 @@
 - OSI model
 - Multicast, PubSub, Anycast, Unicast, mDNS, SNR
 - RFC 5128 State of Peer-to-Peer (P2P) Communication across Network Address Translators (NATs)
-- visit Docker and other container services
+- ACI, AOS, Big Cloud Fabric, Cilium, CNI-Genie, Contiv, Contrail, Flannel,
+  Google Compute Engine, Kube-router, L2 networks/Linux bridging, Multus, NSX-T, OpenVSwitch,
+  OVN (open virtual networking), Project Calico, Romana, Weave net (weaveworks)
+- Open Container Initiative (OCI) - more understanding on containers

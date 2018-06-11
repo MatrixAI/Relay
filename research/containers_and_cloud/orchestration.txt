@@ -1,0 +1,151 @@
+ISTIO/Kubernetes/Docker
+
+- concept of a "service mesh"
+  - kind of similar to Serval's service abstraction layer but this time
+    it's managed by istio
+- istio is a 'sidecar container implementation' for microservices
+  implementing monitoring, tracing, circuit breaking, routing, load
+  balancing, fault injection, retries, timeouts, mirroring, access control,
+  rate limiting and more
+- istio allows  simple canary deployment via routing rules
+  - canary deployment -> slow rollout
+
+- Kubernetes is an open-source cloud orchestration tool
+- Brings containerisation to "the masses" .....
+
+Kubernetes architecture blog
+https://x-team.com/blog/introduction-kubernetes-architecture/
+
+Good image inside the kubernetes arch blog
+https://res.cloudinary.com/dukp6c7f7/image/upload/f_auto,fl_lossy,q_auto/
+s3-ghost/2016/06/o7leok.png
+
+- Pod
+  https://kubernetes.io/docs/concepts/workloads/pods/pod/
+  - Services often are made of multiple containers. If the service wasn't
+    containerised, the apps would all be running together on one VM or
+    physical machine
+  - The pod would share resources like storage, IP addresses, namespace etc
+  - Pods are short-lived?..
+  - Pods are closely related containers 
+
+  - A pod's contents are always co-scheduled and co-related
+  - containers in one pod talking to a container in another pod would talk
+    via the other pod's IP address
+  - communication within a pod is done through `localhost` because they all
+    share the same IP
+
+  - Why not run multiple processes in the same container?
+    - decoupling of dependencies, transparency, modularity
+
+  - comparison of pods with processes - pods are basically processes?
+- Service
+  - An abstraction of a number of pods. Load balancing can be configured
+    here
+  - A service defines a logical set of pods and a policy to access them
+
+- Master Node
+  The admin node of the kubernetes cluster. The one that manages
+  scheduling, rebooting, contains business logic etc.
+  contains:
+    API server - processing commands/requests
+    etcd storage - data store
+    scheduler
+    controller-manager
+
+- Worker nodes
+  Pods run here.
+  Things that run here are:
+    Docker (or another container engine)
+    kubelet - correspondence with master node
+    kube-proxy - network proxy and load balancer
+    kubectl
+
+~~~~~~~~~ Kubernetes docs networking concepts ~~~~~~~~~~
+
+4 network problems to solve:
+  - highly coupled container-to-container comms
+    - apparently solved by pods concept and localhost
+  - pod-to-pod comms
+  - pod-to-service comms
+  - external-to-service comms
+
+Kubernetes has some fundamental requirements on network implementations:
+  - all containers can commnicate with all other containers without NAT
+  - all nodes can communicate with all containers and viceversa without NAT
+  - the IP that a container sees itself as is what others see as well
+
+- IP per pod - containers within a pod can talk to each other on localhost
+  and so need to coordinate ports. THey share network namespaces
+- big list of other things to look at
+
+https://github.com/kubernetes/community/blob/master/contributors/
+design-proposals/network/networking.md
+
+Seems like Kube doesn't really have much of their own networking
+implementations but uses other providers?
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://kubernetes.io/docs/concepts/services-networking/service/
+
+- in the concepts docs we see that there's an extraction of the
+  client-server concept with pods and services and clients
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+
+This is a simple definition of a service. This creates a new service called
+'my-service' which targets port 9376 on any pod with the name MyApp.
+
+- The docs go through a few different ways to have routing and service/pod
+  discovery or whatnot but it can all be summarised into:
+  
+  Client that wants to talk to the service finds the serviceIP/clusterIP
+  and then any messages sent to this IP is either forwarded by IPtable
+  rules or a proxy to a relevant pod.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+original github issue on services
+https://github.com/kubernetes/kubernetes/issues/1107
+
+- a few different terms are talked about here: portals and ambassadors
+- the option that ended up being chosen was IP-per-service, shared
+  ambassador
+- when a service is created, it is assigned an IP:port which is static and
+  this is broadcast to all kube-proxy instances
+- kube-proxy then sets up iptable rules to redirect traffic going to that
+  IP:port back to itself on a random port
+- the kube-proxy will then round-robin traffic across the parts of the
+  service
+
+Not quite sure whether this model is still in place currently.
+
+Pros:
+  - pods don't have to pre-declare services they require
+Cons:
+  - requires IP address assigning
+  - requires tracking of IP:port portals
+  - apparently it probably won't scale well to large numbers of services
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Probably a good place to look at how things work or just general proposals
+
+https://github.com/kubernetes/community/blob/master/contributors/
+design-proposals/network/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Kubernetes can use DNS as a way to provide service discovery
+
+

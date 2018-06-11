@@ -1,0 +1,30 @@
+~~~~~~~~~~~~~~~~~ Containerisation ~~~~~~~~~~~~~~~
+https://blog.netapp.com/blogs/containers-vs-vms/
+
+the old way of providing a platform for services was to have a server with
+a hypervisor and then OSs running on top of the hypervisor and THEN have
+programs running on the virtual machine.
+
+Containerisation removes the need for running multiple OSs on the server.
+A containerised cloud platform may look like 1 OS on hardware running a
+container engine which then has many applications running on top of that.
+These applications are their own binaries and may have their own
+dependencies (which come in the container image) but don't actually need to
+run their own virtual machine for the image to run.
+
+The containerisation of applications and their dependencies means that
+changes to the underlying OS that the platform runs on won't impact the app
+itself. This app can be ported to different OSs and still run as long as
+the container engine maintains the same interface.
+
+This is an extra abstraction layer on top of how VMs work.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dockerfile tutorial
+https://linoxide.com/containers/guide-docker-dockerfile-example-build-
+image/
+
+more crap on docker and containerd and runc and the environment
+https://hackernoon.com/docker-containerd-standalone-runtimes-heres-what-
+you-should-know-b834ef155426
