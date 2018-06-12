@@ -1,6 +1,7 @@
 # Current TODO List
 - Review the Weaveworks Service Discovery Module
 - Review Overlay Networks
+- UPNP
 - Review micro DNS mechanism in Weaveworks
 - SFS and other distributed file systems
 - Filecoin

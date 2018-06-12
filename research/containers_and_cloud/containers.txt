@@ -28,3 +28,33 @@ image/
 more crap on docker and containerd and runc and the environment
 https://hackernoon.com/docker-containerd-standalone-runtimes-heres-what-
 you-should-know-b834ef155426
+
+##########################################################################
+Containers
+
+- advanced implementation of `chroot` based isolation
+- chroot is a very basic and simplistic program which does some form of
+  containerisation
+
+  All chroot does is it changes the root directory for the running process
+  but it doesn't manage network, security, CPU, disk etc.
+- systemd-nspawn (on arch linux) is a beefier version of chroot which can
+  be used to run containerised environments for commands or OSs
+
+- Linux Cgroups (control groups)
+  https://www.mjmwired.net/kernel/Documentation/cgroups.txt
+
+  https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/
+  6/html/resource_management_guide/ch01
+
+  https://sysadmincasts.com/episodes/14-introduction-to-linux-control-
+  groups-cgroups
+
+  From reading, I'm seeing that cgroups is how the ?linux kernel? manages
+  containerisation. It only virtualises the space and resources that a
+  process runs in. It doesn't provide any abstractions on top of a given OS
+  unless in the process running in the cgroup runs another vm or
+  hypervisor.
+
+~~ for now this is probably enough info on containers. will revisit as
+needed ~~~
