@@ -1,0 +1,65 @@
+Weaveworks
+https://github.com/weaveworks/weave
+https://www.weave.works/docs/net/latest/overview/
+
+- Saas for deployment, monitoring and management of containers and
+  microservices (sounds like kubernetes?)
+- maybe not? maybe Weaveworks is something to use with kubernetes?
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+https://thenewstack.io/kubernetes-paas-force-developer-experience-workflow/
+
+" our infrastructure and platforms are becoming increasingly distributed
+  but are enabled by a centralizing force " 
+
+teams sometimes end up building a platform on top of Kubernetes (a
+platform) in order to create a certain workflow
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~
+Weave Net
+~~~~~~~~~~
+- mini DNS server at each node
+- no requirement of a central database for each cluster
+- a weave network is made up of a number of peers which are weavenet
+  routers on different hosts
+- special topology messages so that all peers learn whos connected to who
+  - spanning-tree based broadcast mechanism
+  - neighbor gossip mechanism
+- topology messages are sent when:
+  - a connection is added
+  - a connection is marked as 'established'
+  - a connection is torn down
+  - periodically the entire topology is "gossiped" to a subset of
+    neighbours
+- Weavenet is an overlay network between docker hosts
+- Weave router is in userspace
+- containers in weavenet are run on a private network so no address
+  clashing
+  They have an interface with Docker and weave, each providing separate
+  networks
+- weavenet can be used as a plugin for kubernetes for network policy
+
+IMHO, I'm not the biggest fan of how weaveworks does this neworking.
+Perhaps it is in fact a good way but I will have to see.
+What I dont like about this:
+- mini DNS server at each node
+- purely an overlay network to allow docker containers to talk to each
+  other. it has no abstract functionalities on top of this such as service
+  abstractions or ephemeral containers - topology attempts to deal with
+  ephemeral containers but doesn't do this well
+- it... feels low effort/low tech. There's nothing new here.. as in it's
+  tech that's just duct-taped together to link docker containers.
+- this weavenet module i feel is built to simply be a standalone module
+  with no interoperability (perhaps wrong about this with my brief
+  overview)
+
+What's not too bad:
+- topology messages - it's not that bad. but also not the best. Gossiping
+  is pretty good. I believe I've heard about it in blockchains? but i think
+  if left unchecked, could lead to network cluttering.
+- each node seems to have a good idea of the overall topology which allows
+  the addition of software control over the control plane to be programmed
+  and run on each node
+

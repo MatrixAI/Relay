@@ -1,0 +1,68 @@
+Cilium
+https://github.com/cilium/cilium
+http://docs.cilium.io/en/latest/concepts/
+
+- BPF (berkeley packet filter) - used to perform data path filtering,
+  monitoring, redirecting etc.
+- runs on OSI layers 3/4 for traditional network security as well as layer
+  7. This allows ports to be partially open eg. only GET requests can come
+  through but nothing else
+- to allow scaling, security identity is a key-value thing. Containers are
+  assigned a key and the security policy is stored for later access
+- networking supported in cilium:
+  - Overlay virtual networks - Geneve, VXLAN
+  - native routing via routing tables or other daemons
+- load balancing between containers and external services
+  - implemented using BPF and hash tables
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hmm as a thought, could we use hashing to get *deterministic* routing while
+having it be distributed?
+eg. client_1 wants to talk to service_1 which has bot_1 and bot_2 as
+providers.
+
+Let's just say we do h(client_1, service_1) where h() is a hash function
+and the result tells which bot to direct it to and every time client_1
+connects, they will always get the same bot. 
+
+Perhaps this is already a thing in load balancing. Will have to see when I
+look at load balancing.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- tooling to provide:
+  - event monitoring with metadata
+  - policy decision tracing
+  - metrics export
+- cilium can be used as a plugin for kubernetes for network policy
+- A deployment of Cilium has the following running on each LINUX container
+  node:
+  - Cilium daemon
+    - accepts configuration that describes service-level network security
+      and policies
+    - expose API to allow security operations
+    - gather metadata about new and deleted containers
+    - interact with container platform
+    - generate and improve BPF programs
+  - Cilium CLI
+  - Linux kernel BPF
+  - Container platform network plugin (eg. docker has cilium-docker)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"It can thus transmit state and security context information between two
+container hosts by embedding the information in encapsulation headers or
+even unused bits of the IPv6 packet header."
+
+- interesting... but embedding information in an IP header ties the user to
+  IP ... or whatever header you're embedding in
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+What I don't really like about cilium:
+- relies on external virtual network managers
+- no concept of services or ephemeral containers. Cilium seems to only help
+  manage communication between containers and the monitoring/security of
+  them
+
+What I'm ok with about cilium:
+- key-valueness of security policies. allows for easy management of
+  policies and is very scalable
+

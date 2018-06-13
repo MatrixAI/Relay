@@ -1,0 +1,117 @@
+OSI models
+https://en.wikipedia.org/wiki/OSI_model
+
+- 7 layers
+https://en.wikipedia.org/wiki/Layer_8 mentions layers 8, 9, 10
+
+(government or legal compliance)
+(the organization)
+(the individual user)
+------------- 
+Application
+-------------
+Presentation
+-------------
+Session
+-------------
+Transport
+-------------
+Network
+-------------
+Data link
+-------------
+Physical
+-------------
+
+- each layer serves those above it and is served by those below it
+- it's served the current internet pretty well
+- the 7 layers represent different layers in the network stack
+- by having a look at this, we can see some issues that networks need to
+  overcome in order to function
+
+Physical 
+  - transmission and reception of raw bit streams over physical
+    mediums
+Data link
+  - reliable transmission of data frames between 2 nodes connected
+    by a physical layer
+Network
+  - structuring and managing a multi-node network including
+    addressing, routing and traffic control
+Transport
+  - reliable transmission of data segments between points ona network,
+    including segmentation, acknowledgement and multiplexing
+Session
+  - managing communication sessions ie. continuous exchange of information
+Presentation
+  - Translation of data between a networkign service and an application
+    including character encoding, data compression and encryption/
+    decryption
+Application
+  - high level APIs such as resource sharing, remote file access
+
+Good things about OSI model:
+  - rather simple to visualise and understand - we're all pretty good at
+    stacking things in our minds
+  - hey it works
+  - splits up work pretty well. We have different levels of abstractions to
+    build on top of
+
+- cross-layer functions - functions that aren't tied to a specific layer
+  and may affect more than 1 layer
+  - security
+  - management
+  - ARP
+  - DHCP
+  - DNS
+  - Cross MAC and PHY scheduling (wifi networks and packet scheduling)
+
+- OSI differs a bit from TCP/IP model
+
+-------------
+Application
+-------------
+Transport
+-------------
+Internet
+-------------
+Link
+-------------
+Physical
+-------------
+
+This one is a lot simpler and probably is better to use compared to OSI.
+We can see that OSI isn't as popular because of the sheer amount of crap in
+it. TCP/IP is so much simpler and gets the job done.
+
+- simplicity is good
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OSI and TCP/IP design tied to old telephone systems
+  - routing and switching for interface to interface communication
+  - the 'thin waist' of IP networks 
+
+client-server architecture follows much the same train of thought
+
+we're only seeing widespread distributed computing recently so fair enough
+about the current design
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another Internet architecture -> RINA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+https://en.wikipedia.org/wiki/Recursive_InterNetwork_Architecture_(RINA)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- IP addresses are assigned to interfaces rather than nodes
+  - routing table sizes are much bigger than they need to be because
+    multiple interfaces can lead to the same node
+  - makes multihoming and mobility harder to achieve
+  - fragmentation of TCP packets at IP layer is annoying and headers can be
+    misconfigured/misinterpreted after the frag
+  - IP addresses identify location and identity
+- TCP
+  - congestion detection and avoidance depends on congestion
+    notification/delay which varies largely
+  - detection mechanisms are only triggered when congestion is detected,
+    not before
+  - congestion mechanisms can be triggered when there is no congestion

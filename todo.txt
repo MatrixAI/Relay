@@ -1,15 +1,14 @@
 # Current TODO List
-- Review the Weaveworks Service Discovery Module
 - Review Overlay Networks
+- Load Balancing techniques
 - UPNP
-- Review micro DNS mechanism in Weaveworks
 - SFS and other distributed file systems
 - Filecoin
 - zerotier
-- OSI model
-- Multicast, PubSub, Anycast, Unicast, mDNS, SNR
+- Delta-t protocol -> watson et al
+- Multicast, PubSub, Anycast, Unicast, mDNS, SNR, multihoming and mobile networks
 - RFC 5128 State of Peer-to-Peer (P2P) Communication across Network Address Translators (NATs)
-- ACI, AOS, Big Cloud Fabric, Cilium, CNI-Genie, Contiv, Contrail, Flannel,
+- ACI, AOS, Big Cloud Fabric, CNI-Genie, Contiv, Contrail, Flannel,
   Google Compute Engine, Kube-router, L2 networks/Linux bridging, Multus, NSX-T, OpenVSwitch,
-  OVN (open virtual networking), Project Calico, Romana, Weave net (weaveworks)
+  OVN (open virtual networking), Project Calico, Romana
 - Open Container Initiative (OCI) - more understanding on containers

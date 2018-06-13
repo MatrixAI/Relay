@@ -1,4 +1,4 @@
-ISTIO/Kubernetes/Docker
+ISTIO/Kubernetes/ Orchestration
 
 - concept of a "service mesh"
   - kind of similar to Serval's service abstraction layer but this time
@@ -12,6 +12,9 @@ ISTIO/Kubernetes/Docker
 
 - Kubernetes is an open-source cloud orchestration tool
 - Brings containerisation to "the masses" .....
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Kubernetes -> orchestration framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Kubernetes architecture blog
 https://x-team.com/blog/introduction-kubernetes-architecture/

@@ -1,0 +1,4 @@
+bandwith -> the data transfer rate on a path, how much data can be sent
+            across a channel at once
+throughput -> the data processing rate on a device, eg. how much data a
+              network card can process
