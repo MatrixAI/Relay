@@ -1,0 +1,3 @@
+Inter-process communication
+
+- Netlink sockets

@@ -1,0 +1,71 @@
+RINA - Recursive InterNetwork Architecture
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+https://en.wikipedia.org/wiki/Recursive_InterNetwork_Architecture_(RINA)
+Reddit -> /r/Rina/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- IP addresses are assigned to interfaces rather than nodes
+  - routing table sizes are much bigger than they need to be because
+    multiple interfaces can lead to the same node
+  - makes multihoming and mobility harder to achieve
+  - fragmentation of TCP packets at IP layer is annoying and headers can be
+    misconfigured/misinterpreted after the frag
+  - IP addresses identify location and identity
+- TCP
+  - congestion detection and avoidance depends on congestion
+    notification/delay which varies largely
+  - detection mechanisms are only triggered when congestion is detected,
+    not before
+  - congestion mechanisms can be triggered when there is no congestion
+
+- Based on the IPC model (Inter-Process Communication model)
+- distributed application facilities (DAFs) -> made up of 2 or more
+  distributed app processes (DAPs). These DAPs communicate using a single
+  application protocol called a CDAP (Common Distributed Application
+  Protocol)
+
+                   Distributed Application Facility (DAF)
+    ---------------------------------------------------------------
+    |                           CDAP messages                     |
+    |  DAP_A <-------------------------------------------> DAP_B  |
+    |                                                             |
+    ---------------------------------------------------------------
+
+- In order to exchange information, DAPs have an underlying facility which
+  provides comms services to them. This is another DAF called a DIF
+  (distributed IPC facility)
+- A DIF can be thought of as a layer and allows a DAP to allocate flows to
+  one or more DAPs
+- DIFs can also use other underlying DIFs - recursive use of the same layer
+  but just to differing scopes
+
+- The diagram on wikipedia of an example of RINA networks and IPC processes
+  is just too confusing. It seems like this may have some merit but is
+  extremely bloated (maybe there's a reason to it being this complex)
+
+  https://en.wikipedia.org/wiki/File:RINA-arch.png
+
+- RINA features:
+  - perspective that networking is not layers of different functions but a
+    single layer of distributed IPC over different scopes
+  - supports multihoming and mobility and helps prevent routing table
+    explosion and scales well
+  - other features on wikipedia. not sure what they mean rn
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+http://www.martingeddes.com/think-tank/network-architecture-research-tcp-
+ip-vs-rina/
+
+- recurring pattern of distributed computing
+  - "Communicate this for me from here to over there" followed by 'how'
+- benefits of RINA compared to TCP/IP:
+  - scalability - recursive structure
+  - security
+  - performance
+  - manageability
+  - flexibility
+  - reliability
+  - mobility
+  - cost
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -2,3 +2,9 @@ bandwith -> the data transfer rate on a path, how much data can be sent
             across a channel at once
 throughput -> the data processing rate on a device, eg. how much data a
               network card can process
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On the note of bandwith
+https://us1.campaign-archive.com/?u=f105fd56904428bca9da44a82&id=5c06e3762a
+
+- bandwith increasing (or the increasing of "data pipes") is a bad paradigm

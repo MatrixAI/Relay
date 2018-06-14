@@ -115,3 +115,40 @@ https://en.wikipedia.org/wiki/Recursive_InterNetwork_Architecture_(RINA)
   - detection mechanisms are only triggered when congestion is detected,
     not before
   - congestion mechanisms can be triggered when there is no congestion
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Apparently 3 laws of networking?
+define attenuation - the gradual diminishing in the strength of something
+
+Quality attenuation exists
+  - a network is a bit like a piston with pressure, volume and temperature,
+    setting 2 of them will set the third
+  - the 3 network parameters seem to be
+    Load - generally a network cannot predict or deal with load
+    Loss
+    Delay
+Quality attenuation is conserved
+  - we can't undrop a packet or unqueue a queued one
+Quality attenuation is tradable
+  - loss and delay can be traded sometimes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- in TCP/IP model, there is a resonance effect where small changes or
+  fluctuations are amplified or dimished based on factors out of the
+  control of the network
+
+- Old circuit networks -> Network of Promises
+- Modern day internet -> Network of possibilities (nothing is guaranteed)
+- Network of possibilities
+  - manages contention not bandwith
+    contention is the real resource of networks not bandwith
+      contention is when a packet sits around waiting for other packets
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Future of communications newsletter 2012 march/april
+https://us1.campaign-archive.com/?u=f105fd56904428bca9da44a82&id=5c06e3762a
+https://us1.campaign-archive.com/?u=f105fd56904428bca9da44a82&id=ecc82787e8
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Need to consider different flow types, bursts, queues etc.

@@ -12,3 +12,8 @@
   Google Compute Engine, Kube-router, L2 networks/Linux bridging, Multus, NSX-T, OpenVSwitch,
   OVN (open virtual networking), Project Calico, Romana
 - Open Container Initiative (OCI) - more understanding on containers
+- iptables, nftables
+- keepalived, netlink sockets
+
+
+

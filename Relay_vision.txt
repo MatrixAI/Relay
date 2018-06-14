@@ -49,3 +49,13 @@ Relay should also allow easy location of content and resources by machines
 in the network. For example, a request for a service or content should look
 like "i want CONTENT_A" rather than "i want CONTENT_A from IP_OF_MACHINE_C
 from PORT_C".
+
+---------------------------------------------------------------------------
+
+Abstraction
+
+Functional composition
+Object composition
+  - Dependency Injection
+    http://www.jamesshore.com/Blog/Dependency-Injection-Demystified.html
+Various levels of abstraction

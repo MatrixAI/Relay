@@ -1,0 +1,32 @@
+IPVS
+man ipvsadm(8)
+
+- IP virtual server
+- IP load balancing
+- virtual server is an abstraction exposed to clients who see one service
+  but in reality there's multiple services that can be easily scaled in the
+  back
+
+2 different types of load balancer types are:
+- DNS based load balancing
+- Dispatcher based load balancing (dedicated load balancer server)
+
+- virtual server via NAT
+- virtual server via IP Tunnelling
+  - load balancer just schedules requests to different real servers which
+    return replies directly to the user
+  - servers and load balancer are required to have IP Encapsulation
+    protocol
+- virtual server via direct routing
+  - requires one of the load balancer's interfaces and the real server's
+    interfacesto be in the same physical segment
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+http://blackbird.si/loadbalancing-failover-with-ipvs-and-keepalived/
+
+linux dummy interfaces
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- VRRP (virtual router redundancy protocolInter-process communication
+
+- Netlink sockets)
