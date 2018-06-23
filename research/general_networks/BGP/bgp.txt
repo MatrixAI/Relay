@@ -1,0 +1,5 @@
+BGP
+
+https://blog.benjojo.co.uk/post/bgp-battleships
+
+- sharing of topology and routing information

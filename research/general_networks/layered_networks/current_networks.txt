@@ -152,3 +152,8 @@ https://us1.campaign-archive.com/?u=f105fd56904428bca9da44a82&id=ecc82787e8
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Need to consider different flow types, bursts, queues etc.
+
+###############################################################################
+http://www.naturalborncoder.com/virtualization/2014/10/17/understanding-tun-
+tap-interfaces/
+- hardware bridges, virtual bridges, virtual ethernet (veth)
