@@ -55,16 +55,16 @@ sudo ip route add "$NETWORK_IP" dev $BRIDGE_NAME
 
 # create a veth pair in the global namespace
 echo "Creating veth pairs"
-sudo ip link add name $VETH_0n type veth peer name $VETH_0b
+# sudo ip link add name $VETH_0n type veth peer name $VETH_0b
 sudo ip link add name $VETH_1n type veth peer name $VETH_1b
 sudo ip link add name $VETH_2n type veth peer name $VETH_2b
-sudo ip link set $VETH_0n up
+# sudo ip link set $VETH_0n up
 sudo ip link set $VETH_1n up
 sudo ip link set $VETH_2n up
 
 # connect VETH_0, VETH_2, VETH_4 to the bridge
 echo "Connecting veth pairs to bridge"
-sudo brctl addif $BRIDGE_NAME $VETH_0b
+# sudo brctl addif $BRIDGE_NAME $VETH_0b
 sudo brctl addif $BRIDGE_NAME $VETH_1b
 sudo brctl addif $BRIDGE_NAME $VETH_2b
 
@@ -81,4 +81,4 @@ sudo ip netns exec $NS_NAME1 ifconfig $VETH_1n "$IP_ADDR_NS1" up
 sudo ip link set $VETH_2n netns $NS_NAME2
 sudo ip netns exec $NS_NAME2 ifconfig $VETH_2n "$IP_ADDR_NS2" up
 
-sudo ifconfig $VETH_0n "$IP_ADDR_MAIN" up
+# sudo ifconfig $VETH_0n "$IP_ADDR_MAIN" up

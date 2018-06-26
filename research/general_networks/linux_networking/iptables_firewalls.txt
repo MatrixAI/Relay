@@ -1,6 +1,13 @@
 IPTABLES, FIREWALLS, ROUTING
+
+###############################################################################
 https://www.digitalocean.com/community/tutorials/a-deep-dive-into-
 iptables-and-netfilter-architecture
+
+https://www.frozentux.net/iptables-tutorial/images/tables_traverse.jpg
+
+https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TRAVERSINGOFTABLES
+###############################################################################
 
 - linux uses iptables to figure out where packets need to go and whether
   they should be allowed or dropped

@@ -1,0 +1,161 @@
+CNI
+
+###############################################################################
+https://github.com/containernetworking/cni/blob/master/SPEC.md - 26/06/2018
+###############################################################################
+
+- General stuff
+  - container must be in a new netns before invoking any plugins
+  - runtime determines which networks the container belongs to and which plugins
+    need to be executed
+  - network config is in JSON format and stored in a file
+  - plugins must be executed sequentially
+  - to delete the container, plugins must be deleted in reverse order of
+    execution
+  - must not invoke parallel operations for the same container but is ok to do
+    such operations on different containers
+  - container runtime must order ADD and DEL operations so that there is always
+    a corresponding DEL to an ADD - DELs should be _idempotent_ aka extra DELs
+    should have no extra effect
+  - container IDs should be unique and could be made up of (network name,
+    CNI_CONTAINERID, CNI_IFNAME)
+  - runtime must not call ADD twice without a corresponding DEL for the same
+    (network name, container ID, name of interface inside the container).
+    A given container ID may be added to a specific network multiple times if
+    each addition is done with a different interface name
+
+- CNI Plugin
+  > each plugin must be a separate executable invoked by the container
+    management system (eg. rkt or kubernetes). The plugin is responsible for
+    inserting a network interface into the container netns and assign the IPs
+    and routes and be consistent with the IP Address Management section by
+    invoking approriate IPAM plugin.
+  - CNI plugins must support the following operations:
+    - ADD(containerID, netns_path, netconfig, args, interface_name);
+      ret (interface_list, IP_config, DNS_info)
+      :: add a container to the network
+    - DEL(containerID, netns_path, netconfig, args, interface_name);
+      ret (void)
+      :: delete container from network
+    - GET(containerID, netns_path, netconfig, args, interface_name);
+      ret (interface_list, IP_config, DNS_info);
+      :: get container network configuration
+    - VERSION(void)
+      ret (CNI_supported_spec_versions)
+      :: report version
+  - Runtimes must use the type of network as the name of the executable to
+    invoke. Executables should be in a predefined location (location not
+    specified by spec)
+    - uses ENVIRONMENT VARIABLES for argument passing:
+      - CNI_COMMAND :: ADD, DEL, GET or VERSION
+      - CNI_CONTAINERID :: container id
+      - CNI_NETNS :: path to network namespace file
+      - CNI_IFNAME :: interface name to set up. ret err if unable to set up name
+      - CNI_ARGS :: extra args as alphanumeric kv pairs separated by semicolons
+      - CNI_PATH :: list of paths to sesarch for CNI plugin executables
+    - network config is streamed to the plugin through stdin and is not tied to
+      a specific file on disk
+  - spec does not determine how CNI consumers process information
+  - Errors must be indicated with a non-zero return code and the following JSON:
+    {
+      "cniVersion": "<cni-version>",
+      "code": <numeric-error-code>,
+      "msg": "<short error message>",
+      "details": <long-error-message> (optional)
+    }
+  - stderr can be used for unstructured output like logs
+
+- Network configuration
+  - described in JSON format
+    - cniVersion - string
+    - name - string
+      - should be unique across all containers on the host or admin domain
+    - type - string
+      - refers to filename of CNI plugin executable
+    - args - dictionary
+      - additional args provided by container runtime
+    - ipMasq - boolean
+      - optional. Set up IP masquerade on host for this network
+    - ipam - dictionary with IPAM values
+      - strings - refers to filename of IPAM plugin executable
+    - dns - dictionary with DNS specific values
+      - nameservers - list of strings
+        - priority ordered list of DNS nameservers. String container IPv4 or
+          IPv6 address
+      - domain - string containing local domain for short hostname lookups
+      - search - list of strings for priority ordered search domains for short
+        hostname lookups. Will be prefered over 'domain'
+      - options - list of string options
+  - Plugins can define additional fields they accept and can generate error if
+    called with unknown fields. The 'args' field is used to pass arbitrary data
+    and shouldn't generate errors if data isn't understood but should just be
+    ignored
+
+- IP Allocation
+  - A CNI plugin is expected to assign and maintain an interface's IP address
+    and install necessary routes
+  - Done by a separate plugin so that it can be modular
+        IP Address Management Plugin (IPAM)
+  - It's still the responsibility of whatever plugin to invoke the IPAM
+  - Location of the CNI plugin is passed to the invoking plugin via setting the
+    CNI_PATH environment variable
+  - IPAM plugins receive network configs via stdin
+  - IPAM plugin must receive the same environment variables passed to the CNI
+    plugin
+  - success is indicated by a zero return code and the following JSON printout
+    of the `Result` structure
+    {
+      "cniVersion": "<cni-version>",
+      "interfaces": [  (THIS KEY IS OMITTED BY IPAM PLUGINS)
+        {
+          "name": "<name>",
+          "mac": "<MAC-address>", (required if L2 addresses are meaningful)
+          "sandbox": "<netns path or hypervisor identifier>" (required for \
+          // container/hypervisor interfaces, empty/omitted for host interfaces)
+      ],
+      "ips": [
+        {
+          "version": "<4-or-6>",
+          "address": "<ip-and-prefix-in-CIDR>",
+          "gateway": "<ip-address-of-the-gateway>" (optional)
+          "interface": <numeric index into 'interfaces' list> (not required for\
+          // IPAM plugins)
+        },
+        ...
+      ],
+      "routes": [
+        {
+          "dst": "<ip-and-prefix-in-cidr>",
+          "gw": "<ip-of-next-hop>" (optional)
+        },
+        ...
+      ],
+      "dns": {
+        "nameservers": <list-of-nameservers>, (optional)
+        "domain": <name-of-local-domain>, (optional)
+        "search": <list-of-search-domains>, (optional)
+        "options": <list-of-options> (optional)
+      }
+    }
+  - IPAM plugins include but aren't limited to the following:
+    - host-local:
+      select an unused by other containers on the same host IP within the
+      specified range
+    - dhcp:
+      use DHCP protocol to acquire and maintain a lease. The DHCP requests will
+      be sent via the created container interface so the associated network must
+      support broadcast
+
+- Well-known structures
+  - IPs
+    just like in the Result structure above. 
+    "gateway" is optionally included if one exists. It doesn't tell the CNI
+    plugin to add any routes with this gateway. An example of the use of this
+    value is for the CNI 'bridge' plugin to add this IP address to the linux
+    bridge to make it a gateway
+  - Routes
+    just like in the Result structure above.
+    "dst": destination subnet
+    "gw" ip gateway. if omitted, default gateway is assumed
+  - DNS
+    just like in the Result structure above.

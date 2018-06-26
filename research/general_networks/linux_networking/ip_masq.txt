@@ -1,0 +1,13 @@
+IP Masquerade
+
+###############################################################################
+http://www.tldp.org/HOWTO/IP-Masquerade-HOWTO/ipmasq-background2.1.html
+###############################################################################
+
+- similar to the one-to-many NAT server
+- if a Linux host is connected to the Internet, the IP Masquerade feature allows
+  other "internal" computers connected to this linux box to also reach the
+  Internet as well even if the internal machines don't have an officially
+  assigned IP address.
+- outgoing traffic will appear to be from the ip masq linux box itself
+- basically a form of NAT
