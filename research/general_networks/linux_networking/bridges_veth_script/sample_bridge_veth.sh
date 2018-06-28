@@ -22,6 +22,12 @@
 #
 # From the main namespace, we're able to ping ns1 and ns2 but we can't ping
 # anywhere except the bridge from nsA and nsB
+# https://sreeninet.wordpress.com/2016/05/29/macvlan-and-ipvlan/https://sreeninet.wordpress.com/2016/05/29/macvlan-and-ipvlan/
+# In the above article, there's a line explaining possibly why pinging from ns1
+# to ns2 won't work:
+# 'With Bridge, it is needed to use NAT for external connectivity.'
+# Does this mean in the scenario of a packet going from ns1->bridge->ns2, ns2
+# will see the source IP as the bridge's IP?
 
 #INTERFACE='enp0s25'
 export NS_NAME1="A"

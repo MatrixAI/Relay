@@ -1,0 +1,11 @@
+VLAN (ipvlan)
+
+###############################################################################
+https://wiki.linuxfoundation.org/networking/vlan
+https://www.linuxjournal.com/article/7268
+###############################################################################
+
+- way to split up layer2 broadcasting domain
+- packets are addressed to a vlan ID
+- all subinterfaces have the same MAC address
+- each sub-interface belongs to a different L2 domain (network layer in OSI)

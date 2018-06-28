@@ -1,0 +1,13 @@
+MACVLAN
+
+###############################################################################
+https://sreeninet.wordpress.com/2016/05/29/macvlan-and-ipvlan/
+###############################################################################
+
+- comments in the first link:
+  - "wouldnt macvlan reintroduce MAC address explosion?"
+    "yes it would. MACVLAN isn't a solution for general purpose containers. used
+    as a stepping stone when shifting between VMs and containers."
+
+- MACVLANs allow the use of an existing dhcp server as each interface has a
+  different MAC address

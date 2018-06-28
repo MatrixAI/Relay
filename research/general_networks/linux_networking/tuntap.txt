@@ -1,0 +1,12 @@
+TUNTAP
+
+###############################################################################
+http://www.naturalborncoder.com/virtualization/2014/10/17/understanding-tun-tap-interfaces/
+###############################################################################
+
+- TUN interface
+  network level point-to-point connection
+- TAP interface
+  link level point-to-point connection
+
+- entirely virtual

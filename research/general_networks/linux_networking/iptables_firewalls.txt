@@ -7,6 +7,11 @@ iptables-and-netfilter-architecture
 https://www.frozentux.net/iptables-tutorial/images/tables_traverse.jpg
 
 https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TRAVERSINGOFTABLES
+
+man iptables(8)
+man iptables-extensions(8)
+
+https://www.howtogeek.com/177621/the-beginners-guide-to-iptables-the-linux-firewall/
 ###############################################################################
 
 - linux uses iptables to figure out where packets need to go and whether
@@ -67,3 +72,44 @@ https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TRAVERSINGOFT
 
 - users can define their own chains but these chains can only be reached
   by jumping to it from a rule
+
+
+Here lies a flowchart showing how packets flow through iptables.
+In case one of the links above is broken.
+
+                               XXXXXXXXXXXXXXXXXX
+                             XXX     Network    XXX
+                               XXXXXXXXXXXXXXXXXX
+                                       +
+                                       |
+                                       v
+ +-------------+              +------------------+
+ |table: filter| <---+        | table: nat       |
+ |chain: INPUT |     |        | chain: PREROUTING|
+ +-----+-------+     |        +--------+---------+
+       |             |                 |
+       v             |                 v
+ [local process]     |           ****************          +--------------+
+       |             +---------+ Routing decision +------> |table: filter |
+       v                         ****************          |chain: FORWARD|
+****************                                           +------+-------+
+Routing decision                                                  |
+****************                                                  |
+       |                                                          |
+       v                        ****************                  |
++-------------+       +------>  Routing decision  <---------------+
+|table: nat   |       |         ****************
+|chain: OUTPUT|       |               +
++-----+-------+       |               |
+      |               |               v
+      v               |      +-------------------+
++--------------+      |      | table: nat        |
+|table: filter | +----+      | chain: POSTROUTING|
+|chain: OUTPUT |             +--------+----------+
++--------------+                      |
+                                      v
+                               XXXXXXXXXXXXXXXXXX
+                             XXX    Network     XXX
+                               XXXXXXXXXXXXXXXXXX
+
+-
