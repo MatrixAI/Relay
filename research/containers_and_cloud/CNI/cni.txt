@@ -159,3 +159,6 @@ https://github.com/containernetworking/cni/blob/master/SPEC.md - 26/06/2018
     "gw" ip gateway. if omitted, default gateway is assumed
   - DNS
     just like in the Result structure above.
+
+- CNI is meant to be a simple contract between containers and the network
+  plugins

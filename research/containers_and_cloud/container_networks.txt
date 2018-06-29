@@ -1,0 +1,24 @@
+Container Networks
+
+###############################################################################
+http://hicu.be/docker-networking-macvlan-bridge-mode-configuration
+###############################################################################
+
+- first link shows an example of setting up a docker container to be connected
+  to a macvlan
+- Docker supported networks are MACVLAN and OVERLAY as of mid 2018
+
+###############################################################################
+CNM x CNI
+
+http://www.nuagenetworks.net/blog/container-networking-standards/
+https://thenewstack.io/container-networking-landscape-cni-coreos-cnm-docker/
+##############################################################################
+
+- CNM -> Docker
+  CNI -> coreos
+- CNM seems to use a key-value store to store configs whereas CNI uses json. not
+  that big of a deal
+  CNM also apparently is very targeted towards Docker containers and isn't
+  generic
+
