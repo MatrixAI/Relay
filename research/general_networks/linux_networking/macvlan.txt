@@ -2,6 +2,8 @@ MACVLAN
 
 ###############################################################################
 https://sreeninet.wordpress.com/2016/05/29/macvlan-and-ipvlan/
+https://hicu.be/bridge-vs-macvlan
+http://hicu.be/docker-networking-macvlan-bridge-mode-configuration
 ###############################################################################
 
 - comments in the first link:
@@ -11,3 +13,12 @@ https://sreeninet.wordpress.com/2016/05/29/macvlan-and-ipvlan/
 
 - MACVLANs allow the use of an existing dhcp server as each interface has a
   different MAC address
+- a macvaln allows the configuration of multiple layer 2 addresses to a single
+  physical device
+
+"The macvlan is a trivial bridge that doesn't need to do learning as it knows
+every mac address it can receive, so it doesn't need to implement learning or
+stp. Which makes it simple stupid and and fast."
+
+- third link above gives an example of Docker containers and setting one up with
+  a macvlan

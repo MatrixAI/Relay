@@ -1,0 +1,8 @@
+Docker Networks
+
+###############################################################################
+http://hicu.be/docker-networking-macvlan-bridge-mode-configuration
+###############################################################################
+
+- first link shows an example of setting up a docker container to be connected
+  to a macvlan

@@ -1,19 +1,15 @@
 # Current TODO List
-- Review Overlay Networks
-- Load Balancing techniques
 - UPNP
 - SFS and other distributed file systems
 - Filecoin
 - zerotier
 - Delta-t protocol -> watson et al
-- Multicast, PubSub, Anycast, Unicast, mDNS, SNR, multihoming and mobile networks
+- PubSub, mDNS, SNR, multihoming and mobile networks
 - RFC 5128 State of Peer-to-Peer (P2P) Communication across Network Address Translators (NATs)
 - ACI, AOS, Big Cloud Fabric, CNI-Genie, Contiv, Contrail, Flannel,
-  Google Compute Engine, Kube-router, L2 networks/Linux bridging, Multus, NSX-T, OpenVSwitch,
+  Google Compute Engine, Kube-router, Multus, NSX-T, OpenVSwitch,
   OVN (open virtual networking), Project Calico, Romana
-- Open Container Initiative (OCI) - more understanding on containers
-- iptables, nftables
+- nftables
 - keepalived, netlink sockets
-
-
-
+- OpenStack
+- IPVS

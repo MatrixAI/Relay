@@ -2,6 +2,8 @@ TUNTAP
 
 ###############################################################################
 http://www.naturalborncoder.com/virtualization/2014/10/17/understanding-tun-tap-interfaces/
+https://stackoverflow.com/questions/1003684/how-to-interface-with-the-linux-tun-driver#1003796
+https://gist.github.com/glacjay/585369/b229da72a0dc84dd27d12afc5b76d0c5c44bb9c3
 ###############################################################################
 
 - TUN interface
@@ -10,3 +12,23 @@ http://www.naturalborncoder.com/virtualization/2014/10/17/understanding-tun-tap-
   link level point-to-point connection
 
 - entirely virtual
+  packets sent to tuntap devices aren't put on the wire but made available to
+  programs running in the system
+
+  eg.
+  Let's say that you configured IPX on the tap0, then whenever the kernel sends
+  an IPX packet to tap0, it is passed to the application (VTun for example). The
+  application encrypts, compresses and sends it to the other side over TCP or
+  UDP. The application on the other side decompresses and decrypts the data
+  received and writes the packet to the TAP device, the kernel handles the
+  packet like it came from real physical device.
+
+- The stack overflow link above gives a good explanation
+  - A tun device is set up either using `ip` or `tunctl`
+  - the tun device is given an ip address 10.0.0.0/24 in the example and then
+    brought up
+  - A C program then opens "/dev/net/tun" and calls ioctl() on the resulting
+    file descriptor to read the packets sent to the IP address
+
+- I'm assuming an example for tap interfaces will be the same as tun interfaces
+  except using ethernet addresses

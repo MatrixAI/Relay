@@ -3,10 +3,12 @@ Veth and vpns and bridges
 ###############################################################################
 https://goyalankit.com/blog/linux-bridge
 https://wiki.archlinux.org/index.php/Network_bridge
+https://hicu.be/bridge-vs-macvlan
 ###############################################################################
 
 - a Linux bridge is a software companent that links 2 or more network segments
   any virtual or real device can be connected to it
+- a bridge is a layer 2 device
 - sample code follows:
 ```
 # Goals
