@@ -1,0 +1,34 @@
+KOKO
+
+###############################################################################
+http://dougbtv.com/nfvpe/2017/04/05/koko/
+https://github.com/redhat-nfvpe/koko
+###############################################################################
+
+- initially just to set up veth pairs but now as of writing this (06/18) does
+  vxlan as well
+
+- type VEth struct {
+    NsName    string
+    LinkName  string
+    IPAddr    []net.IPNet
+    MirrorEgress string // (optional) source interface for egress mirror
+    MirrorIngress string // (optional) source interface for ingress mirror
+  }
+
+- type VxLan struct {
+    ParentIF string // parent interface name
+    ID int // VxLan ID
+    IPAddr net.IP // VxLan destination address
+  }
+
+- type VLan struct {
+    ParentIF string // parent interface name
+    ID int // VLan ID
+  }
+
+- type MacVLan struct {
+    ParentIF string // parent interface name
+    Mode netlink.MacvlanMode // MacVlan mode
+  }
+

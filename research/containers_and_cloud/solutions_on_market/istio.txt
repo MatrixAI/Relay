@@ -1,0 +1,81 @@
+ISTIO
+
+###############################################################################
+https://istio.io/docs/concepts/what-is-istio/overview/
+###############################################################################
+
+- provides behavioural insights and operational control over a service mesh:
+  - traffic management:
+    control the flow of traffic and API calls between services
+    makes calls more reliable
+    makes the network more robust in adverse conditions
+  - service identity and security:
+    provice services in the mesh with a verifiable identity
+    provide the ability to protect service traffic on adverse networks
+  - policy enforcement:
+    apply organisational policy to service interactions
+    ensure policies are enforced
+    fair resource distribution
+    policy changes are done by mesh configuration not code
+  - telemetry:
+    understand service dependencies
+    understand flow between services
+
+- data plane:
+  set of intelligent proxies dedicated as sidecars
+  mediate and control network communication between microservices
+  general-purpose policy and telemetry hub
+- control plane:
+  managing and configuring proxies to route traffic
+  configure telemetry hub to enforce policies and collect telemetry
+
+The following diagram demonstrates a potential way for services using
+Istio to communicate. The diagram splits up the Envoy proxy into control and
+data planes. The control plane manages security, load balancing etc.
+
+         'Envoy' proxy
+        +-------------+
+    +-->|control plane|<----+
+    |   +-------------+     |
+    |                       |
+    |                       |
+ +--|-+                   +-|--+
+ |prxy------------------->|prxy|
+ |  ^ |                   |  ^ |
+ +--|-+                   +--|-+
+ |  v |                   |  v |
+ |svcA|                   |svcB|
+ +----+                   +----+
+Service A               Service B
+
+- Core design principles
+  - Maximise transparency:
+    use of istio requires minimal work
+  - incrementality:
+    modularity
+    extensibility
+  - portability:
+    must run on any environment with minimal effort
+  - policy uniformity:
+    apply policies to resources which aren't necessarily at API level
+    have a separate system to maintain policy
+
+- Decoupling of traffic flow from infrastructure scaling:
+  for example, we can specify that a certain % of requets should be routed to a
+  canary deployment or certain user agents should go to specific locations etc.
+
+  This is good for A/B testing, gradual rollouts, canary releases, failure
+  recovery and fault injection.
+
+- assumption that all traffic goes through envoy proxies
+- assumes the presence of a service or container registry eg. provided by
+  Kubernetes
+  Pilot uses this information for service discovery
+  Envoy instances in the mesh perform service discovery and dynamically update
+  their load balancing pools accordingly
+
+  A service can shed load by responding to a request with a HTTP 503 which will
+  have the service caller remove the service instance from its load balancing
+  pool.
+
+- Istio allows fault injection so users can test for end-to-end faults

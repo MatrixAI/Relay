@@ -1,0 +1,67 @@
+VXLAN
+
+###############################################################################
+http://www.definethecloud.net/vxlan-deep-dive/
+https://tools.ietf.org/html/rfc7348
+https://vincent.bernat.im/en/blog/2017-vxlan-linux
+###############################################################################
+
+- uses VLAN-like encapsulation
+  basically fancy words for an overlay network
+  encapsulates link layer frames in transport layer frames, or more
+  specifically, Ethernet frames are put inside UDP packets
+- default port is 4789
+- vxlan is encapsulation over IP so there's no inherent broadcast functionality
+- traffic is unencrypted
+- potentially large overhead
+
+  --+----------------+----------+-----------+-------+-------------------+---
+    | outer ethernet | outer IP | outer UDP | VXLAN | original ethernet |
+  --+----------------+----------+-----------+-------+-------------------+---
+
+- supports both multicast and unicast as well as ipv6 and ipv4
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ip -6 link add vxlan100 type vxlan \
+  id 100 \                // id of the virtual lan
+  dstport 4789 \          // IANA assigned port
+  local 2001:db8:1::1 \   // source IP address to use in outgoing packets
+  group ff05::100 \       // multicast IP address to join. cannot be used with
+                          //  `remote` option
+  // remote IPV6_ADDR \   // specifies the unicast destination IP address to use
+                          // when the destination link layer address isn't known
+                          // by the VXLAN device. cannot be used with `group`.
+  dev enp0s25 \           // physical device to be used
+  ttl 5                   // ttl value to use in outgoing packets
+
+brctl addbr br100             // add a bridge called "br100"
+brctl addif br100 vxlan100    // add the interface we created above
+                              // this interface acts as a VXLAN tunnel endpoint
+                              // (VTEP)
+brctl addif br100 vnet22      // add an interface called vnet22
+                              // I'm assuming that this is the same as vxlan100
+                              // except it has already been created.
+                              // potentially this will have been created like
+                              // how vxlan100 was
+brctl addif br100 vnet25      // add an interface called vnet25
+brctl stp br100 off           // turn off spanning tree protocol for the bridge
+                              // not quite sure why?
+ip link set up dev br100
+ip link set up dev vxlan100
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- VXLAN: a framework for overlaying virtualized layer 2 networks over layer 3
+  networks (yay rfc title)
+- Issues that VXLan intends to address:
+  - limitations from spanning tree and VLan ranges
+    prevention of ports and links due to potential circular routing
+    limit of 4094 vlans
+  - multi-tenant environments
+  - inadequate table sizes at ToR (top of rack) switches (this is more directed
+    towards data centres)
+
+- Security concerns:
+  - Rogues can subscribe to a number of multicast groups and potentially snoop
+    on network traffic
+  - various other L2 and L3 attacks

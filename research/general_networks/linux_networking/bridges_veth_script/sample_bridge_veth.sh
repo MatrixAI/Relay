@@ -28,6 +28,12 @@
 # 'With Bridge, it is needed to use NAT for external connectivity.'
 # Does this mean in the scenario of a packet going from ns1->bridge->ns2, ns2
 # will see the source IP as the bridge's IP?
+# 
+# More thoughts on the above problem :=
+# since the packets travelling from ns1 to ns2 will need to go through the host
+# namespace as the bridge resides there, perhaps we actually need to add rules
+# to iptables. My default policy for the FORWARD chain is DROP. This may explain
+# why no pings were going through despite knowledge of the network addresses.
 
 #INTERFACE='enp0s25'
 export NS_NAME1="A"

@@ -5,7 +5,8 @@
 - zerotier
 - Delta-t protocol -> watson et al
 - PubSub, mDNS, SNR, multihoming and mobile networks
-- RFC 5128 State of Peer-to-Peer (P2P) Communication across Network Address Translators (NATs)
+- RFC 5128 State of Peer-to-Peer (P2P) - 
+  Communication across Network Address Translators (NATs)
 - ACI, AOS, Big Cloud Fabric, CNI-Genie, Contiv, Contrail, Flannel,
   Google Compute Engine, Kube-router, Multus, NSX-T, OpenVSwitch,
   OVN (open virtual networking), Project Calico, Romana
