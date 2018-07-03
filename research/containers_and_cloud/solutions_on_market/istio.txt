@@ -79,3 +79,22 @@ Service A               Service B
   pool.
 
 - Istio allows fault injection so users can test for end-to-end faults
+
+- 'Mixer' module provides policy and telemetry management
+  Before each Envoy makes a call to another service, it makes a call to the
+  Mixer first.
+  The Envoy also caches results of requests.
+  If configured however, an Istio deployment can run without a Mixer component
+  it seems.
+- provides an abstraction on backend implementations and policies
+- the Mixer however is
+  stateless
+  hardened/reliable
+  designed to accommodate large amounts of transient state
+- envoy proxies have a cache
+  mixers have a cache as well
+  mixers talk to backend services
+
+- Istio seems like it's using multiple layers of proxies to achieve abstractions
+
+

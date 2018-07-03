@@ -1,5 +1,9 @@
 SERVAL: service-centric networking
 
+###############################################################################
+https://www.cs.princeton.edu/~jrex/papers/serval-nsdi12.pdf
+###############################################################################
+
 - first thing the paper does is say today's network stack doesn't suit
   mobile and multi-homed devices. But hey it still suits things that don't
   need to change quite well.  - hosts have addresses that are dependent
@@ -68,7 +72,7 @@ lines of syn, synack, ack, data exchange... etc.
   stuff in it
 
   (network layer)     | src addr | dest addr | ...
-                      | source flowID | dest flowID | trans prot |
+  (service layer)     | source flowID | dest flowID | trans prot |
                       flags | | seq # | ack # | nonce | serviceID |
   (transport layer)   | app prot | ....
 
@@ -106,3 +110,7 @@ is that BGP helps to choose a path through the internet intercepting
 the least number of Autonomous Systems (network providers) - updates
 a router's routing table for IP packets to go through as optimal of a
 route as the router can manage
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- being able to split a connection over multiple interfaces?
+- changing interfaces not requiring the establishment of new connections?

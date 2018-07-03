@@ -1,0 +1,42 @@
+KUBERNETES
+
+###############################################################################
+###############################################################################
+
+- container/service orchestraion
+- abstraction of services from the individual containers and physical machines
+  which comprise a service
+
+- Pod:
+  A kubernetes pod is a single runnable processes. This can actually be
+  consisted of multiple individual containers that are all interlinked, eg. 2
+  containers, one running a web server and one running a database
+
+  Pods can be easily replicated across multiple nodes. Pods are also ephemeral
+  and tied to the Nodes they run on. Each pod has a unique IP address.
+
+- Node:
+  A physical
+
+- Service:
+  An abstraction of a logical set of pods and a policy on how to access them.
+
+- by default, when a pod is created, it is only exposed (network wise) to the
+  kubernetes cluster. To expose it to another network such as the localmachine,
+  we need to create a service.
+- scaling a service is as easy as `kubectl scale "deployment" --replicas="number
+  of replicas"`
+- rolling updates are performed automatically by kubernetes whenever a pod's
+  image is updated
+- undoing an update is as easy sa `kubectl rollout undo "deployment"`
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I'm having a lot of difficulty getting kubernetes set up on NixOS.
+
+minikube and virtualbox don't run
+-> error setting up host only network on machine start
+-> virtualbox host networking is enabled however
+
+https://github.com/cstrahan/nixos-config/blob/master/configuration.nix
+you can specifiy for kubelet to start up automatically by editing
+configuration.nix 
