@@ -114,3 +114,31 @@ route as the router can manage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - being able to split a connection over multiple interfaces?
 - changing interfaces not requiring the establishment of new connections?
+- IP address and ports describe interfaces which means if a host moves a new
+  flow needs to be established
+- Serval's architecture proposes
+  - service names:
+    WHO we communicate with
+  - flow names:
+    WHAT communication context to use
+  - addresses:
+    WHERE to direct communication
+- Service layer sits between network and transport layers
+
+Serval proposes alternate networking stack operations vs. TCP/IP:
+(based on diagram toip of base 2 of paper)
+
+TCP/IP
+------
+bind(ip + port) -> application listens on the tuple (IP, port, protocol)
+demultiplex(ip + port) -> packets arriving on the network interface are
+                          demultiplexed based on destination ip, port, protocol
+forward(ip) -> forwarding through the internet is done via ip addresses
+
+Serval
+------
+bind(serviceID) -> application listens on the serviceID
+resolve(serviceID) -> ?????
+demultiplex(flowID) -> packets arriving on the network interface are
+                       demultiplexed based on destination flow
+forward(ip) -> forwarding through the internet is done via ip address

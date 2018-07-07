@@ -1,0 +1,184 @@
+Service Naming
+
+###############################################################################
+NOTE: these are just jottings and thoughts. may not make sense c:
+
+https://github.com/multiformats/multiaddr
+https://github.com/multiformats/multihash
+https://www.cs.princeton.edu/~jrex/papers/serval-nsdi12.pdf
+###############################################################################
+
+-
+  multihash format
+  fn code  dig size hash digest
+  -------- -------- ------------------------------------
+  00010001 00000100 101101100 11111000 01011100 10110101
+  sha1     4 bytes  4 byte sha1 digest
+
+-
+  IPFS over TCP over IPv6 (typical TCP)
+  /ip6/fe80::8823:6dff:fee7:f172/tcp/4001/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+
+  structure of this is
+  / NET_PROT / NET_ADDR / TRANS_PROT / TRANS_PORT / APP_PROT / APP_ADDR
+
+  Let's actually see what this may be like with Serval's proposed service layer
+  Refresher on that :: (let's assume TCP/IP)
+    (network layer) | src addr | dest addr |
+    (service layer) | source flowID | dest flowID | service ID |
+    (trans   layer) | src port | dest port |
+
+  / NET_PROT / NET_ADDR / SERV_ID / SRC_FLOW / DEST_FLOW / TRANS_PROT /
+  TRANS_PORT
+
+  if we're going to grab multiaddr's format straight up this is potentially what
+  an address would look like. We're still relying on the underlying network prot
+  what we want though is for serv_id and flow to be examined first.
+
+  THE PROGRAMMER SHOULD BE CONSIDERING SERVICES NOT NETWORK ADDRESSES
+
+- 
+  / SERV_ID / SRC_FLOW / DEST_FLOW 
+
+  Let's also have a look at how Serval proposes service discovery. Keeping in
+  mind that all physical hosts in the Matrix network are well known within the
+  network as are serviceIDs as automatons are composed with each other in the
+  language.
+
+  > A wants to talk to B.
+  > A creates
+    / SERV_ID / large_random_number / empty_dest_flow /
+    and forwards this to a random link
+  > Intermediate machines (if any) inspect SERV_ID ::
+      case DEST_SERV_UNKNOWN:
+        foward to a random link 
+        *issue: packet travels in circles
+        *issue: are we dealing with malicious nodes? if so is there an issue
+                with nodes just accepting requests on a service ID even if they
+                don't have the service? or does the language specification
+                prevent that
+      case DEST_SERV_KNOWN:
+        forward to correct service
+        *issue: randomness may mean some servers are overloaded while others
+                empty. This effect especially may be amplified in networks with
+                imbalanced links eg.
+                
+                    B - C
+                  /  \
+                A     D
+                |             where I, G, H and D are destination servers.
+                |
+            I - E - F
+             \  |\
+              \ | H
+                G
+                
+                How is this a problem? A only has 2 links and without knowledge
+                of the overall topology, each link will have a 50% chance of
+                having a service request forwarded to it. Hence D will get full
+                much faster whereas I, G, H will still have plenty of load to
+                carry.
+        *issue: if multiple automatons discover the same server, do they always
+                send requests to that server? they should probably also randomly
+                send requests to other links to attempt to discover other
+                servers
+
+- 
+  Let's look at a situation where both ends of communication are the same
+  network protocol. Let's also ignore whether communication is stateless or
+  stateful.
+
+  The mapping of flowID to socket is MANY-to-ONE
+  The flowID is then mapped to an interface
+
+  Examining an example communication channel migration between interfaces on the
+  same physical hosts
+
+        HOST 1                                         HOST 2
+
+      app socket                                      app socket
+  ----|-------------------                    --------|--------------
+      |                                               |       
+  flow1                                          flow3    
+    |                                               |            
+  --|--------------------                     ------|-----------------
+    |                                               |            
+  100.0.0.1                                         +-243.0.0.2  
+    |                                                    |
+  --|--------------------                     -----------|------------
+    |                                                    |
+    |                                                    |
+    +----------------------------------------------------+
+
+-------------------------------------------------------------------------------
+
+        HOST 1                                         HOST 2
+
+      app socket                                      app socket
+  ----|-------|-----------                    --------|-------|------
+      |       |                                       |       |
+  flow1       flow2                               flow3       flow4
+    |           |                                   |           |
+  --|-----------|--------                     ------|-----------|-----
+    |           |                                   |           |
+  100.0.0.1    100.0.0.2                            +-243.0.0.2-+
+    |            |                                       |
+  --|------------|-------                     -----------|------------
+    +------+---- +                                       |
+           |                                             |
+           +---------------------------------------------+
+
+-------------------------------------------------------------------------------
+
+        HOST 1                                         HOST 2
+
+      app socket                                      app socket
+  ------------|-----------                    ----------------|------
+              |                                               |
+              flow2                                           flow4
+                |                                               |
+  --------------|--------                     ------------------|-----
+                |                                               |
+               100.0.0.2                              243.0.0.2-+
+                 |                                       |
+  ---------------|-------                     -----------|------------
+                 |                                       |
+                 |                                       |
+                 +---------------------------------------+
+
+  On the same physical machine, such migrations seem to be easy if the
+  communication can be stateless. If state is required to be kept though, either
+  the application needs to manage state or state needs to be kept in a store and
+  referenced to by flowID.
+
+  With my initial thoughts, migrating to different physical hosts is much the
+  same. Perhaps we'll need to establish communications between the new and old
+  apps and then swap over the flows?
+
+- 
+  I think the multiaddress may be a requirement for communication between hosts
+  using different network address formats (eg. IPv4 to IPv6)
+
+  I reckon flowID should map to a multiaddress and then something will check for
+  compatibility between physical links and destination multiaddress. If both
+  match (eg. ethernet link with IPv4 address and destination address is IPv4)
+  then sending the packet is straightforward.
+
+  Otherwise if there's no match (eg. IPv4 ethernet and IPv6 destination
+  address), there needs to be a way to establish a route to a machine which can
+  bridge the network address types. One way to solve this (first thing that came
+  to mind) would be to broadcast a request for a multiaddress bridging
+  conncetion and cache responses and then tunnel the flow through the bridge.
+
+  -> side thoughts :: Tor relays? 
+
+- 
+  In the above situation, why is a multiaddress needed?
+
+  - allows easy comparison between addresses
+  - we can abstract flowID->address mappings away from a specific network
+    address implementation
+  - allows specification of compatible protocols
+    *** elaborate on protocol comparison .. perhaps i need to start considering
+    flow level protocols (tcp/udp?) ***
+
