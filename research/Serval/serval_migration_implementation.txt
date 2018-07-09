@@ -1,0 +1,113 @@
+Serval Migration Implementation
+
+###############################################################################
+###############################################################################
+
+/src/libservalctrl/hostctrl_local.c
+static int local_flow_migrate(struct hostctrl *hc,
+                              struct flow_id *flow,
+                              const char *to_iface)
+{
+  // struct ctrlmsg_migrate consists of struct ctrlmsg cm amongst other things
+  struct ctrlmsg_migrate cm;
+
+  if(!flow) {
+    LOG_ERR("Undefined flow\n");
+    return -1;
+  }
+  
+  if(!to_iface) {
+    LOG_ERR("Undefined interface\n");
+    return -1;
+  }
+
+  memset(&cm, 0, sizeof(cm));
+  cm.cmh.type = CTLMSG_TYPE_MIGRATE;
+  cm.cmh.len = sizeof(cm);
+
+  // (hc->xid)++; pfffft i don't like their writing
+  // 'xid' is a transaction ID
+  // not quite sure exactly where it's used. Perhaps it's used for logging/stats
+  cm.cmh.xid = ++hc->xid;
+
+  cm.migrate_type = CTRL_MIG_FLOW;
+
+  // struct flow_id is actually just a 4byte integer. It's a struct containing a
+  // union to have it be compatible across either uint8, uint16 or uint32
+  memcpy(&cm.from_f, flow, sizeof(*struct flow_id));
+  strncpy(cm.to_i, to_iface, IFNAMSIZ - 1);
+
+  return message_channel_send(hc->mc, &cm, cm.cmh.len);
+}
+
+The handler for CTRL_MIG_FLOW ends up calling `serval_sock_migrate_flow()`
+
+/src/stack/serval_sock.c
+void serval_sock_migrate_flow(struct flow_id *old_flow, int new_dev)
+{
+  struct sock *sk = serval_sock_lookup_flow(old_flow);
+
+  if(sk)
+  {
+    LOG_SSK(sk, "Found sock, migrating...\n");
+    lock_sock(sk);
+    serval_sock_set_mig_dev(sk, new_dev);
+    serval_sal_migrate(sk);
+    release_sock(sk);
+    sock_put(sk);
+  }
+}
+
+struct sock *serval_sock_lookup_flow(struct flow_id *flowid)
+{
+  return serval_sock_lookup(&established_table, &init_net
+                            flowid, sizeof(*flowid));
+}
+
+static inline void serval_sock_set_mig_dev(struct sock *sk, int ifindex)
+{
+  serval_sk(sk)->mig_dev_if = ifindex;
+}
+
+/src/stack/serval_sal.c
+int serval_sal_migrate(struct sock *sk)
+{
+  int ret;
+  LOG_SSK(sk, "Sending RSYN\n");
+  ret = serval_sal_send_rsyn(sk, serval_sk(sk)->snd_seq.next++);
+  return ret;
+}
+
+/src/stack/serval_sock.h
+// serval table is a hashtable
+struct serval_table
+{
+  struct serval_hslot *hash;
+    unsigned int (*hashfn)(struct serval_table *tbl, struct sock * sk);
+    struct serval_hslot *(*hashslot)(struct serval_table *tbl,
+                                     struct net *net,
+                                     void *key,
+                                     size_t keylen);
+  unsigned int mask;
+}
+
+
+I think `struct sock` is a modified version of the linux kernel socket
+structure. `struct serval_sock` contains a `struct sock` as well as a bunch of
+variables for maintaining SAL state.
+
+AS A NOTE:
+inside `struct serval_sock`, I only see
+
+struct flow_id local_flowid;
+struct flow_id peer_flowid;
+
+which doesn't fit the paper describing how multiple flows can be mapped to the
+same socket. Even if that wasn't an original feature of serval (or if it just
+never was implemented) I think it's a good idea.
+
+When Serval migrates a flow, it needs to be told which flow on which socket is
+migrated to what interface. There seems to be a Serval protocol which I'm not
+too sure if there's documentation for, but a 'RSYN' packet is sent across this
+new interface and if acknowledged properly the flow can be marked as fully
+migrated to the new interface.

@@ -2,6 +2,7 @@ SERVAL: service-centric networking
 
 ###############################################################################
 https://www.cs.princeton.edu/~jrex/papers/serval-nsdi12.pdf
+https://github.com/princeton-sns/serval
 ###############################################################################
 
 - first thing the paper does is say today's network stack doesn't suit
@@ -142,3 +143,100 @@ resolve(serviceID) -> ?????
 demultiplex(flowID) -> packets arriving on the network interface are
                        demultiplexed based on destination flow
 forward(ip) -> forwarding through the internet is done via ip address
+
+##### SERVAL PROTOTYPE SECTION
+https://github.com/princeton-sns/serval
+
+- linux kernel module
+- initial design had a default service gateway, much like the default gateway in
+  LANs except this led to end hosts not having much control
+- the final implementation lets the same machine be either a service router or
+  an end-host, determined by policies specified
+
+- on the serval github wiki quickstart section, we can see an example of the
+  load balancing ->
+  the client has to add a service ID which gets mapped to 0?1? or more IPs and
+  then will automatically split the requests between these IPs
+  
+  Starting up and managing such servers isn't very automatic as exampled
+
+  Starting up a load balancer would mean adding the IPs of the servers as you
+  would a client as well as enabling IP and Serval forwarding by echo 1 >>
+  /proc/sys/net/.......
+
+- serval flow table structure example
+  srcFlowID dstFlowID srcIP       dstIP       state dev
+  4         5         10.10.10.10 10.10.10.11 CONN  wlan0
+
+- `migrate` tool is able to migrate a flow to a different interface
+
+https://github.com/princeton-sns/serval/wiki/Serval-Support-in-the-Linux-Kernel
+- not sure exactly what the state of the kernel networking code is right now
+  my kernel version -> 4.15.18
+  serval writing -> 2.6.35? or something around there
+                    i also see mentions of 3.7
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Things to specifically examine within Serval source code
+- flow migration
+- flow table
+- interoperability with linux kernel network stack
+
+Places of importance in the source code:
+
+/
+|
+|
++--> /include
+|     |
+|     |
+|     +--> /serval
+|     |       |
+|     |       |
+|     |       +--> ctrlmsg.h      control message types and data structures
+|     |
+|     |
+|     +--> /libservalctrl
+              |
+              |
+              +--> hostctrl.h     operations on the host, host control
+                                  callbacks, service registration and
+                                  unregistration, migration etc.
+                                  The function hostcontrol_service_migrate() is
+                                  defined here and used in `struct hostctrl_ops`
+                                  which is fully defined in
+                                  src/libservalctrl/hostctrl_ops.h
+|
++--> /src
+      |
+      +--> /stack
+      |       |
+      |       +--> serval_sock.h  serval socket states and flags, operations,
+      |       |                   serval socket structure. struct serval_table
+      |       |                   is defined here.
+      |       |
+      |       +--> serval_sal.h   serval SAL socket operations, flags,
+      |       |                   structures
+      |       |
+      |       +--> service.h      service structures, flags and operations
+      |       |
+      |       |
+      |       +--> af_serval.h    definition of serval control structure and
+      |       |                   kernel module init and end functions
+      |       |
+      |       +--> ctrl_handler.h    definitions for functions that handle
+      |                           control messages
+      |
+      |
+      +--> /libservalctrl
+              |
+              |
+              +--> hostctrl_ops.h    full definition of `struct hostctl_ops`
+                                  which includes prototypes for
+                                  `flow_migrate()`, `service_migrate()`, etc.
+
+                                  flow_migrate() gets mapped to
+                                  local_flow_migrate() which actually is
+                                  implemented in
+                                  src/libservalctrl/hostctrl_local.c
