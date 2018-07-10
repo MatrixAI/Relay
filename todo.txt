@@ -15,7 +15,4 @@
 - keepalived, netlink sockets
 - OpenStack
 - IPVS
-- mobile networks
-
-Concepts to enumerate
-- name mapping
+- IPsec

@@ -1,0 +1,66 @@
+Network Mobility
+
+###############################################################################
+https://www.cisco.com/c/en/us/about/press/internet-protocol-journal/back-issues/table-contents-36/102-ipv6.html
+
+https://en.wikipedia.org/wiki/Mobile_IP
+
+https://tools.ietf.org/html/rfc5944#page-11
+
+NEMO protocol
+https://tools.ietf.org/html/rfc3963
+
+The following link is the RFC for Mobile IPv6 published 2011. The above NEMO
+RFC was published 2005. It's just there to say hey I've opened the link but
+haven't actually bothered to look at it because it's outdated.
+https://tools.ietf.org/html/rfc3963
+###############################################################################
+
+- IP tunneling
+  - home address and care-of address (temporary IP address for a mobile device)
+- something that won't work for the internet but may work for smaller networks
+  is to propagate route changes while maintaining the same IP address. BEWARE
+  THOUGH
+- link-layer handoff
+
+- the following diagram is pulled from rfc5944 pg14
+
+               2) Datagram is intercepted   3) Datagram is
+                  by home agent and            detunneled and
+                  is tunneled to the           delivered to the
+                  care-of address.             mobile node.
+
+                     +-----+          +-------+         +------+
+                     |home | =======> |foreign| ------> |mobile|
+                     |agent|          | agent | <------ | node |
+                     +-----+          +-------+         +------+
+    1) Datagram to    /|\         /
+       mobile node     |        /   4) For datagrams sent by the
+       arrives on      |      /        mobile node, standard IP
+       home network    |    /          routing delivers each to its
+       via standard    |  |_           destination.  In this figure,
+       IP routing.   +----+            the foreign agent is the
+                     |host|            mobile node's default router.
+                     +----+
+
+                    Figure 1:  Operation of Mobile IPv4
+  
+The following points address Mobile IPv6
+- mobile IPv6 does away with the need for "foreign agents"
+- A mobile node is always able to be addressed at its home address whether it is
+  on its home network or not
+- when a mobile node is attached to a foreign link, it is also addressable at
+  one or more of the care-of addresses
+- binding is the association between a mobile node's "home address" and care-of
+  address
+- communication modes:
+  o bidirectional tunneling:
+    all communication from correspondant to mobile node is done through the
+    home agent
+  o route optimization:
+    mobile node registers its current binding at the correspondent node. Packets
+    from the correspondent node can be routed directly to the care-oif address
+    of the mobile node
+- support for multiple home agents
+- i think the diagram for Mobile IPv4 is adequate to describe the high-level
+  overview of Mobile IPv6 well enough

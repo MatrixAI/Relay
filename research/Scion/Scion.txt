@@ -1,6 +1,12 @@
 SCION Five Years Later
+
+###############################################################################
+Original SCION paper
+http://www.ieee-security.org/TC/SP2011/PAPERS/2011/paper014.pdf
+
+SCION reflection 5 years after
 https://arxiv.org/pdf/1508.01651.pdf
-Paper is in papers/ directory should online pdf become unavailable
+###############################################################################
 
 ~ TLDR is at bottom ~
 
@@ -152,3 +158,11 @@ TLDR!!!
   than what people are used to.
 
   Beacon packets seem to add a lot of network traffic.
+
+###############################################################################
+
+- clean-slate Internet architecture proposal
+- Entities outside a trust domain cannot affect control-plane computation and
+  communication within that trust domain
+- Communication across trust domains are limited to a small group of explicitly
+  identified set of other trust domains
