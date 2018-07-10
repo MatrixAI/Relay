@@ -1,0 +1,102 @@
+Socket Flow Abstraction
+
+###############################################################################
+###############################################################################
+
+- personally I think i need to justtify whether the socket-flow abstraction
+  really is necessary or just an extra unnecessary step
+
+  After a discussion with @CMCDragonkai,
+  "The concept of a flow as a layer of indirection between service names and IPs
+  can be represented in our system, but controlling the names that we pass down
+  to each Automaton. That is the ip that we pass into a service can just be a
+  virtual IP, that maps to a concrete IP later."
+
+  What this means is that each Automaton is a self-contained instance with no
+  knowledge of the outside world. I'm thinking that this would be like living
+  inside a simulation. You wouldn't know you're inside the simulation until you
+  leave or have out-of-band knowledge. We also want each Automaton instance to
+  be able to exist in the Matrix network as well as outside without having to
+  have modifications. This means that service names probably need to be a
+  regular URL, potentially something like
+  'https://serviceA.matrix/_serviceHash_'.
+
+  What the analogy to living inside a simulation also means is that whatever
+  requests the Automaton makes, the Matrix network has control over what this
+  string maps to, kind of like how a URL in DNS is mapped to an IP address, but
+  we can map the Automaton's request URL to a service name instead or something.
+
+  How this may work with the Automaton is that whether it's in the matrix
+  network or out of it, it would send a request to the same URL. However if the
+  Automaton isn't in the Matrix network, the developers of the services would
+  need to have ownership of the domain. If the containers reside in the Matrix
+  network, the URL would be mapped to a service name. I'm thinking whether the
+  developers of the service have ownership of the domain or not, it shouldn't
+  matter, as long as requests aren't allowed to be sent outside the network
+  which should be the case for microservices composed together to form a
+  distributed service.
+
+  1. Let there be 2 automatons, A and B. For A to function, A needs to be able
+     to talk to B (A depends on B, think of web server and database). B doesn't
+     have any dependencies to function.
+
+  2. In a traditional web scenario, B would bind a socket onto a particular
+     interface (eg. 10.0.0.1) and wait for requests. A would then either have
+     the IP of B or it would have a domain name resolved by DNS and then create
+     a socket and connect/send request to B's IP.
+
+     In a Matrix network, the Automatons would do exactly the same thing except
+     they would bind on virtual interfaces. The Matrix network would then have
+     fine-grain control over what gets mapped to what at this stage. I think at
+     this stage we can consider the usefulness of having an extra flow
+     identifier.
+     If automaton A were written in C, I'm envisioning something along the lines
+     of calling `gethostbyname()` and waiting for a response.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     Potentially we could examine whether we're able to pass back both IPv4 and
+     IPv6 addresses arbitrarily.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+     According to the Serval paper, only the initial service discovery has the
+     indirection of passing through many intermediate service routers which
+     means we can actually pass the resolved address of the service which A
+     needs to communicate directly with.
+
+  On the note of using the address we pass back, we can instead of passing back
+  the address of the end server, a 'virtual IP' which is then translated by the
+  Matrix network.
+  Eg. we could pass 10.0.0.1 back to A and we'd maintain this as a `socketID`. 
+  Let's write out a more concrete example to clarify things.
+
+  - Automaton A wants to talk to any Automaton B
+  - A is an automaton, so it resides in a separate network namespace connected
+    to a physical interface through any number of virtual interfaces
+  - A has B's service name but not its network address and so asks to have this
+    service name resolved.
+    - A's request goes through virtual interfaces which connect to the Relay
+      network. Here A's outbound request through whatever socket is noted down
+      and an identifier is assigned to it.
+  - B's network address arrives back at the physical interface which A resides
+    on. The response travels back through the table which holds the mapping of 
+    A's socket which sent the request, it's identifier and now B's network
+    address.
+  - The mapping returns through virtual interfaces to Automaton A the identifier
+    and now A is able to send service requests to a B by calling, in C for
+    example, `connect(int socket,
+                      struct sockaddr *A_to_B_identifier,
+                      socklen_t addr_len);`.
+    Here I'm letting the identifier of the connection be either an IPv4 or IPv6
+    address.
+
+  Since the connection to B is on an abstract IP address, the underlying
+  physical connection can actually migrate between interfaces (eg. from enp0 to
+  wlan0) which would, of course, cause a reconnection between the underlying
+  networks but to A and B, they would still be communicating over the same
+  virtual IP.
+
+  This allows transparent migration from service to service which is necessary
+  so yes the flow abstraction is actually necessary. However to allow automatons
+  to exist within the Matrix network and outside of it without any additional
+  changes by the developers, the flowID probably should be an abstract IP
+  address which gets mapped to concrete addresses later.
