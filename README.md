@@ -1,1 +1,1 @@
-./design/design.txt
+./design/design.md

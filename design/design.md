@@ -1,18 +1,17 @@
-Design Document
----------------
+## Design Document
 
 1.  Overall Design
 
-    o Automatons need to be deployable within and outside a Matrix network
+    - Automatons need to be deployable within and outside a Matrix network
       without any changes to the code by the programmer.
-    o Abstraction
+    - Abstraction
       - containerised microservice
       - service abstraction
       - Relay sidecar service
-        > flow and abstract network addresses
-        > flow table
-    o service discovery and routing
-    o flow migration
+        - flow and abstract network addresses
+        - flow table
+    - service discovery and routing
+    - flow migration
 
 1.1 Overview of Relay network
         
@@ -24,6 +23,5 @@ Design Document
     - 
 
 
-###############################################################################
-References
+## References
 
