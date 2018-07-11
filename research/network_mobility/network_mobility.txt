@@ -5,7 +5,7 @@ https://www.cisco.com/c/en/us/about/press/internet-protocol-journal/back-issues/
 
 https://en.wikipedia.org/wiki/Mobile_IP
 
-https://tools.ietf.org/html/rfc5944#page-11
+https://tools.ietf.org/html/rfc5944
 
 NEMO protocol
 https://tools.ietf.org/html/rfc3963
@@ -13,7 +13,7 @@ https://tools.ietf.org/html/rfc3963
 The following link is the RFC for Mobile IPv6 published 2011. The above NEMO
 RFC was published 2005. It's just there to say hey I've opened the link but
 haven't actually bothered to look at it because it's outdated.
-https://tools.ietf.org/html/rfc3963
+https://tools.ietf.org/html/rfc6275
 ###############################################################################
 
 - IP tunneling

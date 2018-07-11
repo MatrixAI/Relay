@@ -1,0 +1,182 @@
+Service Migration
+
+###############################################################################
+https://tools.ietf.org/html/rfc5944
+https://tools.ietf.org/html/rfc6275
+###############################################################################
+
+My take on service migration initially is based of how mobile networking
+protocols work currently. I've had a look at Mobile IPv4 and Mobile IPv6 and
+they both include a layer of indirection between the mobile node and the
+'correspondent node' aka the other end of the communication - the use of
+home/foreign agents. Well Mobile IPv6 does away with the foreign agents but
+still retains the home agent and Mobile IPv4 has a home agent and a foreign
+agent.
+
+Would this kind of structure be good to base how services are structured?
+
+If we do so, our services will be able to be spun up and torn down extremely
+easily when requested
+BUT
+- if the 'home agent' for some reason goes down then all the services will be in
+  the dark.
+
+                                                                                
+               2) Datagram is intercepted   3) Datagram is                      
+                  by home agent and            detunneled and                   
+                  is tunneled to the           delivered to the                 
+                  care-of address.             mobile node.                     
+                                                                                
+                     +-----+          +-------+         +------+                
+                     |home | =======> |foreign| ------> |mobile|                
+                     |agent|          | agent | <------ | node |                
+                     +-----+          +-------+         +------+                
+    1) Datagram to    /|\         /                                             
+       mobile node     |        /   4) For datagrams sent by the                
+       arrives on      |      /        mobile node, standard IP                 
+       home network    |    /          routing delivers each to its             
+       via standard    |  |_           destination.  In this figure,            
+       IP routing.   +----+            the foreign agent is the                 
+                     |host|            mobile node's default router.            
+                     +----+                                                     
+                                                                                
+                    Figure 1:  Operation of Mobile IPv4
+  
+
+
+                            +---------+                            
+                            |service B|
+                          _ +---------+
+                          /|
+                         /
+                        /
+  +--------------------+                 +---------+
+  |service B home agent|---------------->|service B|
+  +--------------------+                 +---------+
+        ^                                   ||
+        |                                   ||
+        |                                   ||
+        |                                   ||
+    +---------+                             ||
+    |service A|<============================++
+    +---------+
+              
+    Adaption of Mobile IP operation for services
+
+The above diagram shows a sample way in which a home agent could be used with
+services. Let's see what this would be like if we were to go through with
+Serval's service discovery method and using nodes that have knowledge of the
+whereabouts of the requested service as home agents.
+
+
+           +-+        +-+
+           |D|--------|G|
+          /+-+       /+-+
+         /          /  |
+        /          /   |
+       /          /    |
+    +-+          +-+   |
+    |B|----------|E|   |
+    +-+         /+-+   |
+     |         /       |
+     |        /        |
+     |       /         | 
+    +-+   +-+         +-+
+    |A|---|C|---------|F|
+    +-+   +-+         +-+
+
+    Sample network connection diagram.
+    A want to talk to G and does so through D.
+
+A wants to talk to G. A's request can end up being forwarded to G regardless of
+which path it takes via D, E or F. This means that D, E or F can act as a home
+agent.
+
+
+           +-+        xxx
+           |D|--------xGx
+          /+-+       /xxx
+         /          /  |
+        /          /   |
+       /          /    |
+    +-+          +-+   |   +-+
+    |B|----------|E|---+---|G|
+    +-+         /+-+   |   +-+
+     |         /       |
+     |        /        |
+     |       /         |
+    +-+   +-+         +-+     +-+
+    |A|---|C|---------|F|-----|G|
+    +-+   +-+         +-+     +-+
+
+    A, communicating through D, to
+    G which wants to close and create
+    2 new instances.
+
+Now suppose 2 new instances of G get spun up and the original node has to be
+taken down. If A was communicating through E or F then it's ok as G can signal
+to the home agent (E or F) that it needs to reestablish communication with A
+somewhere else.
+
+
+           +-+        xxx
+           |D|>>>>>>>>xGx
+          >+-+       /xxx      
+         >          /  v       
+        >          /   v       
+       >          /    v       
+    +-+          +-+   v   +-+ 
+    |B|----------|E|---+---|G| 
+    +-+         /+-+   v   +-+ 
+     ^         /       v       
+     ^        /        v      
+     ^       /         v       
+    +-+   +-+         +-+     +-+
+    |A|---|C|---------|F|>>>>>|G|
+    +-+   +-+         +-+     +-+
+
+    Migration of flow for communication
+    between service A and G.
+
+Using the original G as the home agent, any communication from A to G can be
+directly forwarded to the new G, where ever it may be. This would mean that the
+original G would need to perform service discovery much the same way A found G.
+This would also reduce the management overhead for nodes on the route between A
+and original G. Why should they have to manage G's trash??
+Once required state information is updated in the new G, the old G can signal to
+A that a new 'care-of address' is in use and A can communicate directly to the
+new G via a shorter route A->C->F->G.
+
+Things we now need to consider for the above method of transferring
+communication contexts:
+- transfer of state
+- network layer tranyer transfer
+- link layer transfer
+- swapping over G's dependencies
+
+Transfer of state information is slightly problematic depending on the service.
+  If G is stateless (eg. serves UDP traffic) then the new
+  Gs will all have this content. Old G can forward any requests A sends to it to
+  the new G, signal a swapover, forward its current flowtable and then shutdown
+  cleanly. Details on the exact method forwarding is handled at service A will
+  need to be ironed out.
+
+  If G requires state (eg. anything that runs on TCP) then we need to transfer
+  the flow table, and any extra state needed. Perhaps the easiest way is to
+  transfer the flow table and let the old G finish serving whatever request it
+  was doing. This runs into problems though, if for example G is transferring a
+  large file or streaming video/audio to A - waiting for the communication to
+  complete may take an awfully long time. I'd like to not have to make any
+  assumptions about state but maybe file transfers are done in a block request
+  and receive kind of manner. If this is the case then a swapover in Gs can
+  actually be done while without having to transfer transport layer state (or at
+  least minimal).
+  - /proc/net/
+  - ss(8)    (in particular, command `ss -A tcp -i -e` gives us TCP specific
+              information about the socket)
+
+
+One point that I've realised while reading about Mobile IP is that it is
+suitable for nodes that move and carry their state with them, like a laptop. I
+don't think it addresses the spinning down of a machine and creating a new one.
+Anything that involves nodes that move may not be suitable.
