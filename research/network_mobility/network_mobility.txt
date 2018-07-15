@@ -64,3 +64,15 @@ The following points address Mobile IPv6
 - support for multiple home agents
 - i think the diagram for Mobile IPv4 is adequate to describe the high-level
   overview of Mobile IPv6 well enough
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- What I've realised is that we actually need to not look at mobile networks as
+  whatever handover protocols there are, they deal with MOBILES NODES. In our
+  case our nodes are not mobile - they get deleted and recreated.
+- IP Mobility could still be useful if we are able to get state replication
+  ...
+  perhaps I should have a look at replication in distributed systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+

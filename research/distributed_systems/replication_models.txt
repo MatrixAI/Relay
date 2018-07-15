@@ -1,0 +1,26 @@
+Replication Models
+
+###############################################################################
+https://en.wikipedia.org/wiki/Storage_replication#Replication_models_in_distributed_systems
+
+https://blog.kloia.com/distributed-computing-in-microservices-cap-theorem-253c16017a99
+###############################################################################
+
+Main thing we need to be able to manage is transferring of state out of machines
+shutting down to new machines and whether we need to transfer state or we can
+let a new connection be established
+
+- state machine replication
+  is this the kind of thing we want? maybe it's ok for things with minimal state
+  but in services which handle millions of requests, we'll have millions of
+  states to manage and replication is just not worth it :: ._. ::
+
+  risk tradeoff - having replication would help mitigate the effects of
+  unexpected outtages or adversarial effects on networks (congestion due to
+  heavy traffic/DDos on large system etc.) but perhaps may not be necessary to
+  all users of a Matrix network
+
+  LET USERS OPT IN TO REPLICATION
+
+- CAP principle
+  Consistency, Availability, Partition tolerance
