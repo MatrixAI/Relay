@@ -13,8 +13,7 @@
 #                    +------+
 #           Veth and namespace setup
 #
-# From the host, we can ping all the IP addresses but from NS1 and NS2, we can
-# only ping IP1a and IP2a.
+# All IPs are able to be pinged from everywhere.
 
 NS1="A"
 NS2="B"
@@ -47,9 +46,27 @@ function create() {
   sudo ip netns exec $NS1 ip link set dev $VETH1b up
   sudo ip netns exec $NS2 ip addr add $IP2b dev $VETH2b
   sudo ip netns exec $NS2 ip link set dev $VETH2b up
+
+  sudo ip netns exec $NS1 ip link set dev lo up
+  sudo ip netns exec $NS2 ip link set dev lo up
   
   sudo ip netns exec $NS1 ip route add default via $NS1_default
   sudo ip netns exec $NS2 ip route add default via $NS2_default
+
+  echo "     IP1b      IP1a +------+ IP2a        IP2b
+ +---+              |      |                +---+
+ |NS1+==============+ HOST +================+NS2|
+ +---+              |      |                +---+
+                    +------+
+           Veth and namespace setup"
+  echo ""
+  echo "IP1b := ${IP1b}"
+  echo "IP1a := ${IP1a}"
+  echo "IP2b := ${IP2b}"
+  echo "IP2a := ${IP2a}"
+
+  echo "NS1 := ${NS1}"
+  echo "NS2 := ${NS2}"
 }
 
 function clean() {
@@ -63,5 +80,5 @@ if [ "$1" == "create" ]; then
 elif [ "$1" == "clean" ]; then
   clean
 else
-  echo "Usage: ./sample_veth_ns.sh [ create | clean ]"
+  echo "Usage: ./veth_ns.sh [ create | clean ]"
 fi
