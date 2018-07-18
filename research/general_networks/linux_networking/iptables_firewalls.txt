@@ -112,4 +112,8 @@ Routing decision                                                  |
                              XXX    Network     XXX
                                XXXXXXXXXXXXXXXXXX
 
--
+
+- connecting a LAN to the internet via NAT
+  `iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
+- when using NAT functionality, tcpdump will pick up traffic after it has gone
+  through NAT, at least when using the OUTPUT chain

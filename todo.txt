@@ -3,7 +3,8 @@
 - UPNP
 - SFS and other distributed file systems
 - Filecoin
-- zerotier
+o zerotier
+o p2p VPN networks
 - Delta-t protocol -> watson et al
 - PubSub, mDNS, SNR, multihoming and mobile networks
 - RFC 5128 State of Peer-to-Peer (P2P) - 
@@ -16,3 +17,4 @@
 - OpenStack
 - IPVS
 - IPsec
+- gossip protocols
