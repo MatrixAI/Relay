@@ -23,3 +23,6 @@ Notes:
 - If we run S and R each in a separate network namespace, we can have an
   instance of D (the orchestrator) in each namespace which can intercept and
   manipulate requests
+
+- I could've used nftables, but iptables is already here and docker by default
+  works with iptables. So I'll just stick with iptables.

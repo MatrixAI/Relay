@@ -100,6 +100,7 @@ ARP broadcast to announce machine presence.
 This is how we announce the presence of a new machine on the network -
 the joining machine does a gratuitious ARP broadcast with its IP. The receivers
 of this packet then send out a 
+https://stackoverflow.com/questions/24415294/python-arp-sniffing-raw-socket-no-reply-packets
 '''
 def arpHandler(arpSock):
     __arp_listen__ = True

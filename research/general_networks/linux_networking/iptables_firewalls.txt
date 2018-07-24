@@ -117,3 +117,15 @@ Routing decision                                                  |
   `iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
 - when using NAT functionality, tcpdump will pick up traffic after it has gone
   through NAT, at least when using the OUTPUT chain
+
+- there doesn't seem to be a userspace library for iptables. perhaps the best
+  way to do it is `iptables-save` and `iptables-restore`
+
+  https://stackoverflow.com/questions/109553/how-can-i-programmatically-manage-iptables-rules-on-the-fly#comment20958_109590
+
+  According to
+  https://www.mail-archive.com/netfilter-devel@lists.samba.org/msg00456.html
+  iptables-restore and iptables both do atomic transacations
+
+  I think this version of atomic means that the firewall will never be in a
+  semi-configured state. 
