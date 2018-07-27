@@ -117,6 +117,8 @@ Routing decision                                                  |
   `iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
 - when using NAT functionality, tcpdump will pick up traffic after it has gone
   through NAT, at least when using the OUTPUT chain
+- we can actually NAT to and from an IP address range
+  perhaps though it just picks the very first ip in the range though
 
 - there doesn't seem to be a userspace library for iptables. perhaps the best
   way to do it is `iptables-save` and `iptables-restore`
