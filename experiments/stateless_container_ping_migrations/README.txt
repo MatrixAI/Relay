@@ -1,3 +1,11 @@
+GOAL
+
+To demonstrate simple migration of communication flows between network
+namespaces pinging each other.
+
+To demonstrate services running on different network types (eg. ipv4 and ipv6)
+communicating with each other.
+
 OVERVIEW
 
 Let S be the container which sends pings.
@@ -26,3 +34,4 @@ Notes:
 
 - I could've used nftables, but iptables is already here and docker by default
   works with iptables. So I'll just stick with iptables.
+
