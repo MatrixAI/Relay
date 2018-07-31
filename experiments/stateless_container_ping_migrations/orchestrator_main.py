@@ -115,11 +115,15 @@ if __name__ == "__main__":
         print("This script needs sudo priveleges to run.")
         sys.exit(0)
 
+    if len(sys.argv) == 2 and sys.argv[1] == '-d':
+        DEBUG = True
+
     signal.signal(signal.SIGTERM, die_gracefully)
     signal.signal(signal.SIGINT, die_gracefully)
 
     # save the current iptables setting
-    ipt.ipt_save()
+    ipt.ipt_save(_initial_save=True)
+    sh.init_network()
 
     #TODO
     #set daemon value 

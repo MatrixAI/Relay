@@ -56,6 +56,8 @@ def pack(multi_addr):
 
 def get_address(packed_multiaddr):
     '''
-    Returns the first address in the multiaddress structure.
+    Returns the netowrk layer address in the multiaddress structure.
+    Assumes that the multiaddr doesn't support anything below IP in the TCP/IP
+    stack.
     '''
     return packed_multiaddr[1]

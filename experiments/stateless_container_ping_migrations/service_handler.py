@@ -4,6 +4,8 @@ Interface into service and flow table data structures and oeprations.
 
 ramwan <ray.wan@matrix.ai>
 '''
+def init_network():
+    sf.init_network()
 
 def new_service(serv_name):
     '''

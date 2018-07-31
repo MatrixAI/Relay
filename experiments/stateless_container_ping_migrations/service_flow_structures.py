@@ -1,3 +1,4 @@
+import networking_handler as nh
 import multiaddress as ma
 '''
 Data structures and operations on service and flow tables.
@@ -33,6 +34,10 @@ _service_instances = {}
 _flow_id_to_ip = {}
 _ip_to_flow_id = {}
 
+def init_network():
+    nh.network_init()
+
+
 '''
 ################################################################################
 Service Table operations
@@ -53,7 +58,10 @@ def add_service_instance(serv_name, multi_addr):
     '''
     packed_multiaddr = ma.pack(multi_addr)
     _service_table[serv_name].append(packed_multiaddr)
-    _add_serv_instance_entry(ma.get_address(packed_multiaddr), multiaddr)
+    _add_serv_instance_entry(ma.get_address(packed_multiaddr), multi_addr)
+    #TODO
+    # error handle
+    ret = nh.instantiate_service(multi_addr)
 
 def delete_service_instance(serv_name):
     '''
@@ -65,8 +73,9 @@ def delete_service_instance(serv_name):
     if len(_service_table[serv_name]) == 0:
         return
 
-    instance = _service_table[serv_name][ len(_service_table[serv_name])-1 ]
-    address = ma.get_address(instance)
+    instance_multiaddr = _service_table[serv_name][ len(_service_table[serv_name])-1 ]
+    nh.shutdown_instance(instance_multiaddr)
+    address = ma.get_address(instance_multiaddr)
     
     _delete_serv_instance_entry(address)
     _service_table[serv_name] = _service_table[serv_name][:-1]
@@ -98,7 +107,7 @@ def _add_serv_instance_entry(key, packed_multiaddr):
     '''
     Params: the key of the service instance (the address)
     '''
-    _service_instance[key] = packed_multiaddr
+    _service_instances[key] = packed_multiaddr
 
 def _delete_serv_instance_entry(key):
     '''

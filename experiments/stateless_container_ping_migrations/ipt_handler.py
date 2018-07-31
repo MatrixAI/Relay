@@ -5,13 +5,12 @@ Module for dealing with operations on iptables
 ramwan  <ray.wan@matrix.ai>
 '''
 
-_initial_save = True
 _ipt_save = []
 
 restore_file = "/tmp/matrix_prescramble_ipt.txt"
 work_file = "/tmp/matrix_scramble_ipt.txt"
 
-def ipt_save():
+def ipt_save(_initial_save=False):
     for line in os.popen('iptables-save'):
         _ipt_save.append(line)
 
