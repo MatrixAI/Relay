@@ -30,13 +30,10 @@ multiaddress    (netns_name, multiaddress)
 
 _net_map = {}
 
-bridge_netns_exists = False
-bridge_exists = False
-
 bridge_netns = "orchestrator"
 bridge_name = "the_bridge"
 bridge_ipv4_multiaddr = ma.pack("/ipv4/10.10.10.10")
-bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
+#bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
 
 def _name():
     '''
@@ -44,6 +41,41 @@ def _name():
     '''
     seed = random.randint(-10000, 10000)
     return base64.b64encode( str(seed).encode('utf-8') ).decode('utf-8')
+
+def _conn_ns_bridge(netns, veth_end):
+    '''
+    Set a veth end to a network namespace.
+    '''
+    ret = os.system('ip netns exec '+bridge_netns+ \
+                   ' ip link set '+veth_end+' netns '+ netns)
+
+def _slave_veth(veth_end):
+    '''
+    Set a veth end as the slave to the orchestrator bridge.
+    '''
+    ret = os.system('ip netns exec '+bridge_netns+ \
+                   ' ip link set '+veth_end+' master '+bridge_name)
+
+def _bring_up_if(netns, ifn):
+    '''
+    Bring up interface 'ifn' in network namespace 'netns'.
+    '''
+    ret = os.system('ip netns exec '+netns+ \
+                   ' ip link set '+ifn+' up')
+
+def _assign_addr(netns, ifn, addr):
+    '''
+    Assign network address to an interface inside a netns.
+    '''
+    ret = os.system('ip netns exec '+netns+ \
+                   ' ip addr add '+addr+' dev '+ifn)
+
+def _def_route(netns, addr):
+    '''
+    Set an address as the default route in a network namespace.
+    '''
+    ret = os.system('ip netns exec '+netns+ \
+                   ' ip route add default via '+addr)
 
 def _add(packed_multiaddr):
     '''
@@ -55,9 +87,8 @@ def _add(packed_multiaddr):
     #TODO
     # error handle
     netns = _create_new_netns()
-    veth = _create_veth_pair()
 
-    ret = _connect_netns_to_bridge(netns, veth[0], veth[1], packed_multiaddr)
+    ret = _connect_netns_to_bridge(netns, packed_multiaddr)
     _net_map[packed_multiaddr] = (netns, packed_multiaddr)
 
     return None
@@ -81,61 +112,76 @@ def _del(multi_addr):
     del _net_map[multi_addr]
 
 def _connect_netns_to_bridge(netns, \
-                             veth1, \
-                             veth2, \
                              packed_multiaddr):
     '''
+    Function to connect a given network namespace to the
+    orchestrator bridge.
     '''
     #TODO
     # error handle
 
+    veth1, veth2 = _create_veth_pair()
+
     # move one veth end to the proper namespace
-    ret = os.system('ip netns exec '+bridge_netns+ \
-                   ' ip link set '+veth1+' netns '+ netns)
+    _conn_ns_bridge(netns, veth1)
     # assign the other veth end to the bridge
-    ret = os.system('ip netns exec '+bridge_netns+ \
-                   ' ip link set '+veth2+' master '+bridge_name)
+    _slave_veth(veth2)
 
     # bring everything up
-    ret = os.system('ip netns exec '+bridge_netns+ \
-                   ' ip link set '+veth2+' up')
-    ret = os.system('ip netns exec '+netns+ \
-                   ' ip link set '+veth1+' up')
-    ret = os.system('ip netns exec '+netns+ \
-                   ' ip link set lo up')
-
+    _bring_up_if(bridge_netns, veth2)
+    _bring_up_if(netns, veth1)
+    _bring_up_if(netns, 'lo')
 
     # assign ip address to netns
     addr = ma.get_address(packed_multiaddr)
-    ret = os.system('ip netns exec '+netns+ \
-                   ' ip addr add '+addr+' dev '+veth1)
-    ret = os.system('ip netns exec '+netns+ \
-                   ' ip route add default via '+addr)
+    _assign_addr(netns, veth1, addr)
+    _def_route(netns, addr)
 
 def _create_new_netns():
     '''
     Attempt to create a network namespace with a randomly generated
     string.
-
-    Returns None if everything proceeds smoothly.
     '''
     name = _name()
     ret = os.system('ip netns add '+name)
+
+    '''
+    ASSUMPTION
+
+    We will not be exhausting the random number range or even get remotely
+    close to even 1/3 of the way. So not putting in any measures for stopping
+    the recursion.
+    '''
+    if ret != 0:
+        print("Netns already exists. Trying again.")
+        name = _create_new_netns()
     return name
 
 def _create_veth_pair():
     '''
     Attempt to create a veth pair with randomly generated strings.
-
-    Returns None if everything proceeds smoothly.
     '''
     name1 = _name()
     name2 = _name()
     # create the veth pair in the bridge namespace so we can check for name
     # collisions
+    
+    '''
+    ASSUMPTION
+
+    Same assumption as in _create_new_netns.
+    '''
     ret = os.system('ip netns exec '+bridge_netns+ \
                    ' ip link add '+name1+' type veth peer name '+name2)
-    return (name1, name2)
+    if ret != 0:
+        print("Possible name collision. Don't know which name caused \
+                the collision so clearing both and trying again.")
+        os.system('ip netns exec '+bridge_netns+ \
+                 ' ip link del '+name1)
+        os.system('ip netns exec '+bridge_netns+ \
+                 ' ip link del '+name2)
+        name1, name2 = _create_veth_pair()
+    return name1, name2
 
 def instantiate_service(multi_addr):
     '''
@@ -160,37 +206,31 @@ def network_init():
     # error handle
     # some failures aren't critical and probably shoudl accommodate for that if
     # i have time
-
+    print("Creating netns for the orchestrator.")
     ret = os.system('ip netns add '+bridge_netns)
-    bridge_netns_exists = True
-    
+    print("Creating the linux bridge.")
     ret = os.system('ip netns exec '+bridge_netns+' \
                     ip link add '+bridge_name+' type bridge')
-    bridge_exists = True
 
+    print("Adding IP address to bridge.")
     # assign IPv4 address
-    ret = os.system('ip netns exec '+bridge_netns+' \
-                    ip address add '+ma.get_address(bridge_ipv4_multiaddr)+' \
-                    dev '+bridge_name)
+    _assign_addr(bridge_netns, \
+                 bridge_name, \
+                 ma.get_address(bridge_ipv4_multiaddr))
 
     # assign IPv6 address
     #ret = os.system('ip netns exec '+bridge_netns+' \
     #               ip address add '+ma.get_address(bridge_ipv6_multiaddr)+' \
     #               dev '+bridge_name)
-
-    ret = os.system('ip netns exec '+bridge_netns+' \
-                    ip link set dev lo up')
-    
-    ret = os.system('ip netns exec '+bridge_netns+' \
-                    ip link set dev '+bridge_name+' up')
+    print("Setting the devices for the bridge netns to be up.")
+    _bring_up_if(bridge_netns, 'lo')
+    _bring_up_if(bridge_netns, bridge_name)
 
     print("Network namespaces initialised.")
 
     # initialise random number generator
     random.seed(time.time())
 
-    return 0
-
 def cleanup():
-    os.system('ip netns delete '+bridge_netns)
+    # only cleanup we need to do is clear all the network namespaces
     os.system('ip -all netns del')
