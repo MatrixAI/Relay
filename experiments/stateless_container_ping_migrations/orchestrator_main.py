@@ -17,7 +17,7 @@ _ipt_restore_file = "/tmp/sample_orchestrator_ipt.txt"
 _ui_thread_name = "ui_thread"
 
 
-def die_gracefully(signum, framenum):
+def die_gracefully():
     '''
     Perform cleanup.
     '''
@@ -27,6 +27,7 @@ def die_gracefully(signum, framenum):
         pass
 
     ipt.ipt_restore(ipt.restore_file)
+    sh.restore_network()
 
 #TODO
 def ui_thread_handler():
@@ -80,8 +81,7 @@ eg. /ipv4/10.0.0.1
         if s[0] == 'h':
             print(helpString)
         elif s[0] == 'q':
-            #TODO
-            # call dieGracefully
+            die_gracefully()
             print("Ctrl+D to exit. soz.")
         elif s[0] == 'n':
             ret = sh.new_service(s[1])

@@ -23,9 +23,6 @@ def ipt_restore(target):
     Params: [ restore_file | work_file ]
     '''
     ret = os.popen('iptables-restore '+target)
-    if ret != None:
-        print("Unable to perform iptables restore.")
-        print(os.strerror(ret))
 
 def _flush_to_file(target):
     with open(target, 'w') as f:

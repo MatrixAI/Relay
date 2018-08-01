@@ -7,6 +7,9 @@ ramwan <ray.wan@matrix.ai>
 def init_network():
     sf.init_network()
 
+def restore_network():
+    sf.restore_network()
+
 def new_service(serv_name):
     '''
     Add a new service name to the service table.

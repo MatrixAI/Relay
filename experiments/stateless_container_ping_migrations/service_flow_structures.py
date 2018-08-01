@@ -37,6 +37,8 @@ _ip_to_flow_id = {}
 def init_network():
     nh.network_init()
 
+def restore_network():
+    nh.cleanup()
 
 '''
 ################################################################################
@@ -73,9 +75,9 @@ def delete_service_instance(serv_name):
     if len(_service_table[serv_name]) == 0:
         return
 
-    instance_multiaddr = _service_table[serv_name][ len(_service_table[serv_name])-1 ]
-    nh.shutdown_instance(instance_multiaddr)
-    address = ma.get_address(instance_multiaddr)
+    packed_multiaddr = _service_table[serv_name][ len(_service_table[serv_name])-1 ]
+    nh.shutdown_instance(packed_multiaddr)
+    address = ma.get_address(packed_multiaddr)
     
     _delete_serv_instance_entry(address)
     _service_table[serv_name] = _service_table[serv_name][:-1]

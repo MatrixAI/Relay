@@ -39,7 +39,10 @@ bridge_ipv4_multiaddr = ma.pack("/ipv4/10.10.10.10")
 bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
 
 def _name():
-    seed = random.randint(-sys.maxsize, sys.maxsize)
+    '''
+    Return a random string.
+    '''
+    seed = random.randint(-10000, 10000)
     return base64.b64encode( str(seed).encode('utf-8') ).decode('utf-8')
 
 def _add(packed_multiaddr):
@@ -66,15 +69,15 @@ def _del(multi_addr):
     table.
     '''
     netns = ""
-    for k, v in _net_map:
+    for k in _net_map:
         if k == multi_addr:
-            netns = v[1]
+            netns = _net_map[k][0]
             break
 
     if netns == "":
         return
 
-    ret = os.system('ip netns del '+ma.get_address(multi_addr))
+    ret = os.system('ip netns del '+netns)
     del _net_map[multi_addr]
 
 def _connect_netns_to_bridge(netns, \
@@ -95,18 +98,18 @@ def _connect_netns_to_bridge(netns, \
 
     # bring everything up
     ret = os.system('ip netns exec '+bridge_netns+ \
-                   ' ip link set dev '+veth2+' up')
+                   ' ip link set '+veth2+' up')
     ret = os.system('ip netns exec '+netns+ \
-                   ' ip link set dev '+veth1+' up')
+                   ' ip link set '+veth1+' up')
     ret = os.system('ip netns exec '+netns+ \
-                   ' ip link set dev lo up')
+                   ' ip link set lo up')
 
 
     # assign ip address to netns
     addr = ma.get_address(packed_multiaddr)
-    ret = os.system('ip netns exec '+_netns+ \
+    ret = os.system('ip netns exec '+netns+ \
                    ' ip addr add '+addr+' dev '+veth1)
-    ret = os.system('ip netns exec '+_netns+ \
+    ret = os.system('ip netns exec '+netns+ \
                    ' ip route add default via '+addr)
 
 def _create_new_netns():
@@ -136,7 +139,7 @@ def _create_veth_pair():
 
 def instantiate_service(multi_addr):
     '''
-    Params: multiaddress for the service to live on.
+    Params: unpacked multiaddress for the service to live on.
     '''
     #TODO
     # error handle
@@ -145,9 +148,9 @@ def instantiate_service(multi_addr):
 
 def shutdown_instance(multi_addr):
     '''
-    Params: multiaddress of the service instance to delete
+    Params: packed multiaddress of the service instance to delete
     '''
-    _del(ma.pack(multi_addr))
+    _del(multi_addr)
 
 def network_init():
     '''
@@ -188,6 +191,6 @@ def network_init():
 
     return 0
 
-def _cleanup():
+def cleanup():
     os.system('ip netns delete '+bridge_netns)
     os.system('ip -all netns del')
