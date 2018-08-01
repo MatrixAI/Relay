@@ -52,6 +52,9 @@ Commands:
         delete an instance of serv_name
     r serv_name
         remove all instances of a service and stop tracking the service
+    c serv_A serv_B [num]
+        get serv_A to talk to serv_B (send ICMP ping)
+        optionally for `num` times
 
 Multiaddress
 A multiaddress is an address of the format
@@ -64,6 +67,9 @@ experiment needs to develop though, it will be.
 
 eg. /ipv4/10.0.0.1
     /ipv6/fe80::8823:6dff:fee7:f172\
+
+Heads up the subnet mask used is /24. Your namespaces can only talk to each
+other through a bridge only if they reside on the same subnet.
     '''
 
 

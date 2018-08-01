@@ -32,8 +32,10 @@ _net_map = {}
 
 bridge_netns = "orchestrator"
 bridge_name = "the_bridge"
-bridge_ipv4_multiaddr = ma.pack("/ipv4/10.10.10.10")
+bridge_ipv4_multiaddr = ma.pack("/ipv4/10.0.0.1")
 #bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
+
+subnet_mask = "/24"
 
 def _name():
     '''
@@ -68,7 +70,7 @@ def _assign_addr(netns, ifn, addr):
     Assign network address to an interface inside a netns.
     '''
     ret = os.system('ip netns exec '+netns+ \
-                   ' ip addr add '+addr+' dev '+ifn)
+                   ' ip addr add '+addr+subnet_mask+' dev '+ifn)
 
 def _def_route(netns, addr):
     '''
@@ -87,6 +89,7 @@ def _add(packed_multiaddr):
     #TODO
     # error handle
     netns = _create_new_netns()
+    _netns_resolvconf(netns)
 
     ret = _connect_netns_to_bridge(netns, packed_multiaddr)
     _net_map[packed_multiaddr] = (netns, packed_multiaddr)
@@ -157,6 +160,14 @@ def _create_new_netns():
         name = _create_new_netns()
     return name
 
+def _netns_resolvconf(netns):
+    '''
+    Each network namespace will now send dns requests to 
+    '''
+    ret = os.system('mkdir -p /etc/netns')
+    with open('/etc/netns/'+netns, 'w') as f:
+        f.write('nameserver '+ma.get_address(bridge_ipv4_multiaddr))
+
 def _create_veth_pair():
     '''
     Attempt to create a veth pair with randomly generated strings.
@@ -226,7 +237,9 @@ def network_init():
     _bring_up_if(bridge_netns, 'lo')
     _bring_up_if(bridge_netns, bridge_name)
 
-    print("Network namespaces initialised.")
+    print("Network namespace initialised.")
+    print("Orchestrator bridge resides on "\
+            +ma.get_address(bridge_ipv4_multiaddr)+subnet_mask)
 
     # initialise random number generator
     random.seed(time.time())
