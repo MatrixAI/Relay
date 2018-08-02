@@ -69,3 +69,10 @@ def remove_service(serv_name):
     Remove a service and delete all of its instances.
     '''
     sf.remove_service(serv_name)
+
+def service_instance_addr(serv_name):
+    '''
+    Returns a random multiaddr of an instance of serv_name.    
+    '''
+    return sf.get_random_instance(serv_name)
+

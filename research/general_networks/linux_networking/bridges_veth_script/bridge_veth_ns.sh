@@ -91,9 +91,7 @@ function create() {
 }
 
 function clean() {
-  sudo ip netns delete $NS1
-  sudo ip netns delete $NS2
-  sudo ip netns delete $NS3
+  sudo ip -all netns del
   sudo ip link delete $BRDG_NAME
 }
 

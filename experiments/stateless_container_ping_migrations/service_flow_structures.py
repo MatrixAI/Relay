@@ -1,5 +1,7 @@
 import networking_handler as nh
 import multiaddress as ma
+import random
+import time
 '''
 Data structures and operations on service and flow tables.
 
@@ -33,6 +35,8 @@ _service_table = {}
 _service_instances = {}
 _flow_id_to_ip = {}
 _ip_to_flow_id = {}
+
+random.seed(time.time())
 
 def init_network():
     nh.network_init()
@@ -87,6 +91,11 @@ def remove_service(serv_name):
         delete_service_instance(serv_name)
 
     del _service_table[serv_name]
+
+def get_random_instance(serv_name):
+    if serv_name not in _service_table:
+        return None
+    return random.choice(_service_table[serv_name])
 
 def service_table_to_string():
     return str(_service_table)

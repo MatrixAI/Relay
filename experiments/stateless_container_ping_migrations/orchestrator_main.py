@@ -12,6 +12,7 @@ import threading
 import signal
 import service_handler as sh
 import ipt_handler as ipt
+import mini_dns as dns
 
 _ipt_restore_file = "/tmp/sample_orchestrator_ipt.txt"
 _ui_thread_name = "ui_thread"
@@ -26,6 +27,7 @@ def die_gracefully():
     for thread in threading.enumerate():
         pass
 
+    dns.stop_listen()
     ipt.ipt_restore(ipt.restore_file)
     sh.restore_network()
 
@@ -130,6 +132,7 @@ if __name__ == "__main__":
     # save the current iptables setting
     ipt.ipt_save(_initial_save=True)
     sh.init_network()
+    dns.listen()
 
     #TODO
     #set daemon value 
