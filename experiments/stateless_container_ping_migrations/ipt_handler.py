@@ -23,6 +23,7 @@ def ipt_restore(target):
     Params: [ restore_file | work_file ]
     '''
     ret = os.popen('iptables-restore '+target)
+    print("Original iptables settings restored.")
 
 def _flush_to_file(target):
     with open(target, 'w') as f:

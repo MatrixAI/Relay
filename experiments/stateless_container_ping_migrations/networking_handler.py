@@ -35,7 +35,7 @@ bridge_name = "the_bridge"
 bridge_ipv4_multiaddr = ma.pack("/ipv4/10.0.0.1")
 #bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
 
-subnet_mask = "/24"
+_subnet_mask = "/16"
 
 def _name():
     '''
@@ -70,7 +70,7 @@ def _assign_addr(netns, ifn, addr):
     Assign network address to an interface inside a netns.
     '''
     ret = os.system('ip netns exec '+netns+ \
-                   ' ip addr add '+addr+subnet_mask+' dev '+ifn)
+                   ' ip addr add '+addr+_subnet_mask+' dev '+ifn)
 
 def _def_route(netns, addr):
     '''
@@ -111,6 +111,7 @@ def _del(multi_addr):
     if netns == "":
         return
 
+    ret = os.system('rm -r /etc/netns/'+netns)
     ret = os.system('ip netns del '+netns)
     del _net_map[multi_addr]
 
@@ -162,10 +163,10 @@ def _create_new_netns():
 
 def _netns_resolvconf(netns):
     '''
-    Each network namespace will now send dns requests to 
+    Each network namespace will now send dns requests to the bridge
     '''
-    ret = os.system('mkdir -p /etc/netns')
-    with open('/etc/netns/'+netns, 'w') as f:
+    ret = os.system('mkdir -p /etc/netns/'+netns)
+    with open('/etc/netns/'+netns+'/resolv.conf', 'w+') as f:
         f.write('nameserver '+ma.get_address(bridge_ipv4_multiaddr))
 
 def _create_veth_pair():
@@ -239,11 +240,16 @@ def network_init():
 
     print("Network namespace initialised.")
     print("Orchestrator bridge resides on "\
-            +ma.get_address(bridge_ipv4_multiaddr)+subnet_mask)
+            +ma.get_address(bridge_ipv4_multiaddr)+_subnet_mask)
+    print("For your namespaces to be able to communicate with each other, they \
+need to be on the same subnet as the bridge.")
 
     # initialise random number generator
     random.seed(time.time())
 
 def cleanup():
     # only cleanup we need to do is clear all the network namespaces
+    # TODO
+    # cleanup only what was created by this program.... not everything...
     os.system('ip -all netns del')
+    os.system('rm -r /etc/netns/*')

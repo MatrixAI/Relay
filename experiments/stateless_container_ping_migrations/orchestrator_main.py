@@ -10,26 +10,28 @@ import sys
 import os
 import threading
 import signal
+import select
 import service_handler as sh
 import ipt_handler as ipt
 import mini_dns as dns
 
 _ipt_restore_file = "/tmp/sample_orchestrator_ipt.txt"
 _ui_thread_name = "ui_thread"
-
+global _ui_thread_listening
 
 def die_gracefully():
     '''
     Perform cleanup.
     '''
-    #TODO
-    #clean up the system
-    for thread in threading.enumerate():
-        pass
+    global _ui_thread_listening
+
+    print("Shutting down.")
 
     dns.stop_listen()
     ipt.ipt_restore(ipt.restore_file)
     sh.restore_network()
+
+    _ui_thread_listening = False
 
 #TODO
 def ui_thread_handler():
@@ -74,60 +76,73 @@ Heads up the subnet mask used is /24. Your namespaces can only talk to each
 other through a bridge only if they reside on the same subnet.
     '''
 
+    poll = select.poll()
+    poll.register(sys.stdin.fileno(), select.POLLIN) 
 
+    global _ui_thread_listening
+    _ui_thread_listening = True
 
     # user input loop
     # TODO
     # check validity of provided arguments
-    while True:
-        ret = None
-        s = input().split(' ')
+    while _ui_thread_listening:
+        events = poll.poll(500)
         
-        if len(s) == 0:
-            continue
-
-        if s[0] == 'h':
-            print(helpString)
-        elif s[0] == 'q':
-            die_gracefully()
-            print("Ctrl+D to exit. soz.")
-        elif s[0] == 'n':
-            ret = sh.new_service(s[1])
-        elif s[0] == 'a':
-            ret = sh.new_service_instance(s[1], s[2])
-        elif s[0] == 'p':
-            if len(s) == 1 or s[1] == "servicetable":
-                print(sh.service_table_stringify())
-            elif s[1] == "serviceinstances":
-                print(sh.service_instances_stringify())
-        elif s[0] == 'd':
-            if len(s) < 2:
-                print("What service do you want to delete an instance from.")
+        if events:
+            ret = None
+            s = os.read(sys.stdin.fileno(), 1024)\
+                   .decode('utf-8')              \
+                   .strip()                      \
+                   .split(' ')
+            
+            if len(s) == 0:
+                continue
+    
+            if s[0] == 'h':
+                print(helpString)
+            elif s[0] == 'q':
+                die_gracefully()
+            elif s[0] == 'n':
+                ret = sh.new_service(s[1])
+            elif s[0] == 'a':
+                ret = sh.new_service_instance(s[1], s[2])
+            elif s[0] == 'p':
+                if len(s) == 1 or s[1] == "servicetable":
+                    print(sh.service_table_stringify())
+                elif s[1] == "serviceinstances":
+                    print(sh.service_instances_stringify())
+            elif s[0] == 'd':
+                if len(s) < 2:
+                    print("What service do you want to delete \
+                            an instance from.")
+                else:
+                    sh.delete_service_instance(s[1])
+            elif s[0] == 'r':
+                if len(s) < 2:
+                    print("What service do you want to remove.")
+                else:
+                    sh.remove_service(s[1])
             else:
-                sh.delete_service_instance(s[1])
-        elif s[0] == 'r':
-            if len(s) < 2:
-                print("What service do you want to remove.")
-            else:
-                sh.remove_service(s[1])
-        else:
-            print("Command not recognised.")
+                print("Command not recognised.")
+    
+            if ret != None:
+                print(ret)
 
-        if ret != None:
-            print(ret)
+    poll.unregister(sys.stdin.fileno())
 
 
-
+'''
+###############################################################################
+                                M A I N
+###############################################################################
+'''
 if __name__ == "__main__":
     if os.geteuid() != 0:
         print("This script needs sudo priveleges to run.")
         sys.exit(0)
 
-    if len(sys.argv) == 2 and sys.argv[1] == '-d':
-        DEBUG = True
-
-    signal.signal(signal.SIGTERM, die_gracefully)
-    signal.signal(signal.SIGINT, die_gracefully)
+    # TODO
+    # signal handling
 
     # save the current iptables setting
     ipt.ipt_save(_initial_save=True)
@@ -138,6 +153,5 @@ if __name__ == "__main__":
     #set daemon value 
     #listen for user commands
     ui_thread = threading.Thread(name=_ui_thread_name, \
-                                 target=ui_thread_handler,  \
-                                 daemon=None)
+                                 target=ui_thread_handler)
     ui_thread.start()

@@ -1,56 +1,125 @@
 import socket
-import service_flow_structures as sf
 import multiaddress as ma
 import threading
+import os
+import ctypes
+import select
+import time
+from networking_handler import bridge_netns, bridge_ipv4_multiaddr
+import service_flow_structures as sf
+
 '''
 Code heavily pulled from
 https://github.com/pathes/fakedns/blob/master/fakedns.py
 Cheers pathes
 
+setns() in python
+https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
+network-namespaces-from-my-python-code#28865626
+
 Modified as needed by ramwan <ray.wan@matrix.ai>
 '''
-_listening = False
-dns_ipv4_addr=""
+
+'''
+Variable definitions
+'''
+# setns(2)
+_setns = ctypes.cdll.LoadLibrary('libc.so.6').setns
+
+_dns_active = False
+_dns_ipv4 = None
+#_dns_ipv6 = None
+_dns4_thread = None
+#_dns6_thread = None
+dns_ipv4_addr = ma.get_address(bridge_ipv4_multiaddr)
+#dns_ipv6_addr = ma.get_address(bridge_ipv6_multiaddr)
 dns_header_length = 12
+
+class _Namespace(object):
+    '''
+    Class for easily entering and exiting network namespaces.
+    Taken from
+    https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
+    network-namespaces-from-my-python-code#28865626
+    '''
+    def __init__(self, nsname):
+        curr_pid = str(os.getpid())
+        self.initial_netns = '/proc/'+curr_pid+'/ns/net'
+        self.target_netns = '/var/run/netns/'+nsname
+
+    def __enter__(self):
+        # before entering the new netns, open a fd so that we can
+        # exit back to our original netns
+        self.initial_netns_fd = open(self.initial_netns)
+        with open(self.target_netns) as fd:
+            # setns(fd, CLONE_NEWNET)
+            _setns(fd.fileno(), 0)
+
+    def __exit__(self, *args):
+        _setns(self.initial_netns_fd.fileno(), 0)
+        os.close(self.initial_netns_fd.fileno())
 
 def listen():
     '''
+    Initialises sockets in the orchestrator/bridge netns and starts separate
+    threads to listen on them.
     '''
-    _listening = True
-    dns_ipv4 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #dns_ipv6 = socket.socklet(socket.AF_INET6, socket.SOCK_DGRAM)
+    global _dns_active
+    global _dns_ipv4
+    #global dns_ipv6
+    global _dns4_thread
+    #global _dns6_thread
+    _dns_active = True
 
-    #TODO
-    # error handle
-    dns_ipv4.bind(('', 53))
-    #dns_ipv6.bind(('', 53))
+    with _Namespace(bridge_netns):
+        _dns_ipv4 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #_dns_ipv6 = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
-    dns4_thread = threading.Thread(name="dns4_thread",     \
-                                   target=_listen_thread,  \
-                                   args=dns_ipv4)
-    #dns6_thread = threading.Thread(name="dns6_thread",    \
-    #                               target=_listen_thread, \
-    #                               args=dns_ipv6)
+        _dns_ipv4.bind((dns_ipv4_addr, 53))
+        #_dns_ipv6.bind((dns_ipv6_addr,53))
 
-    dns4_thread.start()
-    #dns6_thread.start()
+        #TODO
+        # error handle
+        _dns4_thread = threading.Thread(name="dns4_thread",     \
+                                       target=_listen,  \
+                                       args=[_dns_ipv4])
+        #_dns6_thread = threading.Thread(name="dns6_thread",    \
+        #                               target=_listen, \
+        #                               args=[_dns_ipv6])
 
-    dns4_thread.join()
-    #dns6_thread.join()
+        _dns4_thread.start()
+        #dns6_thread.start()
 
-    dns_ipv4.close()
-    #dns_ipv6.close()
+def _listen(sock):
+    '''
+    Function called by threads which poll on sockets.
+    '''
+    poll = select.poll()
+    poll.register(sock, select.POLLIN)
 
-def _listen_thread(sock):
-    while _listening:
-        data, addr = sock.recv(1024)
-        resp = _get_response(data)
-        sock.sendto(resp, addr)
+    while _dns_active:
+        events = poll.poll(500)
+
+        if events:
+            if events[0][1] & select.POLLIN:
+                data, addr = sock.recvfrom(1024)
+                resp = _get_response(data)
+                sock.sendto(resp, addr)
+    poll.unregister(sock)
 
 def stop_listen():
     '''
+    Stop and close the DNS sockets.
     '''
-    _listening = False
+    global _dns_active
+    _dns_active = False
+
+    _dns4_thread.join()
+    #_dns6_thread.join()
+
+    os.close(_dns_ipv4.fileno())
+    #os.close(_dns_ipv6.fileno())
+    print("DNS threads stopped.")
 
 def _get_response(request):
     '''
@@ -71,12 +140,11 @@ def _get_response(request):
     # Accept IPIv6 and IPv4 requests
     accepted_questions = []
     for question in all_questions:
-        if question['qtype'] == b'\x00\x01' and \
-                question['qclass'] == b'\x00\x01':
+        # IPv4 or IPv6
+        if question['qtype'] == b'\x00\x01' or \
+           question['qtype'] == b'\x00\x1c' and \
+           question['qclass'] == b'\x00\x01':
             accepted_questions.append(question)
-        elif question['qtype'] == b'\x00\x1c' and \
-                question['qclass'] == b'\x00\x01':
-            accepted_question.append(question)
 
     response = (
         _response_header(data) +
@@ -157,6 +225,8 @@ def _response_questions(questions):
     Generates DNS response questions.
     See http://tools.ietf.org/html/rfc1035 4.1.2. Question section format.
     '''
+    # TODO
+    # TEST FOR IPv6
     sections = b''
 
     for question in questions:
@@ -202,7 +272,9 @@ def _response_answers(questions):
         record += b'\x00\x04'
         # RDATA - in case of QTYPE=A and QCLASS=IN, it's IPv4 address.
         if question['qtype'] == b'\x00\x01':
-            _get_instance_addr(question['name'])
+            #addr = _get_instance_addr(question['name'])
+            addr = "127.0.0.1"
+            record += socket.inet_aton(addr)
         # elif question['qtype'] == b'\x00\x1c'
         else:
             #TODO

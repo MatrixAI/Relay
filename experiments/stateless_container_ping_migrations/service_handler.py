@@ -9,6 +9,7 @@ def init_network():
 
 def restore_network():
     sf.restore_network()
+    print("Original network settings restored.")
 
 def new_service(serv_name):
     '''
