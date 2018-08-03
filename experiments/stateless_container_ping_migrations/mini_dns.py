@@ -103,7 +103,7 @@ def _listen(sock):
         if events:
             if events[0][1] & select.POLLIN:
                 data, addr = sock.recvfrom(1024)
-                resp = _get_response(data)
+                resp = _get_response(data, addr)
                 sock.sendto(resp, addr)
     poll.unregister(sock)
 
@@ -121,9 +121,10 @@ def stop_listen():
     #os.close(_dns_ipv6.fileno())
     print("DNS threads stopped.")
 
-def _get_response(request):
+def _get_response(request, addr):
     '''
     On invalid requests or errors, return None.
+    `addr` is the inet_pton() of a string network address
     '''
     data = request.strip()
 
@@ -149,7 +150,7 @@ def _get_response(request):
     response = (
         _response_header(data) +
         _response_questions(accepted_questions) +
-        _response_answers(accepted_questions)
+        _response_answers(accepted_questions, addr)
     )
 
     return response
@@ -187,7 +188,6 @@ def _extract_questions(data):
         # Move pointer 5 octets further (zero length octet, QTYPE, QNAME)
         pointer += 5
         questions.append(question)
-        print(question['name'])
 
     return questions
 
@@ -243,13 +243,15 @@ def _response_questions(questions):
 
     return sections
 
-def _response_answers(questions):
+def _response_answers(questions, addr):
     '''
     Generates DNS response answers.
     See http://tools.ietf.org/html/rfc1035 4.1.3. Resource record format.
     '''
     records = b''
+    names = _join_question_names(questions)
 
+    count = 0
     for question in questions:
         record = b''
         for label in question['name']:
@@ -271,18 +273,53 @@ def _response_answers(questions):
         # In case of QTYPE=A and QCLASS=IN, RDLENGTH=4.
         record += b'\x00\x04'
         # RDATA - in case of QTYPE=A and QCLASS=IN, it's IPv4 address.
+
+        # TODO
+        # handle names without any instances
         if question['qtype'] == b'\x00\x01':
-            #addr = _get_instance_addr(question['name'])
-            addr = "127.0.0.1"
+            addr = _get_flow_id(names[count], addr)
             record += socket.inet_aton(addr)
         # elif question['qtype'] == b'\x00\x1c'
         else:
             #TODO
             pass
+        count += 1
 
         records += record
 
     return records
 
-def _get_instance_addr(serv_name):
-    return ma.get_address(sf.get_random_instance(serv_name))
+def _join_question_names(split_questions):
+    '''
+    DNS request formatting has each label of the domain name split up so we need
+    to join it back together in order to look up the ip.
+    '''
+    names = []
+    for i in range(len(split_questions)):
+        names.append([])
+        for j in range(len(split_questions[i]['name'])):
+            names[i].append(split_questions[i]['name'][j].decode('utf-8'))
+        names[i] = '.'.join(names[i])
+    return names
+
+def _get_flow_id(serv_name, sender_addr):
+    '''
+    Returns a flow ID which the DNS request sender will send requests to.
+    Represents the flow abstraction so that requests can transparently be
+    migrated.
+
+    Adds entry to the flow table.
+    Behaviour of add_flow_entry -> if flow exists, we'll just get the same flow
+    id back.
+    '''
+    fid = None
+    try:
+        string_addr = socket.inet_pton(socket.AF_INET, sender_addr[0])
+        fid = sf.add_flow_entry(serv_name, \
+                                v4=string_addr)
+    except:
+        # ipv6 address
+        fid = sf.add_flow_entry(serv_name, \
+                                v6=string_addr)
+
+    return fid
