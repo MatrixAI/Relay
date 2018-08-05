@@ -4,8 +4,13 @@ import base64
 import random
 import time
 import sys
+import ctypes
 '''
 Module for interacting with the linux networking stack and iptables itself.
+
+setns() in python
+https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
+network-namespaces-from-my-python-code#28865626
 
 ramwan  <ray.wan@matrix.ai>
 '''
@@ -19,6 +24,8 @@ a veth pair to a linux bridge running in its own network namespace.
 Note that when cleaning up the network spaces, a veth pair will be removed if a
 netns which one end resides in is removed as well.
 '''
+# setns(2)
+_setns = ctypes.cdll.LoadLibrary('libc.so.6').setns
 
 '''
 - DATA STRUCTURES -
@@ -35,7 +42,36 @@ bridge_name = "the_bridge"
 bridge_ipv4_multiaddr = ma.pack("/ipv4/10.0.0.1")
 #bridge_ipv6_multiaddr = "/ipv6/ff:ff::"
 
-_subnet_mask = "/16"
+subnet_mask = "/16"
+
+class Namespace(object):
+    '''
+    Class for easily entering and exiting network namespaces.
+    Taken from
+    https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
+    network-namespaces-from-my-python-code#28865626
+    '''
+    def __init__(self, nsname):
+        curr_pid = str(os.getpid())
+        self.initial_netns = '/proc/'+curr_pid+'/ns/net'
+        self.target_netns = '/var/run/netns/'+nsname
+
+    def __enter__(self):
+        # before entering the new netns, open a fd so that we can
+        # exit back to our original netns
+        self.initial_netns_fd = open(self.initial_netns)
+        with open(self.target_netns) as fd:
+            # setns(fd, CLONE_NEWNET)
+            _setns(fd.fileno(), 0)
+
+    def __exit__(self, *args):
+        _setns(self.initial_netns_fd.fileno(), 0)
+        os.close(self.initial_netns_fd.fileno())
+
+def get_ns_name(multiaddress):
+    if multiaddress in _net_map:
+        return _net_map[multiaddress][0]
+    return None
 
 def _name():
     '''
@@ -70,7 +106,7 @@ def _assign_addr(netns, ifn, addr):
     Assign network address to an interface inside a netns.
     '''
     ret = os.system('ip netns exec '+netns+ \
-                   ' ip addr add '+addr+_subnet_mask+' dev '+ifn)
+                   ' ip addr add '+addr+subnet_mask+' dev '+ifn)
 
 def _def_route(netns, addr):
     '''
@@ -240,7 +276,7 @@ def network_init():
 
     print("Network namespace initialised.")
     print("Orchestrator bridge resides on "\
-            +ma.get_address(bridge_ipv4_multiaddr)+_subnet_mask)
+            +ma.get_address(bridge_ipv4_multiaddr)+subnet_mask)
     print("For your namespaces to be able to communicate with each other, they \
 need to be on the same subnet as the bridge.")
 

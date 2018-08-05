@@ -48,6 +48,10 @@ Commands:
         print service table
     p serviceinstances
         print service instance table
+    p iptoflow
+        print ip to flow id table
+    p flowtoip
+        print flow id to ip table
     n serv_name
         new service instance with name `service_name`
     a serv_name multi_addr
@@ -111,6 +115,10 @@ other through a bridge only if they reside on the same subnet.
                     print(sh.service_table_stringify())
                 elif s[1] == "serviceinstances":
                     print(sh.service_instances_stringify())
+                elif s[1] == "iptoflow":
+                    print(sh.ip_to_flow_stringify())
+                elif s[1] == "flowtoip":
+                    print(sh.flow_to_ip_stringify())
             elif s[0] == 'd':
                 if len(s) < 2:
                     print("What service do you want to delete \

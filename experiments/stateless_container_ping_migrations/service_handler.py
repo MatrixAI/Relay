@@ -77,3 +77,8 @@ def service_instance_addr(serv_name):
     '''
     return sf.get_random_instance(serv_name)
 
+def ip_to_flow_stringify():
+    return sf.ip_to_flow_stringify()
+
+def flow_to_ip_stringify():
+    return sf.flow_to_ip_stringify()

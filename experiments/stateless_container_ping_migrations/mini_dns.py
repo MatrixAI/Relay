@@ -2,20 +2,15 @@ import socket
 import multiaddress as ma
 import threading
 import os
-import ctypes
 import select
 import time
-from networking_handler import bridge_netns, bridge_ipv4_multiaddr
+from networking_handler import bridge_netns, bridge_ipv4_multiaddr, Namespace
 import service_flow_structures as sf
 
 '''
-Code heavily pulled from
+DNS Code heavily pulled from
 https://github.com/pathes/fakedns/blob/master/fakedns.py
 Cheers pathes
-
-setns() in python
-https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
-network-namespaces-from-my-python-code#28865626
 
 Modified as needed by ramwan <ray.wan@matrix.ai>
 '''
@@ -23,9 +18,6 @@ Modified as needed by ramwan <ray.wan@matrix.ai>
 '''
 Variable definitions
 '''
-# setns(2)
-_setns = ctypes.cdll.LoadLibrary('libc.so.6').setns
-
 _dns_active = False
 _dns_ipv4 = None
 #_dns_ipv6 = None
@@ -34,30 +26,6 @@ _dns4_thread = None
 dns_ipv4_addr = ma.get_address(bridge_ipv4_multiaddr)
 #dns_ipv6_addr = ma.get_address(bridge_ipv6_multiaddr)
 dns_header_length = 12
-
-class _Namespace(object):
-    '''
-    Class for easily entering and exiting network namespaces.
-    Taken from
-    https://stackoverflow.com/questions/28846059/can-i-open-sockets-in-multiple-
-    network-namespaces-from-my-python-code#28865626
-    '''
-    def __init__(self, nsname):
-        curr_pid = str(os.getpid())
-        self.initial_netns = '/proc/'+curr_pid+'/ns/net'
-        self.target_netns = '/var/run/netns/'+nsname
-
-    def __enter__(self):
-        # before entering the new netns, open a fd so that we can
-        # exit back to our original netns
-        self.initial_netns_fd = open(self.initial_netns)
-        with open(self.target_netns) as fd:
-            # setns(fd, CLONE_NEWNET)
-            _setns(fd.fileno(), 0)
-
-    def __exit__(self, *args):
-        _setns(self.initial_netns_fd.fileno(), 0)
-        os.close(self.initial_netns_fd.fileno())
 
 def listen():
     '''
@@ -71,7 +39,7 @@ def listen():
     #global _dns6_thread
     _dns_active = True
 
-    with _Namespace(bridge_netns):
+    with Namespace(bridge_netns):
         _dns_ipv4 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #_dns_ipv6 = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
@@ -97,6 +65,14 @@ def _listen(sock):
     poll = select.poll()
     poll.register(sock, select.POLLIN)
 
+    # TODO
+    # for some reason, _get_response() will return None for a few tries
+    # before meaningful data is returned even if a proper response is possible.
+    # for example repeatedly requesting for a flowID that exists will usually
+    # (perhaps 6/7? tries on avg) return results instantly but occassionaly will
+    # return None.
+    #
+    # Hacky fix with try/except.
     while _dns_active:
         events = poll.poll(500)
 
@@ -104,7 +80,11 @@ def _listen(sock):
             if events[0][1] & select.POLLIN:
                 data, addr = sock.recvfrom(1024)
                 resp = _get_response(data, addr)
-                sock.sendto(resp, addr)
+                try:
+                    sock.sendto(resp, addr)
+                except Exception as e:
+                    continue
+    #shutdown
     poll.unregister(sock)
 
 def stop_listen():
@@ -248,6 +228,19 @@ def _response_answers(questions, addr):
     Generates DNS response answers.
     See http://tools.ietf.org/html/rfc1035 4.1.3. Resource record format.
     '''
+    # TODO
+    # Check for the existence of an instance of the requested server.
+    # If none exist, we should return a response that indicates there is no
+    # IP mapping for that domain name request.
+
+    '''
+    for name in names:
+        try get an address
+        
+        if None, response indicating no server
+        else regular response as below
+    '''
+
     records = b''
     names = _join_question_names(questions)
 
@@ -313,13 +306,14 @@ def _get_flow_id(serv_name, sender_addr):
     id back.
     '''
     fid = None
-    try:
-        string_addr = socket.inet_pton(socket.AF_INET, sender_addr[0])
-        fid = sf.add_flow_entry(serv_name, \
-                                v4=string_addr)
-    except:
-        # ipv6 address
-        fid = sf.add_flow_entry(serv_name, \
-                                v6=string_addr)
+    #try:
+    socket.inet_pton(socket.AF_INET, sender_addr[0])
+    fid = sf.get_flow_id(serv_name, \
+                             v4=sender_addr[0])
+    #except Exception as e:
+    #    print(e)
+    #    # ipv6 address
+    #    fid = sf.get_flow_id(serv_name, \
+    #                         v6=sender_addr[0])
 
     return fid

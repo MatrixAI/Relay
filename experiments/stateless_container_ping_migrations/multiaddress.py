@@ -1,4 +1,4 @@
-from socket import inet_pton, AF_INET, AF_INET6
+import socket
 '''
 Simple multiaddress module.
 
@@ -17,6 +17,9 @@ _supported_protocols = [\
         "ipv6"\
 ]
 
+IPV4 = "ipv4"
+IPV6 = "ipv6"
+
 def valid(multi_addr):
     '''
     Check whether multi_addr is valid.
@@ -32,12 +35,12 @@ def valid(multi_addr):
     if s[0] in _supported_protocols:
         if s[0] == "ipv4":
             try:
-                return inet_pton(AF_INET, s[1])
+                return socket.inet_pton(socket.AF_INET, s[1])
             except:
                 return False
         else:
             try:
-                return inet_pton(AF_INET6, s[1])
+                return socket.inet_pton(socket.AF_INET6, s[1])
             except:
                 return False
     return False
@@ -61,3 +64,18 @@ def get_address(packed_multiaddr):
     stack.
     '''
     return packed_multiaddr[1]
+
+def get_type(packed_multiaddr):
+    return packed_multiaddr[0]
+
+def ip_to_multiaddr(string_ip):
+    try:
+        socket.inet_pton(socket.AF_INET, string_ip)
+        return "/ipv4/"+string_ip
+    except:
+        return "/ipv6/"+string_ip
+    return None
+
+def ip_to_packed_multiaddr(string_ip):
+    return pack( ip_to_multiaddr(string_ip) )
+        
