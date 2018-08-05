@@ -3,35 +3,28 @@ GOAL
 To demonstrate simple migration of communication flows between network
 namespaces pinging each other.
 
+NOT IMPLEMENTED
 To demonstrate services running on different network types (eg. ipv4 and ipv6)
 communicating with each other.
 
 OVERVIEW
 
+This experiment implements a very simple DNS mechanism in python 3 and a simple
+prototype python orchestrator running in its own namespace. Containers
+(automatons) are simulated by creating new network namespaces and connecting
+them to the orchestrator bridge via veth pairs.
+
 Let S be the container which sends pings.
 Let R be the container which responds to pings.
-Let D be the discovery mechanism (whether it be in the host namespace or a
-separate container.
-Let R's service name be SERVICE_R.
+Let O be the orchestrator namespace.
 
-what we need:
-  1 container to respond to pings
-  1 container to send pings
+S sends a DNS request to have R's service name resolved. The resolution is
+performed by the orchestrator DNS server residing in O and returns an abstract
+IP address. The orchestrator edits iptables rules in S's namespace which use NAT
+to translate the abstract IP to a concrete IP address and vice versa.
 
-
-Steps
-- S sends a hostname resolve request for SERVICE_R to D
-- D performs service discovery and gets R's IP.
-- D responds to S with the flowID (virtual IP) and creates a mapping of
-  [flowID, R_IP, S_PORT]
-- S sends a ping packet to R and R responds.
-- A new instance of R is created
-
-Notes:
-- If we run S and R each in a separate network namespace, we can have an
-  instance of D (the orchestrator) in each namespace which can intercept and
-  manipulate requests
-
-- I could've used nftables, but iptables is already here and docker by default
-  works with iptables. So I'll just stick with iptables.
-
+In this current implementation, the iptables updating only is triggered upon a
+DNS request (eg. calling `host` or `dig`).
+Furthermore, S has to cease sending ICMP ping packets to R for the migration to
+occur.
+(Possibly due to locks in the kernel)
