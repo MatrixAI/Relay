@@ -163,3 +163,5 @@ if __name__ == "__main__":
     ui_thread = threading.Thread(name=_ui_thread_name, \
                                  target=ui_thread_handler)
     ui_thread.start()
+    ui_thread.join()
+    print("Goodbye :^)")
