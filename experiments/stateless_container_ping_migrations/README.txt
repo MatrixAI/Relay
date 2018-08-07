@@ -331,3 +331,5 @@ NOTES ON FURTHER DIRECTION
 - state communication between orchestrators on different physical hosts
 - security requirements within a Matrix network
 - quality of service constraints
+- clarify orchestrator design in order to find more focus with emphasis on
+  multi-host functionality

@@ -1,0 +1,66 @@
+ORCHESTRATOR DESIGN
+
+Functionalities
+o - things Relay and Orchestrator implementor needs to worry about
+x - probably will be an API or hooks for other modules to call into
+* - implementation details
+
+  Control Plane
+
+  x security checks for inter-automaton communication (only automatons composed
+    together and with compatible protocols can talk to each other)
+  o load balancing logic
+  x interface with Overwatch for QoS and management logic
+  o instantiate and delete automatons
+  o instantiate and delete orchestrator nodes
+  o implement flow abstraction functionalities
+    * packet mangling
+    * automaton name resolving
+    * peer-to-peer VPN (network layer tunnelling)
+  o communication of orchestrator critical data
+    * in-band/out-of-band control data?
+  o inter-network routing
+    * ipv4, ipv6 physical hosts
+  o name generation
+    * netns names
+    * veth names
+    * network address allocation
+    * flow ID generation
+  o automaton load tracking
+
+  Data Plane
+
+  o send packets within a single physical host
+  o send packets to other physical hosts
+
+Data structures
+o - single host data structures
+x - multi host data structures
+> - unsure. would need to be tested
+* - implementation details
+  
+  x automaton table 
+    - tracks what automatons exist globally
+    - tracks number of automaton instances per host
+      * helpful for load balancing
+    - what automatons need to communicate with each other
+      * graph representation of automaton communication?
+      * composition of automatons?
+    - automaton load tracking
+  o instance table
+    - automaton instances residing on the local physical host
+      * network namespaces
+      * veth endpoints
+      * concrete network addresses
+    - which automaton an instance belongs to
+    > associated flow table
+      > is it better to dynamically allocate a flow table per instance created
+        or have a per-host flow table?
+  o flow table
+    > Assumes flow table per instance
+    * Because we're assuming a flow table per instance, we now don't need to
+      use a bi-map as was needed in the initial experiment - we know which
+      automaton is on one side and the flowID is the key to find what's on the
+      other side.
+    - tracks flow ID (communication context)
+    - automaton on other end of communication

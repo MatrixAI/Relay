@@ -1,20 +1,15 @@
 # Current TODO List
-- criu
-- UPNP
-- SFS and other distributed file systems
-- Filecoin
-o zerotier
-o p2p VPN networks
-o wireguard
-- Delta-t protocol -> watson et al
-- PubSub, mDNS, SNR, multihoming and mobile networks
-- RFC 5128 State of Peer-to-Peer (P2P) - 
-  Communication across Network Address Translators (NATs)
-- ACI, AOS, Big Cloud Fabric, CNI-Genie, Contiv, Contrail, Flannel,
-  Google Compute Engine, Kube-router, Multus, NSX-T, OpenVSwitch,
-  OVN (open virtual networking), Project Calico, Romana
-- keepalived, netlink sockets
-- OpenStack
-- IPVS
-- IPsec
-- gossip protocols
+
+- p2p vpn/network layer tunelling
+  o zerotier
+  o tor
+  o bittorrent
+  o UPNP
+  o wireguard
+  o ipvs
+- bpf
+- distributed systems
+  o gossip protocols
+  o chubby lock service for loosely-coupled distributed systems, Google
+  o sharding
+  o other blockchain things
