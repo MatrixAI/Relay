@@ -1,0 +1,15 @@
+INTERHOST COMMUNICATION
+
+This document tracks thoughts on interhost communication between orchestrator
+nodes.
+
+o we don't have control over what happens when packets are in flight
+o hosts can reside on different networks and network types
+  . do we need to do our own routing between hosts?
+  . hosts can be virtual or physical, the orchestrator doesn't know and doesn't
+    really care
+o scale of the Matrix network
+  . one host
+  . a few hosts
+  . many hosts
+  . hundreds, thousands, even more hosts

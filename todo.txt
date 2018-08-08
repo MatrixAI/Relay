@@ -17,6 +17,7 @@ of interest but at least are worth having a look at.
   o userspace networking
   o BGP and variants
   o Scion new internet architecture
+  o software defined networks
 - distributed systems
   o gossip protocols
   o chubby lock service for loosely-coupled distributed systems, Google
