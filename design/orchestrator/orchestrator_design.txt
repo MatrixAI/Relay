@@ -64,3 +64,8 @@ x - multi host data structures
       other side.
     - tracks flow ID (communication context)
     - automaton on other end of communication
+
+
+Questions
+
+  o do intra-host communications need to always pass through the orchestrator?
