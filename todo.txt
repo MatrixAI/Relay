@@ -1,4 +1,7 @@
-# Current TODO List
+TODO list
+
+This list just has points that potentially have interest. Most probably won't be
+of interest but at least are worth having a look at.
 
 - p2p vpn/network layer tunelling
   o zerotier
@@ -7,9 +10,17 @@
   o UPNP
   o wireguard
   o ipvs
-- bpf
+- general networking tools/design
+  o bpf
+  o netfilter architecture
+  o linux networking stack
+  o userspace networking
+  o BGP and variants
+  o Scion new internet architecture
 - distributed systems
   o gossip protocols
   o chubby lock service for loosely-coupled distributed systems, Google
   o sharding
   o other blockchain things
+  o state replication/consistency
+  o general distributed systems design
