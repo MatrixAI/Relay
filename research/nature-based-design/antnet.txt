@@ -1,0 +1,19 @@
+ANTNET
+
+###############################################################################
+papers in /papers/nature-based-design
+
+###############################################################################
+
+- page 5 in COMNET_antnet.pdf is quite interesting
+  reinforcement learning seems to come into play when picking routes
+  perhaps it's not actually reinforcement learning
+  but at least the equations look familiar from my readings of reinforcement
+  learning
+
+  mention of epsilon-greedy on page 6
+
+- reinforcement learning actually could be applied quite well to this... perhaps
+  more readings will tell.
+  Reason for thinking this is that the problem domain is quite well defined and
+  criteria can be easily specified.

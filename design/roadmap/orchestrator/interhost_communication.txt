@@ -12,15 +12,41 @@ o hosts can reside on different networks and network types
 
   . hosts can be virtual or physical, the orchestrator doesn't know and doesn't
     really care
+
+  . communication should be point-to-point as much as possible
+    ? feasibility and effectiveness need to be examined
+
+  . we know that each node is running the same orchestrator code. Or at least we
+    don't need to consider malicious nodes. This is because a company or group
+    running the network wouldn't benefit from sabotaging a single node in their
+    network ... why would you shoot yourself in the foot?
+
+    this simplifies security a bit as we don't need to consider malicious nodes
+    pretending to behave like legitimate ones. 
 o scale of the Matrix network
   . one host
   . a few hosts
   . many hosts
   . hundreds, thousands, even more hosts
 
+  My personal thoughts on the feasibility of the interconnection of
+  orchestrators are that they should most definitely not be connected to each
+  other orchestrator. Every bit of resource dedicated to maintaining the network
+  is resource not being used for the actual purpose of the network - to run and
+  scale whatever services are needed.
+
+  The size of routing metadata should be adaptable to what free resources there
+  are. This is probably a feature to be added later on though but maybe could be
+  kept in mind when designing and testing the network.
+
+  Another point raised in discussions is an analogy of neural network abstract
+  designs to nodes in the network.
+
 o routing designs
   . ant colony routing
   . antnet
+  . neural networks
+  . reinforcement learning
 
   Firstly it should probably be made clearer the structure of the orchestrator
   network.
