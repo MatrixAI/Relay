@@ -166,3 +166,30 @@ TLDR!!!
   communication within that trust domain
 - Communication across trust domains are limited to a small group of explicitly
   identified set of other trust domains
+
+################################################################################
+
+Top level ISPs like Telstra
+    |
+    v
+Another level of ISPs like TPG, iinet
+    |
+    v
+Various geographical regions
+    |
+    v
+  ..... potentially more geographical splitting
+    |
+    v
+Homeowners and businesses
+
+I believe the above flow is what Scion is proposing and finding a solution for.
+The idea of being able to pick a route based on policy (combining up and down
+paths) is very interesting but not sure whether the Matrix network is going to
+be structured in the same way.
+
+Isolating trust to a few core domains is also interesting but not sure whether
+it's applicable to Matrix though.
+
+How would selecting paths be useful though?
+Perhaps for selecting low latency paths? Load balancing?

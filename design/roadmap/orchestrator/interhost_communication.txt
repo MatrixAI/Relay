@@ -6,6 +6,10 @@ nodes.
 o we don't have control over what happens when packets are in flight
 o hosts can reside on different networks and network types
   . do we need to do our own routing between hosts?
+    
+    I think yes we do because we can only assume that not all hosts will be on
+    the same network. This is probably the safest assumption to make.
+
   . hosts can be virtual or physical, the orchestrator doesn't know and doesn't
     really care
 o scale of the Matrix network
@@ -13,3 +17,10 @@ o scale of the Matrix network
   . a few hosts
   . many hosts
   . hundreds, thousands, even more hosts
+
+o routing designs
+  . ant colony routing
+  . antnet
+
+  Firstly it should probably be made clearer the structure of the orchestrator
+  network.

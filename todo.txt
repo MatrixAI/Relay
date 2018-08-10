@@ -18,10 +18,17 @@ of interest but at least are worth having a look at.
   o BGP and variants
   o Scion new internet architecture
   o software defined networks
-- distributed systems
+- distributed systems/computing
   o gossip protocols
   o chubby lock service for loosely-coupled distributed systems, Google
   o sharding
   o other blockchain things
   o state replication/consistency
   o general distributed systems design
+
+- other things of general interest to possibly skim through
+  o weird as it sounds, I think the following could be worth at least looking at
+    quickly
+    . USB and other hardware interfaces
+    . NFS
+    . vehicle routing problems
