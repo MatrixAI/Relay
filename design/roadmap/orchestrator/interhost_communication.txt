@@ -49,4 +49,23 @@ o routing designs
   . reinforcement learning
 
   Firstly it should probably be made clearer the structure of the orchestrator
-  network.
+  network as well as what needs to be transported on the network. For example,
+  if the network handles a lot of image fetches from databases, it doesn't
+  matter which database instance is accessed if it's a distributed/replicated
+  database.
+
+  However if there needs to be long running connections to a server for a game,
+  the same source and sink nodes need to be there for the connection unless an
+  explicit upgrade is requested.
+
+  However in the case just described, we can alter the route from source to sink
+  without disrupting the flow. Again this depends highly on the structure of the
+  network. If the size of the network is very small, we can actually just use
+  traditional routing algorithms or even just send data to and from the source
+  and sink directly.
+
+  If for some reason someone wants thousands of services in a world-wide mesh,
+  we could actually see a sort of tiered heirarchy in the network.
+  
+  Scaling a network can be done vertically and horizontally and each form of
+  scaling may be better for certain situations.

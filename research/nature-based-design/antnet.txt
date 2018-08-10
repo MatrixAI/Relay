@@ -17,3 +17,5 @@ papers in /papers/nature-based-design
   more readings will tell.
   Reason for thinking this is that the problem domain is quite well defined and
   criteria can be easily specified.
+
+- robust to changes in the network and has inherent load balancing
