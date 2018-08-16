@@ -1,0 +1,43 @@
+AUTOMATON NETWORKING
+
+- automaton combinators
+  o message
+    . sends a message as a form of notification
+    . doesn't take any form of response
+  o request-response
+    . sends a message as a request
+    . expects a response
+  o request-action[-response]
+    . sends a message as a request
+    . expects something to be performed
+        , can be on behalf of the requester
+        , something such as file transfer could be performed
+        , could trigger other actions to be performed resulting in a response to
+          the original requester
+
+  Some possible combinators/examples are:
+  o request response from left side
+    A sends a request to B and receives a response from B.
+  o response request from left side
+    A receives a request from B and sends a response to B.
+  o message from left side
+    A sends a message to B.
+  o message to left side
+    A receives a message from B.
+
+- load balancing
+  o
+
+- statistics tracking
+  o 
+
+- migration
+  o automaton name abstraction (mentioned as service name abstraction in other
+    documents)
+  o usage of flow ID to mark a communication flow between one container and
+    another. This could even potentially be used to mark the communication flow
+    between composed automatons.
+
+- automaton communication
+  o inter-automaton communication needs to be point-to-point from the
+    perspective of the programs

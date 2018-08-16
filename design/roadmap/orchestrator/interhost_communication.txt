@@ -21,7 +21,7 @@ o hosts can reside on different networks and network types
     running the network wouldn't benefit from sabotaging a single node in their
     network ... why would you shoot yourself in the foot?
 
-    this simplifies security a bit as we don't need to consider malicious nodes
+   this simplifies security a bit as we don't need to consider malicious nodes
     pretending to behave like legitimate ones. 
 o scale of the Matrix network
   . one host

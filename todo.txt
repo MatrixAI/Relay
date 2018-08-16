@@ -18,6 +18,7 @@ of interest but at least are worth having a look at.
   o BGP and variants
   o Scion new internet architecture
   o software defined networks
+  o pull vs push based architecture
 - distributed systems/computing
   o gossip protocols
   o chubby lock service for loosely-coupled distributed systems, Google
