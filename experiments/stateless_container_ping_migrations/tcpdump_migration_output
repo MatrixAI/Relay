@@ -1,0 +1,112 @@
+ray@~: sudo ip netns exec LTY1MzA= tcpdump
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on NTgyNg==, link-type EN10MB (Ethernet), capture size 262144 bytes
+21:00:23.385278 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 6, length 64
+21:00:23.385320 IP 10.0.1.1 > 10.0.2.1: ICMP echo reply, id 1717, seq 6, length 64
+21:00:23.449253 ARP, Request who-has 10.0.2.1 tell 10.0.1.1, length 28
+21:00:23.449267 ARP, Reply 10.0.2.1 is-at 9e:78:8d:ef:07:ae (oui Unknown), length 28
+21:00:24.409276 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 7, length 64
+21:00:24.409305 IP 10.0.1.1 > 10.0.2.1: ICMP echo reply, id 1717, seq 7, length 64
+21:00:25.433247 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 8, length 64
+21:00:25.433280 IP 10.0.1.1 > 10.0.2.1: ICMP echo reply, id 1717, seq 8, length 64
+21:00:26.457211 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 9, length 64
+21:00:26.457238 IP 10.0.1.1 > 10.0.2.1: ICMP echo reply, id 1717, seq 9, length 64
+21:00:27.481272 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 10, length 64
+21:00:28.505274 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 11, length 64
+21:00:29.529216 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 12, length 64
+21:00:30.553271 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 13, length 64
+21:00:31.577275 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 14, length 64
+21:00:32.601272 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 15, length 64
+21:00:33.625274 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 16, length 64
+21:00:34.649297 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 17, length 64
+21:00:35.673289 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 18, length 64
+21:00:35.986280 IP6 :: > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+21:00:36.489239 IP6 :: > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+21:00:36.569215 IP6 :: > ff02::1:ffed:1b6c: ICMP6, neighbor solicitation, who has fe80::498:cff:feed:1b6c, length 32
+21:00:36.697246 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 19, length 64
+21:00:36.761255 IP6 fe80::ec0d:efff:fe60:87ea > ff02::2: ICMP6, router solicitation, length 16
+21:00:37.593284 IP6 fe80::498:cff:feed:1b6c > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+21:00:37.593312 IP6 fe80::498:cff:feed:1b6c > ff02::2: ICMP6, router solicitation, length 16
+21:00:37.721234 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 20, length 64
+21:00:38.073216 IP6 fe80::498:cff:feed:1b6c > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+21:00:38.745232 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 21, length 64
+21:00:39.769275 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 22, length 64
+21:00:40.793287 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 23, length 64
+21:00:41.241258 IP6 fe80::498:cff:feed:1b6c > ff02::2: ICMP6, router solicitation, length 16
+21:00:41.817241 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 24, length 64
+21:00:42.187762 IP 10.0.2.1.35370 > 10.0.0.1.domain: 19536+ A? a.com. (23)
+21:00:42.841286 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 25, length 64
+21:00:43.865233 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 26, length 64
+21:00:44.889286 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 27, length 64
+21:00:44.953196 IP6 fe80::9c78:8dff:feef:7ae > ff02::2: ICMP6, router solicitation, length 16
+21:00:45.913303 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 28, length 64
+21:00:46.937231 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 29, length 64
+21:00:47.187840 IP 10.0.2.1.35370 > 10.0.0.1.domain: 19536+ A? a.com. (23)
+21:00:47.961281 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 30, length 64
+21:00:48.537200 IP6 fe80::498:cff:feed:1b6c > ff02::2: ICMP6, router solicitation, length 16
+21:00:48.985277 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 31, length 64
+21:00:50.009285 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 32, length 64
+21:00:51.033276 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 33, length 64
+21:00:52.057238 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 34, length 64
+21:00:53.081197 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 35, length 64
+21:00:53.252750 IP 10.0.2.1.58434 > 10.0.0.1.domain: 48997+ A? a.com. (23)
+21:00:54.105271 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 36, length 64
+21:00:55.129271 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 37, length 64
+21:00:56.153271 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 38, length 64
+21:00:57.177234 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 39, length 64
+21:00:58.201272 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 40, length 64
+21:00:58.252823 IP 10.0.2.1.58434 > 10.0.0.1.domain: 48997+ A? a.com. (23)
+21:00:59.225276 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 41, length 64
+21:01:00.249272 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 42, length 64
+21:01:01.273269 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 43, length 64
+21:01:02.297263 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 44, length 64
+21:01:02.361276 IP6 fe80::498:cff:feed:1b6c > ff02::2: ICMP6, router solicitation, length 16
+21:01:03.321277 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 45, length 64
+21:01:03.385231 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:03.385231 ARP, Request who-has 10.0.0.1 tell 10.0.2.1, length 28
+21:01:04.233988 IP 10.0.2.1.36250 > 10.0.0.1.domain: 17813+ A? a.com. (23)
+21:01:04.345272 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 46, length 64
+21:01:04.409230 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:04.409230 ARP, Request who-has 10.0.0.1 tell 10.0.2.1, length 28
+21:01:05.369273 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 47, length 64
+21:01:05.433209 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:05.433209 ARP, Request who-has 10.0.0.1 tell 10.0.2.1, length 28
+21:01:06.393271 IP 10.0.2.1 > 10.0.1.1: ICMP echo request, id 1717, seq 48, length 64
+21:01:07.417270 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:08.441180 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:09.233941 ARP, Request who-has 10.0.0.1 tell 10.0.2.1, length 28
+21:01:09.233965 ARP, Reply 10.0.0.1 is-at 02:00:d5:2d:d7:b6 (oui Unknown), length 28
+21:01:09.233971 IP 10.0.2.1.36250 > 10.0.0.1.domain: 17813+ A? a.com. (23)
+21:01:09.314283 IP 10.0.0.1.domain > 10.0.2.1.36250: 17813- 1/0/0 A 10.0.254.0 (44)
+21:01:09.314500 IP 10.0.2.1.41617 > 10.0.0.1.domain: 9121+ AAAA? a.com. (23)
+21:01:09.314637 IP 10.0.0.1.domain > 10.0.2.1.41617: 9121- 1/0/0 AAAA[|domain]
+21:01:09.314786 IP 10.0.2.1.44737 > 10.0.0.1.domain: 5542+ MX? a.com. (23)
+21:01:09.314846 IP 10.0.0.1.domain > 10.0.2.1.44737: 5542-[|domain]
+21:01:09.465233 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:09.529193 IP6 fe80::9c06:62ff:fecf:4c85 > ff02::2: ICMP6, router solicitation, length 16
+21:01:10.489271 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:11.513241 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:12.537202 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:13.561322 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:14.585219 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:14.649206 ARP, Request who-has 10.0.2.1 tell 10.0.0.1, length 28
+21:01:14.649241 ARP, Reply 10.0.2.1 is-at 9e:78:8d:ef:07:ae (oui Unknown), length 28
+21:01:15.609236 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:16.633348 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:17.657239 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:18.681237 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:18.850450 ARP, Request who-has 10.0.1.2 tell 10.0.2.1, length 28
+21:01:18.850479 ARP, Reply 10.0.1.2 is-at 06:98:0c:ed:1b:6c (oui Unknown), length 28
+21:01:18.850481 IP 10.0.2.1 > 10.0.1.2: ICMP echo request, id 2481, seq 1, length 64
+21:01:18.850493 IP 10.0.1.2 > 10.0.2.1: ICMP echo reply, id 2481, seq 1, length 64
+21:01:19.850541 IP 10.0.2.1 > 10.0.1.2: ICMP echo request, id 2481, seq 2, length 64
+21:01:19.850570 IP 10.0.1.2 > 10.0.2.1: ICMP echo reply, id 2481, seq 2, length 64
+21:01:20.683345 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+21:01:20.857284 IP 10.0.2.1 > 10.0.1.2: ICMP echo request, id 2481, seq 3, length 64
+21:01:20.857315 IP 10.0.1.2 > 10.0.2.1: ICMP echo reply, id 2481, seq 3, length 64
+21:01:21.689204 ARP, Request who-has 10.0.1.1 tell 10.0.2.1, length 28
+^C
+104 packets captured
+104 packets received by filter
+0 packets dropped by kernel
+

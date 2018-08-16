@@ -1,0 +1,5 @@
+ray@~: sudo ip netns exec LTU4NjA= conntrack -L conntrack
+icmp     1 29 src=10.0.2.1 dst=10.0.254.0 type=8 code=0 id=15599 src=10.0.1.2 dst=10.0.2.1 type=0 code=0 id=15599 mark=0 use=1
+icmp     1 24 src=10.0.2.1 dst=10.0.254.0 type=8 code=0 id=15533 src=10.0.1.2 dst=10.0.2.1 type=0 code=0 id=15533 mark=0 use=1
+icmp     1 29 src=10.0.2.1 dst=10.0.254.0 type=8 code=0 id=14224 src=10.0.1.1 dst=10.0.2.1 type=0 code=0 id=14224 mark=0 use=3
+conntrack v1.4.4 (conntrack-tools): 3 flow entries have been shown.

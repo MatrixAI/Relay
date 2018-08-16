@@ -100,3 +100,20 @@ Socket Flow Abstraction
   to exist within the Matrix network and outside of it without any additional
   changes by the developers, the flowID probably should be an abstract IP
   address which gets mapped to concrete addresses later.
+
+################################################################################
+Another note which I think will be helpful is that the socket flow abstraction
+can be extended to cover the flow between composed automatons.
+
+Consider the example of A sending a message to B which as its response sends a
+message to C which in turn sends a message as a response back to A.
+                        A -> B -> C -> .
+where '.' represents the start. The syntax of this composition isn't yet
+determined but the idea may still be relevant. When these automatons are
+composed together in the language specification, the developers have made
+explicit that this communication flow will occur. If we were to use a flowID as
+an abstraction, we'd eliminate the problem of having to have A open another
+socket to receive a response from C instead of B which it actually sends a
+message out to.
+
+This way, any automaton in the composition can be ephemeral.

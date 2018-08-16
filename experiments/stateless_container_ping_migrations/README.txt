@@ -1,5 +1,11 @@
 ################################################################################
 
+________________________________________________________________________________
+NOTE some of the things I talk about in the body of this writeup are addressed 
+at the very bottom - namely the reason why the experiment wasn't quite working.
+--------------------------------------------------------------------------------
+
+
 PRIMARY GOAL
 
 To simulate automatons being able to communicate with each other across an
@@ -333,3 +339,64 @@ NOTES ON FURTHER DIRECTION
 - quality of service constraints
 - clarify orchestrator design in order to find more focus with emphasis on
   multi-host functionality
+
+
+
+
+
+More notes after reading more into kernel code
+----------------------------------------------
+
+Xtables code for the function `xt_replace_table()` can be found at
+net/netfilter/x_tables.c. I'm thinking that this is the function which upgrades
+an xtable configuration which is what an iptables update eventually will call.
+Inside we can see a reference to a seqlock.
+
+With this knowledge, I ran the experiment again and tried to swap out the target
+service while `ping` was running. The ping program proceeded to fail
+(specifically, it gave "Destination Host Unreachable") messages.
+
+I disregarded this and tried to resolve a service anyway to set the flowID in
+the orchestrator to the new IP of the new service instance. The first `host`
+call failed, perhaps it was just due to my implementation (or python being
+dodgy) as sometimes DNS requests do fail.
+
+A second attempt at `host a.com` however returned the same flowID. The original
+`ping` program continued to print out "Destination Host Unreachable" messages
+but I was able to run a second ping program which was able to ping the flowID
+successfully.
+
+Running `tcpdump` while having the old ping program running (the one with host
+unreachable) and the new ping which is able to use the same flowID. I've added a
+log of the tcpdump output for those interested to go through as well in this
+directory.
+
+My suspicion is that this has something to do with conntrack as indeed there is
+no lock in the kernel preventing iptables from changing underneath a program.
+
+Upon repeating the experiment but running `conntrack` to check the connections
+in the constant namespace, we can see that the old connection still exists
+(conntrack_migration_output file in this directory). 
+
+Running the experiment one more time but this time editing the conntrack table
+as well (`sudo ip netns exec *namespace* conntrack -D conntrack`) proved to be
+enough as the original ping program which would've started showing host
+unreachable messages now proceeds as if nothing had changed (although icmp_seq
+numbers were off) as shown below.
+
+"""
+ray@examples: sudo ip netns exec MTQyNQ== ping 10.0.254.0
+PING 10.0.254.0 (10.0.254.0) 56(84) bytes of data.
+64 bytes from 10.0.254.0: icmp_seq=1 ttl=64 time=0.064 ms
+64 bytes from 10.0.254.0: icmp_seq=2 ttl=64 time=0.041 ms
+64 bytes from 10.0.254.0: icmp_seq=3 ttl=64 time=0.040 ms
+64 bytes from 10.0.254.0: icmp_seq=4 ttl=64 time=0.047 ms
+64 bytes from 10.0.254.0: icmp_seq=39 ttl=64 time=0.073 ms
+64 bytes from 10.0.254.0: icmp_seq=40 ttl=64 time=0.048 ms
+64 bytes from 10.0.254.0: icmp_seq=41 ttl=64 time=0.042 ms
+64 bytes from 10.0.254.0: icmp_seq=42 ttl=64 time=0.051 ms
+64 bytes from 10.0.254.0: icmp_seq=43 ttl=64 time=0.049 ms
+64 bytes from 10.0.254.0: icmp_seq=44 ttl=64 time=0.050 ms
+"""
+
+

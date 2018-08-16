@@ -14,6 +14,7 @@
 #           Veth and namespace setup
 #
 # All IPs are able to be pinged from everywhere.
+# Extra note: both ends of the veth pair need to be on the same subnet.
 
 NS1="A"
 NS2="B"

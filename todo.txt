@@ -33,3 +33,8 @@ of interest but at least are worth having a look at.
     . USB and other hardware interfaces
     . NFS
     . vehicle routing problems
+
+Things the next experiment may examine:
+  - lower level networking rules
+  - automaton composition rules specified from a file
+  - flowID representing an automaton's connection in a composition

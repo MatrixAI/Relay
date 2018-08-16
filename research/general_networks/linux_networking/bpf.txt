@@ -1,0 +1,8 @@
+BPF
+
+################################################################################
+https://qmonnet.github.io/whirl-offload/2016/09/01/dive-into-bpf/
+################################################################################
+
+- BPF only does packet filtering but what we kind of needed with the
+  architecture on the original experiment was NAT
