@@ -1,0 +1,47 @@
+name:                automaton-composition-and-networking-experiment
+version:             0.0.0.1
+github:              "MatrixAI/Relay"
+license:             BSD3
+author:              "ramwan"
+maintainer:          "ray.wan@matrix.ai"
+copyright:           "Copyright: (c) 2018 Raymond Wan"
+
+extra-source-files:
+- README.txt
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Please see the README in this directory.
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  experiment-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - automaton-composition-and-networking-experiment
+
+tests:
+  experiment-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - automaton-composition-and-networking-experiment
