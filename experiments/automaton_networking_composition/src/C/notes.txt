@@ -1,0 +1,4 @@
+gcc -o ../a.out sample_libiptc_linking.c -L/home/$USER/.nix-profile/lib/ -liptc
+
+sample command to link the file 'sample_libiptc_linking.c' with libiptc.so to
+create an executable ../a.out
