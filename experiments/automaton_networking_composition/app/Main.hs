@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import qualified ParseInput as PI
 
 main :: IO ()
-main = someFunc
+main = PI.readUntilEOF []
+       >>= print

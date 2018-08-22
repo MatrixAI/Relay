@@ -5,7 +5,7 @@
   haskell.lib.buildStackProject {
     name = "automaton_networking_and_composition_experiment";
     src = null;
-    buildInputs = [ python3 ];
+    buildInputs = [ python3 iptables ];
     shellHook = ''
       echo 'Entering experiment environment'
       set -v

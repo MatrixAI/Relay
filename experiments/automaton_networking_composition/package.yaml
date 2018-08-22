@@ -20,6 +20,8 @@ description: Please see the README in this directory.
 
 dependencies:
 - base >= 4.7 && < 5
+- cryptonite
+- bytestring
 
 library:
   source-dirs: src/haskell
