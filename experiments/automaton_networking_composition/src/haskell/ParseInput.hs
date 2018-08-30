@@ -5,6 +5,21 @@ module ParseInput
 import qualified Control.Monad as CM
 import qualified System.IO as SIO
 
+type Name = String
+type NetnsName = String
+type VethNames = (String, String)
+type DefGateway = String
+type DepFlows = [String] -- to properly do
+type CompositFlow = String -- to properly do
+data Automaton = Automaton {
+                    name :: Name,
+                    netnsName :: NetnsName,
+                    vethNames :: VethNames,
+                    defaultGateway :: DefGateway,
+                    dependencyFlows :: DepFlows,
+                    compositionFlow :: CompositFlow
+                           } deriving (Show, Eq)
+
 -- read lines in from STDIN
 readUntilEOF :: [String] -> IO [String]
 readUntilEOF lns = do

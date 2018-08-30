@@ -5,20 +5,26 @@ of interest but at least are worth having a look at.
 
 - p2p vpn/network layer tunelling
   o zerotier
-  o tor
-  o bittorrent
-  o UPNP
+    > location of peers via external mechanisms (dns-like root servers)
+    > p2p
   o wireguard
+    > potentially useful for interhost networking. However we'd need to see
+    about how flexible the configuration of peers are in order to allow new
+    hosts to come online and old ones to drop out
+    > interested in how a new 'wireguard' device is created. i think it's worth
+    looking at source code
   o ipvs
+    > layer 4 switching which means underlying network protocol HAS to be IP and
+    we HAVE to have a transport protocol of either TCP, UDP or SCTP
+    > has NAT, direct tunnelling and IP encapsulation. All are concepts relevant
+    to Relay but layer 4 switching may be too restrictive.
 - general networking tools/design
   o bpf
   o netfilter architecture
   o linux networking stack
   o userspace networking
+    > snabb
   o BGP and variants
-  o Scion new internet architecture
-  o software defined networks
-  o pull vs push based architecture
 - distributed systems/computing
   o gossip protocols
   o chubby lock service for loosely-coupled distributed systems, Google
@@ -26,6 +32,10 @@ of interest but at least are worth having a look at.
   o other blockchain things
   o state replication/consistency
   o general distributed systems design
+- load balancing
+  o nginx
+  o warp
+  o haproxy
 
 - other things of general interest to possibly skim through
   o weird as it sounds, I think the following could be worth at least looking at

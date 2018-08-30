@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 05cbd619e1b6af5b9725a1d0ae947fbf6c0c885902cdff6a2a2ecdde4bbd2083
+-- hash: 04b5de6006f2b9f248477164e9da64c87ca0ed6c837c3a8430f5cf87ea7a8402
 
 name:           automaton-composition-and-networking-experiment
 version:        0.0.0.1
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       ParseInput
+      SampleNetworking
   other-modules:
       Paths_automaton_composition_and_networking_experiment
   hs-source-dirs:
@@ -35,6 +36,7 @@ library
       base >=4.7 && <5
     , bytestring
     , cryptonite
+    , network
   default-language: Haskell2010
 
 executable experiment-exe
@@ -49,6 +51,7 @@ executable experiment-exe
     , base >=4.7 && <5
     , bytestring
     , cryptonite
+    , network
   default-language: Haskell2010
 
 test-suite experiment-test
@@ -64,4 +67,5 @@ test-suite experiment-test
     , base >=4.7 && <5
     , bytestring
     , cryptonite
+    , network
   default-language: Haskell2010
