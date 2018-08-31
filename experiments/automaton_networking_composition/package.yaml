@@ -1,7 +1,7 @@
-name:                automaton-composition-and-networking-experiment
+name:                automaton-experiment
 version:             0.0.0.1
 github:              "MatrixAI/Relay"
-license:             BSD3
+license:             Apache
 author:              "ramwan"
 maintainer:          "ray.wan@matrix.ai"
 copyright:           "Copyright: (c) 2018 Raymond Wan"
@@ -23,6 +23,7 @@ dependencies:
 - cryptonite
 - bytestring
 - network
+- hexstring
 
 library:
   source-dirs: src/haskell
@@ -36,7 +37,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - automaton-composition-and-networking-experiment
+    - automaton-experiment
 
 tests:
   experiment-test:
@@ -47,4 +48,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - automaton-composition-and-networking-experiment
+    - automaton-experiment

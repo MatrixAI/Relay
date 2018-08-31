@@ -1,5 +1,41 @@
 ZEROMQ
 
 ###############################################################################
+http://www.aosabook.org/en/zeromq.html
 http://zguide.zeromq.org/page:all
 ###############################################################################
+
+- smart endpoints, dumb network architecture
+  end-to-end principle
+
+- throughput
+  o throughput can only be measured at a single point in a system.
+    overall throughput doesn't make sense but throughput of a set of things
+    makes sense.
+- latency
+  o latency can only be measured between 2 different points and each unit of
+    transmission has its own latency.
+
+- actor model
+
+- user interface
+  o zeromq replicates as closely as it can the BSD sockets interface making it
+    much simpler for developers to pick it up and use
+  o another point raised was having a very general solution vs having solutions
+    targeted towards specific problem domains. A general solution may be very
+    good but often times has a very steep learning curve. Potential midpoint is
+    to have a general platform but have implementations for popular use cases.
+
+- managing tradeoffs
+  o a key point I got from reading the AOSA zeromq article was that there are
+    optimal algorithms/solutions for specific situations but often times there's
+    no overall best. The example discussed was batching messages - in what
+    situation message batching would be best and what situations messages
+    shouldn't be batched. When possible, solutions to all problems can be
+    incorporated to improve performance rather than having a single general
+    solution.
+  o critical paths of execution need to be optimized whereas optimization of
+    code that runs once every now and then isn't as important
+
+- concurrency  model
+  o lock free algorithms

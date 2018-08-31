@@ -30,7 +30,8 @@ int main(int argc, char **argv)
   //
   // man pages don't specify the use of htons() on the protocol, however the
   // majority of guides and answers to questions online use it.
-  int sock_pack = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));
+  // We actually do need to use htons() on the protocol number.
+  int sock_pack = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_IP));
   if (sock_pack < 0)
   {
     printf("Unable to create socket.\n");

@@ -1,0 +1,56 @@
+Distributed Systems Studies
+
+###############################################################################
+http://www.aosabook.org/en/distsys.html
+###############################################################################
+
+- distributed systems design principles
+  o Web distributed systems design
+    
+    Availability
+    Performance
+    Reliability
+    Scalability
+    Manageability
+    Cost
+
+  o CAP theorem
+  
+    Consistency
+      Every read receives the most recent write or an error.
+    Availability
+      Always will get a non-error response.
+    Partition Tolerance
+      System continues to operate despite break in communication.
+
+- monitoring and statistics at the forefront
+
+- reasons for failure of systems
+  o realistically, it's more often than not going to be a SOFTWARE fault
+
+- service oriented architecture
+  o splitting each thing that the overall service needs to do into smaller
+  services so that they can be independently scaled and upgraded without
+  effecting the other parts
+
+- shared-nothing architecture (flat p2p)
+
+- vertical scaling
+
+- horizontal scaling
+  o sharding/partitioning
+    . exploits parallelism to make large amounts of small workloads
+    . no need to communicate between shards
+
+    Flickr (this may be slightly old)
+      . Shards are a slice of the main database.
+      . Active Master-Master Ring Replication
+      . a user is stuck to a server in a shard
+      . each server in a shard is at 50% load, allowing for failures and
+        upgrades
+
+  o clusters
+    . groups of machines (virtual or physical), generally behind a load balancer
+    . multiple clusters spread geographically
+
+- load balancing
