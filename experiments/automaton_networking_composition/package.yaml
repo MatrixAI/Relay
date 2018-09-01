@@ -23,7 +23,7 @@ dependencies:
 - cryptonite
 - bytestring
 - network
-- hexstring
+- iproute
 
 library:
   source-dirs: src/haskell

@@ -1,4 +1,4 @@
-{ mkDerivation, base, bytestring, cryptonite, hexstring, hpack
+{ mkDerivation, base, bytestring, cryptonite, hpack, iproute
 , network, stdenv
 }:
 mkDerivation {
@@ -8,14 +8,14 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    base bytestring cryptonite hexstring network
+    base bytestring cryptonite iproute network
   ];
   libraryToolDepends = [ hpack ];
   executableHaskellDepends = [
-    base bytestring cryptonite hexstring network
+    base bytestring cryptonite iproute network
   ];
   testHaskellDepends = [
-    base bytestring cryptonite hexstring network
+    base bytestring cryptonite iproute network
   ];
   preConfigure = "hpack";
   homepage = "https://github.com/MatrixAI/Relay#readme";
