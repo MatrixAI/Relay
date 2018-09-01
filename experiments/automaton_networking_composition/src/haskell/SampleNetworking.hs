@@ -1,6 +1,6 @@
 module SampleNetworking
     ( createSocket,
-      getPacket,
+      getNPackets,
     ) where
 
 import qualified Network.Socket as S hiding (send, sendTo, recv, recvFrom)
@@ -8,21 +8,32 @@ import qualified Network.Socket.ByteString as BS
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import qualified Numeric as N
+import qualified Control.Monad as M
 import Foreign.C
 
 foreign import ccall unsafe "htons" c_htons :: CInt -> CInt
 
 createSocket :: IO S.Socket
 createSocket = do
-        -- #define ETH_P_IP 0x0800
-        sock <- S.socket S.AF_PACKET S.Datagram $ c_htons 0x0800
-        S.setSocketOption sock S.ReuseAddr 1
-        return sock
+    -- #define ETH_P_IP 0x0800
+    sock <- S.socket S.AF_PACKET S.Datagram $ c_htons 0x0800
+    S.setSocketOption sock S.ReuseAddr 1
+    return sock
+
+getNPackets :: (Integral a) => a -> S.Socket -> IO ()
+getNPackets 1 s = getPacket s
+getNPackets n s
+    | n <= 0 = putStrLn "why are you like this...."
+    | otherwise = do
+        getPacket s
+        getNPackets (n-1) s
 
 getPacket :: S.Socket -> IO ()
 getPacket s = do
-        pkt <- BS.recv s 2048
-        packetType $ head $ foldr ($) "" $ map N.showHex (map fromEnum $ BC.unpack pkt)
+    pkt <- BS.recv s 2048
+    let hex_pkt = foldr ($) "" $ map N.showHex (map fromEnum $ BC.unpack pkt)
+    putStrLn hex_pkt
+    packetType $ head hex_pkt
 
 packetType :: Char -> IO ()
 packetType '4' = putStrLn "Got an IPv4 packet."

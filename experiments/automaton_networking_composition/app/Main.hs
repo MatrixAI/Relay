@@ -5,4 +5,7 @@ import qualified SampleNetworking as SN
 
 main :: IO ()
 main = SN.createSocket
-       >>= SN.getPacket
+       >>= \s ->
+         putStrLn "How many packets to get?"
+         >> getLine
+         >>= \x -> SN.getNPackets (read x :: Int) s
