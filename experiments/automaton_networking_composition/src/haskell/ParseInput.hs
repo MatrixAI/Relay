@@ -1,8 +1,8 @@
 module ParseInput
     ( readUntilEOF,
+      parse
     ) where
 
-import qualified Control.Monad as CM
 import qualified System.IO as SIO
 import Definitions
 
@@ -16,4 +16,14 @@ readUntilEOF lns = do
                           input <- SIO.hGetLine SIO.stdin
                           readUntilEOF $ lns ++ [input]
 
+--
+--parse :: [String] ->
+--parse lines =  
 
+--
+splitOn :: Char -> String ->[String]
+splitOn _ "" = [""]
+splitOn delim string = foldr f [[]]
+              where f char line@(x:xs)
+                      | char == delim = []:line
+                      | otherwise = (char:x):xs

@@ -8,11 +8,14 @@ import qualified Network.Socket.ByteString as BS
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import qualified Numeric as N
-import qualified Control.Monad as M
-import Foreign.C
 
+import Foreign.C
 foreign import ccall unsafe "htons" c_htons :: CInt -> CInt
 
+{- Creates an ethernet socket which returns IP frames.
+ - Will return ALL IP PACKETS received on the interface - promiscuous mode is
+ - just a side effect of having an AF_PACKET socket.
+ -}
 createSocket :: IO S.Socket
 createSocket = do
     -- #define ETH_P_IP 0x0800
