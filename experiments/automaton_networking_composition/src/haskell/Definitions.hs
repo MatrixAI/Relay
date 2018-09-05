@@ -19,6 +19,8 @@ type FlowID = IP.IPv6
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
 type ConcreteAddress = IP.IPv6
 --
+type Mapping = (FlowID, Automaton)
+--
 type FlowTable = Map.HashMap FlowID Automaton
 
 --
@@ -53,9 +55,13 @@ data Automaton = Automaton {
                     name :: Name,
                     numberInstances :: Int,
                     dependencyFlows :: [FlowID],
-                    compositionFlows :: [(FlowID, Automaton)],
+                    compositionFlows :: [Mapping],
                     instances :: [Instance]
                            } deriving (Show, Eq)
+
+--
+compose :: FlowID -> Automaton -> Mapping
+compose f a = (f, a)
 
 -- # Instance #
 -- Automaton instance data. 
@@ -75,13 +81,32 @@ data Composition = Composition {
                      flowTable :: FlowTable
                                }
 
--- # hashToHex #
+-- # hashAndHex #
 -- Takes a string, hashes it and then shows it in hex.
-hashToHex :: String -> String
-hashToHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s
+hashAndHex :: String -> String
+hashAndHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s
 
+--
+createFlowTable :: [Automaton] -> FlowTable
+                    -- [FLowTable] -> FlowTable
+createFlowTable l = foldl unionFlowTable newFlowTable $
+                        -- [[Mapping]] -> [FlowTable]
+                        map createFlowTable' $
+                        -- [Automaton] -> [[Mapping]]
+                        map compositionFlows l
+
+--
+createFlowTable' :: [Mapping] -> FlowTable
+createFlowTable' [] = newFlowTable
+createFlowTable' l = foldl flowTableIns newFlowTable l
+
+--
 newFlowTable :: FlowTable
 newFlowTable = Map.empty
+
+--
+unionFlowTable :: FlowTable -> FlowTable -> FlowTable
+unionFlowTable a b = Map.union a b
 
 --
 flowTableIns :: FlowTable -> (FlowID, Automaton) -> FlowTable

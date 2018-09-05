@@ -3,30 +3,7 @@ module Composition1
 
 import Definitions
 
-instance_a1 = Instance {
-                netnsName = "netns_a1",
-                vethNames = [
-                  hashToHex "veth1_a1",
-                  hashToHex "veth2_a1"
-                          ],
-                defaultGateway = concreteAddress "fc00::1"
-                       }
-instance_b1 = Instance {
-                netnsName = "netns_b1",
-                vethNames = [
-                  hashToHex "veth1_b1",
-                  hashToHex "veth2_b1"
-                            ],
-                defaultGateway = concreteAddress "fc00::2"
-                       }
-instance_b2 = Instance {
-                netnsName = "netns_b2",
-                vethNames = [
-                  hashToHex "veth1_b2",
-                  hashToHex "veth2_b2"
-                            ],
-                defaultGateway = concreteAddress "fc00::3"
-                       }
+
 {-
  - 2 automatons composed in a "->" manner.
  - One instance of one automaton
@@ -34,11 +11,35 @@ instance_b2 = Instance {
  -}
 composition :: Composition
 composition =
-        let a = Automaton {
+        let instance_a1 = Instance {
+                netnsName = "netns_a1",
+                vethNames = [
+                  hashAndHex "veth1_a1",
+                  hashAndHex "veth2_a1"
+                          ],
+                defaultGateway = concreteAddress "fc00::1"
+                       }
+            instance_b1 = Instance {
+                netnsName = "netns_b1",
+                vethNames = [
+                  hashAndHex "veth1_b1",
+                  hashAndHex "veth2_b1"
+                            ],
+                defaultGateway = concreteAddress "fc00::2"
+                       }
+            instance_b2 = Instance {
+                netnsName = "netns_b2",
+                vethNames = [
+                  hashAndHex "veth1_b2",
+                  hashAndHex "veth2_b2"
+                            ],
+                defaultGateway = concreteAddress "fc00::3"
+                       }
+            a = Automaton {
                   name = "a",
                   numberInstances = 1,
                   dependencyFlows = [],
-                  compositionFlows = [(flowID "fd00::1", b)],
+                  compositionFlows = [compose (flowID "fd00::1") b],
                   instances = [instance_a1]
                           }
             b = Automaton {
@@ -48,12 +49,9 @@ composition =
                   compositionFlows = [],
                   instances = [instance_b1, instance_b2]
                           }
-            flow_table = foldl flowTableIns newFlowTable $ compositionFlows a
-        
-        in Composition{automatons=[
-                                    a,
-                                    b
-                                  ],
-                       flowTable=flow_table
-                      }
+            l_a = [a, b]
+        in Composition {
+                       automatons = l_a,
+                       flowTable = createFlowTable l_a
+                       }
             
