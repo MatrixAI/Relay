@@ -1,12 +1,17 @@
 module Definitions
   where
 
-import qualified Data.ByteString as B
+import Data.ByteString (ByteString)
+import qualified Data.HashMap.Strict as Map
 import qualified Data.IP as IP
+import qualified Data.Char as C
+import qualified Crypto.Hash as H
+import qualified Numeric as N
 
 -- deterministically generated automaton name
-type Name = B.ByteString
+type Name = String
 -- flowID for a communication context
+-- flowIDs are of the IPv6 range fd00::/7 -> unique-local range
 type FlowID = IP.IPv6
 
 -- # Automaton #
@@ -17,17 +22,15 @@ type FlowID = IP.IPv6
 -- ## - facilitate searching.
 data Automaton = Automaton {
                     name :: Name,
+                    numberInstances :: Int,
                     dependencyFlows :: [FlowID],
                     compositionFlows :: [FlowID]
+                    instances :: [Instance]
                            } deriving (Show, Eq)
 
--- # TranslationTable #
--- The table which will be queried when packets arrive in the namespace and need
--- to have addresses translated.
--- ## - naive implementation - list of rules
-data TranslationTable = TranslationTable {
-                          rules :: [Rule]
-                                         } deriving (Show, Eq)
+-- # Generic Table structure #
+-- ## - naive implementation - long tree
+data Table a = End | Entry a (Table a) deriving (Show, Eq)
 
 -- # Rule #
 -- Translation rule to be matched against.
@@ -42,9 +45,21 @@ data Rule = Rule {
 --             will be different for each instance of an automaton
 -- vethNames - randomly generated veth endpoint names
 --             will be different for each instance of an automaton
+-- defaultGateway - will be an IPv6 address of format fc00::/7
+--                  -> unique-local address
 data Instance = Instance {
-                  automaton :: Automaton,
                   netnsName :: Name,
-                  vethNames :: Name,
+                  vethNames :: [Name],
                   defaultGateway :: IP.IPv6
                          } deriving (Show, Eq)
+
+-- # hashToHex #
+-- Takes a string, hashes it and then shows it in hex.
+hashToHex :: String -> String
+hashToHex s = take 15 $ show $ H.hashWith H.SHA1 s
+
+-- tableInsert                                                                  
+-- Generic function to insert on Table datatype                                 
+tableInsert :: a -> Table a -> Table a                                          
+tableInsert e End = Entry e End                                                 
+tableInsert e (Entry x table) = Entry x (tableInsert e table)

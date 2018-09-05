@@ -1,5 +1,5 @@
 { mkDerivation, base, bytestring, cryptonite, hpack, iproute
-, network, stdenv
+, network, stdenv, unordered-containers
 }:
 mkDerivation {
   pname = "automaton-experiment";
@@ -8,14 +8,14 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    base bytestring cryptonite iproute network
+    base bytestring cryptonite iproute network unordered-containers
   ];
   libraryToolDepends = [ hpack ];
   executableHaskellDepends = [
-    base bytestring cryptonite iproute network
+    base bytestring cryptonite iproute network unordered-containers
   ];
   testHaskellDepends = [
-    base bytestring cryptonite iproute network
+    base bytestring cryptonite iproute network unordered-containers
   ];
   preConfigure = "hpack";
   homepage = "https://github.com/MatrixAI/Relay#readme";

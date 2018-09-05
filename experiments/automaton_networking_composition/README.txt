@@ -6,10 +6,15 @@ eg. A B C
 The second line indicates how many of each automaton we want separate by spaces.
 eg. 1 2 3
 
-The next lines show the compositions. Each composition needs to be on a new line
-with spaces between compositions. In between each automaton name, there needs to
-be a composition operator which will be listed below.
+The next lines show the compositions. Each composition is restricted to
+interactions between only TWO automatons. Each composition needs to be on a new
+line with spaces between compositions. In between each automaton name, there
+needs to be a composition operator which will be listed below.
 eg. A -> B -> C
+    needs to be written as
+    A -> B
+    B -> C
+
     apple => banana
 
 The composition operators that this experiment will deal wtih are:

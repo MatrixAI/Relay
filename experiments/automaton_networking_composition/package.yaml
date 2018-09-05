@@ -24,6 +24,7 @@ dependencies:
 - bytestring
 - network
 - iproute
+- unordered-containers
 
 library:
   source-dirs: src/haskell

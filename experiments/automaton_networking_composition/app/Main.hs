@@ -12,4 +12,4 @@ main = SN.createSocket
          >>= \x -> SN.getNPackets (read x :: Int) s
 -}
 main = PI.readUntilEOF []
-       >>= \lines -> PI.parse lines
+       >>= \lines -> putStrLn $ show $ PI.parse lines
