@@ -25,9 +25,12 @@ dependencies:
 - network
 - iproute
 - unordered-containers
+- hashable
 
 library:
-  source-dirs: src/haskell
+  source-dirs:
+    - src/haskell/
+    - src/haskell/compositions/
 
 executables:
   experiment-exe:

@@ -11,5 +11,4 @@ main = SN.createSocket
          >> getLine
          >>= \x -> SN.getNPackets (read x :: Int) s
 -}
-main = PI.readUntilEOF []
-       >>= \lines -> putStrLn $ show $ PI.parse lines
+main = putStrLn "Nothing in main yet..."
