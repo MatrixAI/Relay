@@ -1,10 +1,9 @@
 name:                automaton-experiment
 version:             0.0.0.1
 github:              "MatrixAI/Relay"
-license:             Apache
+license:             GNU-v2
 author:              "ramwan"
 maintainer:          "ray.wan@matrix.ai"
-copyright:           "Copyright: (c) 2018 Raymond Wan"
 
 extra-source-files:
 - README.txt
