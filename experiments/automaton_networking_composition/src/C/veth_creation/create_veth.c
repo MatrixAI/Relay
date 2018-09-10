@@ -27,131 +27,86 @@ struct req {
   struct ifinfomsg ifm;
 };
 
-//
-struct rtattr *nlmsg_recurse(struct nlmsghdr *nlmsg, int attr, const void *data, size_t len)
+/*
+ * HELPER FUCNTIONS
+ */
+
+//we should check for ENOMEM here
+void nlmsg_put_attr(struct nlmsghdr *nlmsg, int attr, const void *data, size_t len)
 {
   struct rtattr *rt = NLMSG_TAIL(nlmsg);
-  rt->rta_len = RTA_LENGTH(len);
-  rt->rta_type = attr;
-  if(len > 0) memcpy(RTA_DATA(rt), data, len);
+  size_t rta_len = RTA_LENGTH(len);
+  size_t t_len = NLMSG_ALIGN(nlmsg->nlmsg_len) + RTA_ALIGN(rta_len);
 
-  nlmsg->nlmsg_len = NLMSG_ALIGN(nlmsg->nlmsg_len) + RTA_ALIGN(rt->rta_len);
+  rt->rta_type = attr;
+  rt->rta_len = rta_len;
+
+  if(data && len)
+    memcpy(RTA_DATA(rt), data, len);
+
+  nlmsg->nlmsg_len = t_len;
+}
+
+//
+struct rtattr *nlmsg_nest(struct nlmsghdr *nlmsg, int attr)
+{
+  struct rtattr *rt = NLMSG_TAIL(nlmsg);
+  nlmsg_put_attr(nlmsg, attr, NULL, 0);
 
   return rt;
 }
 
 //
-void nlmsg_close_recurse(struct nlmsghdr *nlmsg, struct rtattr *rt)
+void nlmsg_end_nest(struct nlmsghdr *nlmsg, struct rtattr *rta)
 {
-  rt->rta_len = (void *)NLMSG_TAIL(nlmsg) - (void *)rt;
+  rta->rta_len = (void *)NLMSG_TAIL(nlmsg) - (void *)rta;
 }
 
 
+
+/*
+ * MAIN
+ */
+
 int main(int argc, char **argv)
 {
+  int res;
   int sock = socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE);
-  char snd_buf[32768]; char rcv_buf[1048576]; char ack_buf[1];
+  int snd_buf[32768]; int rcv_buf[1048576]; int ack_buf;
 
-  setsockopt(sock, SOL_SOCKET, SO_SNDBUF, snd_buf, 4);
-  setsockopt(sock, SOL_SOCKET, SO_RCVBUF, rcv_buf, 4);
-  setsockopt(sock, SOL_NETLINK, NETLINK_EXT_ACK, ack_buf, 4);
+  res = setsockopt(sock, SOL_SOCKET, SO_SNDBUF, snd_buf, 4);
+  if(res != 0)
+  {
+    printf("error with setsockopt(sock, SOL_SOCKET, SO_SNDBUF, snd_buf, 4)\n");
+    printf("%d => %s\n", errno, strerror(errno));
+    return 0;
+  }
+  res = setsockopt(sock, SOL_SOCKET, SO_RCVBUF, rcv_buf, 4);
+  if(res != 0)
+  {
+    printf("error with setsockopt(sock, SOL_SOCKET, SO_RCVBUF, rcv_buf, 4)\n");
+    printf("%d => %s\n", errno, strerror(errno));
+    return 0;
+  }
+  res = setsockopt(sock, SOL_NETLINK, NETLINK_EXT_ACK, &ack_buf, 4);
+  if(res != 0)
+  {
+    printf("error with setsockopt(sock, SOL_NETLINK, NETLINK_EXT_ACK, ack_buf, 4)\n");
+    printf("%d => %s\n", errno, strerror(errno));
+    return 0;
+  }
 
   struct sockaddr_nl addr;
+  memset(&addr, 0, sizeof(addr));
   addr.nl_family = AF_NETLINK;
-  addr.nl_pid = 0;
-  addr.nl_groups = 0;
-  bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr));
 
-  /*
-    struct nlmsghdr hdr = {len=32, type=RTM_NEWLINK, flags=NLM_F_REQUEST|NLM_F_ACK, seq=0, pid=0}
-    struct ifinfomsg ifmsg = {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_NETROM, ifi_index=0, ifi_flags=0, ifi_change=0}
-
-    sendto(3, { hdr, ifmsg }, 32, 0, NULL, 0) = 32
-   */
-  struct nlmsghdr nl_hdr; struct ifinfomsg ifmsg;
-  int msg_size = sizeof(struct nlmsghdr) + sizeof(struct ifinfomsg);
+  res = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
   
-  ifmsg.ifi_family = AF_UNSPEC;
-  ifmsg.ifi_type = ARPHRD_NETROM;
-  ifmsg.ifi_index = 0;
-  ifmsg.ifi_flags = 0;
-  ifmsg.ifi_change = 0;
-  nl_hdr.nlmsg_len = NLMSG_LENGTH(msg_size);
-  nl_hdr.nlmsg_type = RTM_NEWLINK;
-  nl_hdr.nlmsg_flags = NLM_F_REQUEST|NLM_F_ACK;
-  nl_hdr.nlmsg_seq = 11;
-  nl_hdr.nlmsg_pid = 0;
-
-  // could also be done by creating a new struct type
-  char buf[msg_size];
-  memcpy(&buf[0], &nl_hdr, sizeof(struct nlmsghdr));
-  memcpy(&buf[sizeof(struct nlmsghdr)], &ifmsg, sizeof(struct ifinfomsg));
-
-  int res = sendto(sock, (void *)&buf, msg_size, 0, NULL, 0);
-  printf("sendto(sock, (void *)&buf, %d, 0, NULL, 0) = %d\n", msg_size, res);
-
   if(res < 0)
   {
-    printf("error -> %s\n", strerror(errno));
+    printf("unable to bind: %s", strerror(errno));
     return 0;
   }
-  else
-  {
-    printf("sent %d bytes\n", res);
-  }
-
-  /*
-    recvmsg(3, hdr, 0)
-
-    struct msghdr hdr =
-            {
-              msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, // struct sockaddr
-              msg_namelen= sizeof(struct sockaddr),
-              msg_iov=[
-                        {
-                          iov_base={
-                                     {len=52, type=NLMSG_ERROR, flags=0, seq=0, pid=747},
-                                     { error=-ENODEV, 
-                                       msg={
-                                             {len=32, type=RTM_NEWLINK, flags=NLM_F_REQUEST|NLM_F_ACK, seq=0, pid=0},
-                                             {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_NETROM, ifi_index=0, ifi_flags=0, ifi_change=0}
-                                           }
-                                     }
-                                   },
-                          iov_len=16384
-                        }
-                      ],
-              msg_iovlen=1, 
-              msg_controllen=0,
-              msg_flags=0
-            }
-   */
-  struct msghdr msg_hdr;
-  struct iovec iov[1];
-  iov[0].iov_base = malloc(1024);
-  iov[0].iov_len = 1024;
-
-  msg_hdr.msg_name = (struct sockaddr *)&addr;
-  msg_hdr.msg_namelen = sizeof(struct sockaddr);
-  msg_hdr.msg_iov = iov;
-  msg_hdr.msg_iovlen = 1;
-
-  sleep(1);
-  printf("trying to recv message\n");
-  res = 0;//recvmsg(sock, &msg_hdr, 0);
-
-  printf("recvmsg(sock, &msg_hdr, 0) = %d\n", res);
-  if(res < 0)
-  {
-    printf("error -> %s\n", strerror(errno));
-    return 0;
-  }
-  else
-  {
-    // NLMSG_OK() to check if message is ok.... but skipped here
-    printf("yea it's ok...\n");
-  }
-  free(iov[0].iov_base);
 
   /*
     sendmsg(3, hdr, 0)
@@ -189,43 +144,65 @@ int main(int argc, char **argv)
           msg_controllen=0,
           msg_flags=0}
    */
-  struct req rq;
-  rq.nh = nl_hdr;
-  rq.ifm = ifmsg;
-  
-  struct rtattr *r1 = nlmsg_recurse(&nl_hdr, IFLA_LINKINFO, NULL, 0);
-  struct rtattr *r2 = nlmsg_recurse(&nl_hdr, IFLA_INFO_KIND, "veth", 5);
-  struct rtattr *r3 = nlmsg_recurse(&nl_hdr, IFLA_INFO_DATA, NULL, 0);
-  struct rtattr *r4 = nlmsg_recurse(&nl_hdr, VETH_INFO_PEER, NULL, 0);
-  struct rtattr *r5 = nlmsg_recurse(&nl_hdr, IFLA_IFNAME, "v2", 3);
 
-  nlmsg_close_recurse(&nl_hdr, r1);
-  nlmsg_close_recurse(&nl_hdr, r2);
-  nlmsg_close_recurse(&nl_hdr, r3);
-  nlmsg_close_recurse(&nl_hdr, r4);
-  nlmsg_close_recurse(&nl_hdr, r5);
+  struct msghdr msg_hdr;
+  struct nlmsghdr nl_hdr; struct ifinfomsg ifmsg;
+  struct iovec iov; struct req *rq;
 
-  msg_hdr.msg_name = (struct sockaddr *)&addr;
-  msg_hdr.msg_namelen = sizeof(struct sockaddr);
+  memset(&ifmsg, 0, sizeof(ifmsg));
+  ifmsg.ifi_family = AF_UNSPEC;
+  ifmsg.ifi_type = ARPHRD_NETROM;
+
+  nl_hdr.nlmsg_len = NLMSG_LENGTH(sizeof(struct ifinfomsg));
+  nl_hdr.nlmsg_type = RTM_NEWLINK;
+  nl_hdr.nlmsg_flags = NLM_F_REQUEST|NLM_F_ACK|NLM_F_EXCL|NLM_F_CREATE;
+  nl_hdr.nlmsg_seq = 0;
+  nl_hdr.nlmsg_pid = 0;
+
+  msg_hdr.msg_name = (void *)&addr;
+  msg_hdr.msg_namelen = sizeof(addr);
+  msg_hdr.msg_iov = &iov;
   msg_hdr.msg_iovlen = 1;
+  msg_hdr.msg_control = NULL;
   msg_hdr.msg_controllen = 0;
   msg_hdr.msg_flags = 0;
-  msg_hdr.msg_iov = iov;
 
-  iov[0].iov_base = (void *)&rq;
-  iov[0].iov_len = nl_hdr.nlmsg_len + 1;
+  rq = (struct req *)&nl_hdr;
+  rq->ifm = ifmsg;
 
-  res = sendmsg(sock, &msg_hdr, 0);
+  // Create the message
+  struct rtattr *r1 = nlmsg_nest(&nl_hdr, IFLA_LINKINFO);
+  nlmsg_put_attr(&nl_hdr, IFLA_INFO_KIND, "veth", 4);
+  struct rtattr *r2 = nlmsg_nest(&nl_hdr, IFLA_INFO_DATA);
+  struct rtattr *r3 = nlmsg_nest(&nl_hdr, VETH_INFO_PEER);
+  
+  nl_hdr.nlmsg_len += sizeof(struct ifinfomsg); //idk why...
+
+  nlmsg_put_attr(&nl_hdr, IFLA_IFNAME, "v2", 2);
+  nlmsg_end_nest(&nl_hdr, r3);
+  nlmsg_end_nest(&nl_hdr, r2);
+  nlmsg_end_nest(&nl_hdr, r1);
+
+  nlmsg_put_attr(&nl_hdr, IFLA_IFNAME, "v1", 2);
+
+  iov.iov_base = (void *)&rq;
+  iov.iov_len = nl_hdr.nlmsg_len;
+
+  //printf("msg_hdr.msg_name.nl_family = %d\n", msg_hdr.msg_name.nl_family);
+  //printf("AF_NETLINK = %d\n", AF_NETLINK);
+
+  // Send the message
+  res = sendto(sock, &msg_hdr, sizeof(msg_hdr), 0, NULL, 0);
   
   if(res < 0)
   {
-    printf("error with second sendto(sock, &msg_hdr, 0)\n");
-    printf("%s\n", strerror(errno));
+    printf("error with sendmsg(sock, &msg_hdr, 0)\n");
+    printf("%d => %s", errno, strerror(errno));
     return 0;
   }
   else
   {
-    printf("sendto(sock, &msg_hdr, 0) = %d\n", res);
+    printf("sendmsg(sock, &msg_hdr, 0) = %d\n", res);
   }
 
   /*
@@ -240,29 +217,30 @@ int main(int argc, char **argv)
             },
             MSG_PEEK|MSG_TRUNC)
    */
-  msg_hdr.msg_name = (struct sockaddr *)&addr;
-  msg_hdr.msg_namelen = sizeof(struct sockaddr);
+  msg_hdr.msg_name = &addr;
+  msg_hdr.msg_namelen = sizeof(addr);
   msg_hdr.msg_iovlen = 1;
-  iov[0].iov_base = malloc(1024);
-  iov[0].iov_len = 1024;
+  iov.iov_base = malloc(1024);
+  iov.iov_len = 1024;
   res = recvmsg(sock, &msg_hdr, 0);
   
   if(res<0)
   {
-    printf("error: %s\n", strerror(errno));
+    printf("error with recvmsg(sock, &msg_hdr, 0)\n");
+    printf("%d => %s", errno, strerror(errno));
   }
   else
   {
     printf("recvmsg(sock, &msg_hdr, 0) = %d\n", res);
-    struct nlmsghdr *nlhdr = iov[0].iov_base;
-    struct nlmsgerr *err = iov[0].iov_base + sizeof(struct nlmsghdr);
+    struct nlmsghdr *nlhdr = iov.iov_base;
+    struct nlmsgerr *err = iov.iov_base + sizeof(struct nlmsghdr);
     printf("nlhdr->len = %d\n", nlhdr->nlmsg_len);
     printf("err->error = %d\n", err->error);
     printf("err->msg->type = %d\n", err->msg.nlmsg_type);
     printf("RTM_NEWLINK = %d\n", RTM_NEWLINK);
-    printf("iov_len = %ld\n", iov[0].iov_len);
+    printf("iov_len = %ld\n", iov.iov_len);
   }
-  free(iov[0].iov_base);
+  free(iov.iov_base);
 
   /*
     recvmsg(3,

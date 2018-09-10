@@ -22,5 +22,5 @@ mkDerivation {
   ];
   preConfigure = "hpack";
   homepage = "https://github.com/MatrixAI/Relay#readme";
-  license = stdenv.lib.licenses.asl20;
+  license = stdenv.lib.licenses.gpl3;
 }
