@@ -1,0 +1,7 @@
+# ignore all vim swap files
+**/__pycache__
+**/*.swp
+serval/
+iptables/
+**/.stack-work
+**/a.out
