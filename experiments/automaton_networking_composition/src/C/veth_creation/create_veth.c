@@ -91,33 +91,42 @@ int main(int argc, char **argv)
 
 
   struct sockaddr_nl sender_addr;
-  struct nlmsghdr nl_hdr; struct ifinfomsg ifmsg; struct iovec iov;
+  struct nlmsghdr *nl_hdr = malloc(1024);
+  struct ifinfomsg ifmsg; struct iovec iov;
   
   memset(&ifmsg, 0, sizeof(struct ifinfomsg));
   ifmsg.ifi_family = AF_UNSPEC;
   ifmsg.ifi_type = ARPHRD_NETROM;
   ifmsg.ifi_change = 0xFFFFFFFF;
 
-  nl_hdr.nlmsg_len = NLMSG_LENGTH(sizeof(struct nlmsghdr));
-  nl_hdr.nlmsg_type = RTM_NEWLINK;
-  nl_hdr.nlmsg_flags = NLM_F_REQUEST|NLM_F_CREATE|NLM_F_EXCL|NLM_F_ACK;
-  nl_hdr.nlmsg_seq = 0;
-  nl_hdr.nlmsg_pid = 0;
+  nl_hdr->nlmsg_len = NLMSG_LENGTH(sizeof(struct ifinfomsg));
+  nl_hdr->nlmsg_type = RTM_NEWLINK;
+  nl_hdr->nlmsg_flags = NLM_F_REQUEST|NLM_F_CREATE|NLM_F_EXCL|NLM_F_ACK;
+  nl_hdr->nlmsg_seq = 0;
+  nl_hdr->nlmsg_pid = 0;
 
   // Create the message
-  struct rtattr *r1 = nlmsg_nest(&nl_hdr, IFLA_LINKINFO);
-  nlmsg_put_attr(&nl_hdr, IFLA_INFO_KIND, "veth", 4);
-  struct rtattr *r2 = nlmsg_nest(&nl_hdr, IFLA_INFO_DATA);
-  struct rtattr *r3 = nlmsg_nest(&nl_hdr, VETH_INFO_PEER);
+  struct rtattr *r1 = nlmsg_nest(nl_hdr, IFLA_LINKINFO);
+  nlmsg_put_attr(nl_hdr, IFLA_INFO_KIND, "veth", 5);
+  struct rtattr *r2 = nlmsg_nest(nl_hdr, IFLA_INFO_DATA);
+  struct rtattr *r3 = nlmsg_nest(nl_hdr, VETH_INFO_PEER);
   
-  nl_hdr.nlmsg_len += sizeof(struct ifinfomsg);
+  nl_hdr->nlmsg_len += sizeof(struct ifinfomsg);
 
-  nlmsg_put_attr(&nl_hdr, IFLA_IFNAME, "v2", 2);
-  nlmsg_end_nest(&nl_hdr, r3);
-  nlmsg_end_nest(&nl_hdr, r2);
-  nlmsg_end_nest(&nl_hdr, r1);
+  nlmsg_put_attr(nl_hdr, IFLA_IFNAME, "v2", 3);
 
-  nlmsg_put_attr(&nl_hdr, IFLA_IFNAME, "v1", 2);
+  nlmsg_end_nest(nl_hdr, r3);
+  nlmsg_end_nest(nl_hdr, r2);
+  nlmsg_end_nest(nl_hdr, r1);
+
+  nlmsg_put_attr(nl_hdr, IFLA_IFNAME, "v1", 3);
+
+// print
+for(int i=0; i<nl_hdr->nlmsg_len; i++)
+{
+  printf("%x ", *((char *)nl_hdr + i*sizeof(char)));
+}
+printf("\n");
 
   struct msghdr msg_hdr = {
     .msg_name = &sender_addr,
@@ -129,13 +138,26 @@ int main(int argc, char **argv)
     .msg_flags = 0
   };
 
+printf("Stats: \n");
+printf("IFLA_LINKINFO = %x\n", IFLA_LINKINFO);
+printf("IFLA_INFO_KIND = %x\n", IFLA_INFO_KIND);
+printf("IFLA_INFO_DATA = %x\n", IFLA_INFO_DATA);
+printf("VETH_INFO_PEER = %x\n", VETH_INFO_PEER);
+
+// print
+for(int i=0; i<nl_hdr->nlmsg_len; i++)
+{
+  printf("%x ", *((char *)nl_hdr + i*sizeof(char)));
+}
+printf("\n");
+
   memset(&sender_addr, 0, sizeof(sender_addr));
   sender_addr.nl_family = AF_NETLINK;
 
-  iov.iov_len = nl_hdr.nlmsg_len;
-  iov.iov_base = malloc(nl_hdr.nlmsg_len);
-  memcpy(iov.iov_base, &nl_hdr, nl_hdr.nlmsg_len - sizeof(struct ifinfomsg));
-  memcpy(iov.iov_base + nl_hdr.nlmsg_len - sizeof(struct ifinfomsg),
+  iov.iov_len = nl_hdr->nlmsg_len;
+  iov.iov_base = malloc(nl_hdr->nlmsg_len);
+  memcpy(iov.iov_base, nl_hdr, nl_hdr->nlmsg_len - sizeof(struct ifinfomsg));
+  memcpy(iov.iov_base + nl_hdr->nlmsg_len - sizeof(struct ifinfomsg),
          &ifmsg,
          sizeof(struct ifinfomsg));
 
@@ -186,7 +208,7 @@ int main(int argc, char **argv)
     struct nlmsgerr *err = iov.iov_base + sizeof(struct nlmsghdr);
     
     printf("err->error = %d\n", err->error);
-    printf("errno %d => %s\n", errno, strerror(errno));
+    printf("errno %d => %s\n", -err->error, strerror(-err->error));
   }
   free(iov.iov_base);
 
