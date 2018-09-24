@@ -1,7 +1,7 @@
 module Main where
 
 import qualified ParseInput as PI
-import qualified SampleNetworking as SN
+import qualified Networking as N
 
 main :: IO ()
 {-

@@ -1,4 +1,4 @@
-module SampleNetworking
+module Networking
     ( createSocket,
       getNPackets,
     ) where

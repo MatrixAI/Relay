@@ -23,26 +23,26 @@ type Mapping = (FlowID, Automaton)
 --
 type FlowTable = Map.HashMap FlowID Automaton
 
---
+-- TODO: gracefully handle invalid IP string inputs
 flowID :: String -> FlowID
 flowID "" = error "no ipv6 address provided to flowID constructor"
 flowID s
-        | ip<minBound || ip>maxBound = error "bad flowID"
+        | ip<minIP || ip>maxIP = error "bad flowID"
         | otherwise = read s :: FlowID 
         where ip = read s :: IP.IPv6 
-              minBound = read "fd00::" :: IP.IPv6
-              maxBound = read "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+              minIP = read "fd00::" :: IP.IPv6
+              maxIP = read "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
                           :: IP.IPv6
 
---
+-- TODO: gracefully handle invalid IP string inputs
 concreteAddress :: String -> ConcreteAddress
 concreteAddress "" = error "no ipv6 address provided to gateway constructor"
 concreteAddress s
-        | ip<minBound || ip>maxBound = error "bad gateway address"
+        | ip<minIP || ip>maxIP = error "bad gateway address"
         | otherwise = read s :: IP.IPv6
         where ip = read s :: IP.IPv6
-              minBound = read "fc00::" :: IP.IPv6
-              maxBound = read "fcff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+              minIP = read "fc00::" :: IP.IPv6
+              maxIP = read "fcff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
                           :: IP.IPv6
 
 -- # Automaton #
@@ -54,64 +54,65 @@ concreteAddress s
 data Automaton = Automaton {
                     name :: Name,
                     numberInstances :: Int,
-                    dependencyFlows :: [FlowID],
+                    dependencyFlows :: [Mapping],
                     compositionFlows :: [Mapping],
                     instances :: [Instance]
                            } deriving (Show, Eq)
 
---
-compose :: FlowID -> Automaton -> Mapping
-compose f a = (f, a)
 
 -- # Instance #
 -- Automaton instance data. 
--- netnsName - randomly generated network namespace name
---             will be different for each instance of an automaton
--- vethNames - randomly generated veth endpoint names
---             will be different for each instance of an automaton
 data Instance = Instance {
                   netnsName :: Name,
-                  vethNames :: [Name],
+                  vethNames :: (Name, Name),
                   defaultGateway :: ConcreteAddress
                          } deriving (Show, Eq)
 
 -- # Composition #
+-- The composition of the network. This is a high level model of the network 
 data Composition = Composition {
                      automatons :: [Automaton],
                      flowTable :: FlowTable
                                }
 
--- # hashAndHex #
--- Takes a string, hashes it and then shows it in hex.
-hashAndHex :: String -> String
-hashAndHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s
+-- create a composition mapping between a flowID and the associated
+-- destination automaton
+compose :: FlowID -> Automaton -> Mapping
+compose f a = (f, a)
 
---
+-- Creates a flow table for the network given a list of automatons
 createFlowTable :: [Automaton] -> FlowTable
                     -- [FLowTable] -> FlowTable
+createFlowTable [] = newFlowTable
 createFlowTable l = foldl unionFlowTable newFlowTable $
                         -- [[Mapping]] -> [FlowTable]
                         map createFlowTable' $
                         -- [Automaton] -> [[Mapping]]
                         map compositionFlows l
 
---
+-- helper function for creating a flow table given a list of flowID-automaton
+-- mappings
 createFlowTable' :: [Mapping] -> FlowTable
 createFlowTable' [] = newFlowTable
 createFlowTable' l = foldl flowTableIns newFlowTable l
 
---
+-- create an empty flow table
 newFlowTable :: FlowTable
 newFlowTable = Map.empty
 
---
+-- merge 2 flowtables
 unionFlowTable :: FlowTable -> FlowTable -> FlowTable
 unionFlowTable a b = Map.union a b
 
---
+-- 
 flowTableIns :: FlowTable -> (FlowID, Automaton) -> FlowTable
 flowTableIns m (f,a)
         | null m = Map.singleton f a
         | exists/=Nothing = error "FlowID in use in translation table"
         | otherwise = Map.insert f a m
         where exists = Map.lookup f m 
+
+-- # hashAndHex #
+-- Takes a string, hashes it and then shows it in hex.
+hashAndHex :: String -> String
+hashAndHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s

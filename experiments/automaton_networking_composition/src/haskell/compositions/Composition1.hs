@@ -44,14 +44,14 @@ composition =
                           }
             b = Automaton {
                   name = "b",
-                  numberInstances = 1,
+                  numberInstances = 2,
                   dependencyFlows = [],
                   compositionFlows = [],
                   instances = [instance_b1, instance_b2]
                           }
             l_a = [a, b]
         in Composition {
-                       automatons = l_a,
-                       flowTable = createFlowTable l_a
+                         automatons = l_a,
+                         flowTable = createFlowTable l_a
                        }
             

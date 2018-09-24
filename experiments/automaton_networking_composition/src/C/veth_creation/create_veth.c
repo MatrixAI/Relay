@@ -77,7 +77,7 @@ int main(int argc, char **argv)
   struct sockaddr_nl addr;
   memset(&addr, 0, sizeof(addr));
   addr.nl_family = AF_NETLINK;
-  addr.nl_pid = getpid();
+  addr.nl_pid = getpid(); // or 0
 
   res = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
   
