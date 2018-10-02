@@ -2,7 +2,7 @@ module ParseInput
   where
 
 -- COMPOSITION
-import Composition1
+--import Composition1
 --
 
 import qualified System.IO as IO

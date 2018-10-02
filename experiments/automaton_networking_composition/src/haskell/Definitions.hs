@@ -1,13 +1,27 @@
-module Definitions
-  where
+{-
+ - Functions to operate on these models are found in another file.
+ - 
+ - ramwan <ray.wan@matrix.ai>
+ -}
 
+module Definitions (
+  Name,
+  FlowID,
+  ConcreteAddress,
+  Mapping,
+  FlowTable,
+  ConcreteInstance,
+  AbstractInstance,
+  Automaton,
+  Composition
+) where
+
+import Data.Hashable
+import qualified Data.HashMap.Strict as Map
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
-import qualified Data.HashMap.Strict as Map
 import qualified Data.IP as IP
-import qualified Data.Char as C
-import Data.Hashable
-import qualified Crypto.Hash as H
+import qualified Data.Matrix as M
 
 instance Hashable IP.IPv6
 -- deterministically generated automaton name
@@ -18,101 +32,51 @@ type FlowID = IP.IPv6
 -- concrete address of an automaton
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
 type ConcreteAddress = IP.IPv6
---
-type Mapping = (FlowID, Automaton)
---
+-- Automaton A will talk on FlowID in order to communicate with Automaton B
+type Mapping = (FlowID, Automaton) -- (FlowID, Automaton B)
+-- Hashmap in order to facilitate lookup by the name translation system for
+-- translating packets flowing across the hub
 type FlowTable = Map.HashMap FlowID Automaton
+--
+type CompositionGraph = M.Matrix Int
 
--- TODO: gracefully handle invalid IP string inputs
-flowID :: String -> FlowID
-flowID "" = error "no ipv6 address provided to flowID constructor"
-flowID s
-        | ip<minIP || ip>maxIP = error "bad flowID"
-        | otherwise = read s :: FlowID 
-        where ip = read s :: IP.IPv6 
-              minIP = read "fd00::" :: IP.IPv6
-              maxIP = read "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
-                          :: IP.IPv6
 
--- TODO: gracefully handle invalid IP string inputs
-concreteAddress :: String -> ConcreteAddress
-concreteAddress "" = error "no ipv6 address provided to gateway constructor"
-concreteAddress s
-        | ip<minIP || ip>maxIP = error "bad gateway address"
-        | otherwise = read s :: IP.IPv6
-        where ip = read s :: IP.IPv6
-              minIP = read "fc00::" :: IP.IPv6
-              maxIP = read "fcff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
-                          :: IP.IPv6
+{-
+ - Contains data related to the functionality of the automaton in relation to
+ - the kernel.
+ -}
+data ConcreteInstance = ConcreteInstance {
+                          netns :: Name,
+                          veths :: (Name, Name),
+                          gateway :: ConcreteAddress
+                                         }
 
--- # Automaton #
--- Generic automaton type used as a template when instantiations are needed. It
--- contains data which will be the same across all automatons.
--- ## - depending on how many FlowIDs we have, it may be necessary to implement
--- ## - a "large automaton" type which has a binary tree instead of a list to
--- ## - facilitate searching.
+{-
+ - Contains data related to the functionality of the automaton in relation to
+ - the Relay network.
+ -}
+data AbstractInstance = AbstractInstance {
+                          dependencyFlows :: [FlowID],
+                          compositionFlows :: [FlowID],
+                          concreateInstance :: ConcreteInstance
+                                         }
+
+{-
+ - Generic Automaton structure containing high level information about the
+ - automaton.
+ -}
 data Automaton = Automaton {
-                    name :: Name,
-                    numberInstances :: Int,
-                    dependencyFlows :: [Mapping],
-                    compositionFlows :: [Mapping],
-                    instances :: [Instance]
-                           } deriving (Show, Eq)
+                   index :: Int,
+                   name :: Name
+                           }
 
-
--- # Instance #
--- Automaton instance data. 
-data Instance = Instance {
-                  netnsName :: Name,
-                  vethNames :: (Name, Name),
-                  defaultGateway :: ConcreteAddress
-                         } deriving (Show, Eq)
-
--- # Composition #
--- The composition of the network. This is a high level model of the network 
+{-
+ - Data structure containing static information about the composition of the
+ - network. This structure should not change unless the network structure needs
+ - to be changed.
+ -}
 data Composition = Composition {
                      automatons :: [Automaton],
-                     flowTable :: FlowTable
+                     abstractInstances :: [AbstractInstance],
+                     compositionGraph :: CompositionGraph
                                }
-
--- create a composition mapping between a flowID and the associated
--- destination automaton
-compose :: FlowID -> Automaton -> Mapping
-compose f a = (f, a)
-
--- Creates a flow table for the network given a list of automatons
-createFlowTable :: [Automaton] -> FlowTable
-                    -- [FLowTable] -> FlowTable
-createFlowTable [] = newFlowTable
-createFlowTable l = foldl unionFlowTable newFlowTable $
-                        -- [[Mapping]] -> [FlowTable]
-                        map createFlowTable' $
-                        -- [Automaton] -> [[Mapping]]
-                        map compositionFlows l
-
--- helper function for creating a flow table given a list of flowID-automaton
--- mappings
-createFlowTable' :: [Mapping] -> FlowTable
-createFlowTable' [] = newFlowTable
-createFlowTable' l = foldl flowTableIns newFlowTable l
-
--- create an empty flow table
-newFlowTable :: FlowTable
-newFlowTable = Map.empty
-
--- merge 2 flowtables
-unionFlowTable :: FlowTable -> FlowTable -> FlowTable
-unionFlowTable a b = Map.union a b
-
--- 
-flowTableIns :: FlowTable -> (FlowID, Automaton) -> FlowTable
-flowTableIns m (f,a)
-        | null m = Map.singleton f a
-        | exists/=Nothing = error "FlowID in use in translation table"
-        | otherwise = Map.insert f a m
-        where exists = Map.lookup f m 
-
--- # hashAndHex #
--- Takes a string, hashes it and then shows it in hex.
-hashAndHex :: String -> String
-hashAndHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s

@@ -25,6 +25,8 @@ dependencies:
 - iproute
 - unordered-containers
 - hashable
+- mtl
+- matrix
 
 library:
   source-dirs:

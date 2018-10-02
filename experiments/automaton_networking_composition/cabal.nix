@@ -1,5 +1,5 @@
 { mkDerivation, base, bytestring, cryptonite, hashable, hpack
-, iproute, network, stdenv, unordered-containers
+, iproute, matrix, mtl, network, stdenv, unordered-containers
 }:
 mkDerivation {
   pname = "automaton-experiment";
@@ -8,16 +8,16 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    base bytestring cryptonite hashable iproute network
+    base bytestring cryptonite hashable iproute matrix mtl network
     unordered-containers
   ];
   libraryToolDepends = [ hpack ];
   executableHaskellDepends = [
-    base bytestring cryptonite hashable iproute network
+    base bytestring cryptonite hashable iproute matrix mtl network
     unordered-containers
   ];
   testHaskellDepends = [
-    base bytestring cryptonite hashable iproute network
+    base bytestring cryptonite hashable iproute matrix mtl network
     unordered-containers
   ];
   preConfigure = "hpack";
