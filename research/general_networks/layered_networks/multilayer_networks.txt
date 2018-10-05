@@ -1,0 +1,53 @@
+MULTILAYER NETWORKS
+
+###############################################################################
+https://people.maths.ox.ac.uk/porterm/papers/multilayer_review-published.pdf
+
+###############################################################################
+
+A_1 is A subscript 1
+A^1 is A superscript 1
+A^^1 is pow(A, 1)
+
+- G = (V, E)
+  V = {v_1, v_2, v_3.... v_n}
+  E = {(v_a, v_b), (v_c, v_d) .... }
+
+- G_M = (V_M, E_M)
+  v E V for all v in V_M
+
+  The multilayer network G_M consists of vertices and edges labeled in a
+  different way.
+  or...
+
+  M = (V_M, E_M, V, L)
+  V_M -> the set of intra-layer vertices
+  E_M -> the set of all edges
+         ((u, a), (v, b)) E E_M
+         where u, v are nodes and a, b are layers/aspects
+        
+         we can define a weight function 
+         w :: E_M -> Real
+
+         we can define intra-layer edges as
+         E_A = {((u, a), (v, b)) E E_M | a = b}
+         and inter-layer edges
+         E_C = E_M \ E_A
+
+         coupling edges can be defined as
+         E_C' `elem` E_C
+         E_C' = {((u, a), (v, b) E E_C | u = v}
+  V -> set of all vertices
+  L -> set of layers
+
+- concept of 'aspects' in paper
+  aspects are an edge-type, can be considered as a layer.
+  Check Fig. 4 on page 13 (215)
+
+  aspects appear to be another degree of freedom in representing networks.
+  for example we can have an aspect denoting interhost links and another aspect
+  denoting time. Each aspect will have multiple layers and each layer can be
+  denoted A x A (A is the set of automatons). This is just an example.
+
+  Or an aspect denoting existing connections and another aspect denoting
+  potential links to choose from if any existing links go down.

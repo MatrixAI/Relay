@@ -38,7 +38,7 @@ type Mapping = (FlowID, Automaton) -- (FlowID, Automaton B)
 -- translating packets flowing across the hub
 type FlowTable = Map.HashMap FlowID Automaton
 --
-type CompositionGraph = M.Matrix Int
+--type CompositionGraph = M.Matrix Int
 
 
 {-

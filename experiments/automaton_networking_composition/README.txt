@@ -22,3 +22,10 @@ o ->
   Message from left to right
 o =>
 Message from left to right and response from right to left
+
+###############################################################################
+
+We need a graph structure which is able to be modified with low overhead as we
+treat automatons as ephemeral. This probably means we can't represent automaton
+instances in a graph with a tensor. I also don't know how useful matrix
+operations will be
