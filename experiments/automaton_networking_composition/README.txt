@@ -28,4 +28,12 @@ Message from left to right and response from right to left
 We need a graph structure which is able to be modified with low overhead as we
 treat automatons as ephemeral. This probably means we can't represent automaton
 instances in a graph with a tensor. I also don't know how useful matrix
-operations will be
+operations will be either.
+
+###############################################################################
+
+First goal of experiment :-
+  o Be able to instantiate different compositions and have automatons be able to
+    communicate with each other.
+  o Flow translator needs to handle failures of automatons
+  o Orchestrator does not need to check for failed instances

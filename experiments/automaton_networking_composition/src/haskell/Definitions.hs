@@ -21,9 +21,9 @@ import qualified Data.HashMap.Strict as Map
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
 import qualified Data.IP as IP
-import qualified Data.Matrix as M
 
 instance Hashable IP.IPv6
+
 -- deterministically generated automaton name
 type Name = String
 -- flowID for a communication context
@@ -37,9 +37,36 @@ type Mapping = (FlowID, Automaton) -- (FlowID, Automaton B)
 -- Hashmap in order to facilitate lookup by the name translation system for
 -- translating packets flowing across the hub
 type FlowTable = Map.HashMap FlowID Automaton
---
---type CompositionGraph = M.Matrix Int
 
+-- Simple generic graph structure represented as G = {V, E}
+-- This probably will change later.
+type Vertex = Int
+type Sender = Vertex
+type Receiver = Vertex
+type Node a = (Vertex, a)
+-- edges in our graph are unidirectional so we make the distinction between
+-- sender and receiver
+type Edge = (Sender, Receiver)
+type Graph a = ([Node a], [Edge])
+-- type MultiEdge = (Sender, Receiver, SenderL, ReceiverL)
+-- type MultilayerGraph a = ([Graph a], [MultiEdge])
+
+-- encodes the relationship between automatons as defined by the user
+-- // can we use this graph as a midstep between creating instance graphs? can
+-- // instance graphs be hypergraphs?? graphs with hyperedges
+type CompositionGraph = Graph Automaton
+
+-- having a multilayer network graph allows us to potentially monitor different
+-- traffic on the same link - perhaps useful for monitoring interhost
+-- communication
+-- since this experiment only handles intrahost situations, we can ignore
+-- testing multi-layer networks for now
+
+-- graph that encodes kernel level network links. In our intrahost situation, it
+-- represents all the network namespaces linked to the flow translator
+-- // whats the point of having a graph structure to represent everything being
+-- // connected to 1 node? at this point it might as well be a list...
+-- type NetworkGraph = Graph ConcreteInstance
 
 {-
  - Contains data related to the functionality of the automaton in relation to
@@ -58,7 +85,7 @@ data ConcreteInstance = ConcreteInstance {
 data AbstractInstance = AbstractInstance {
                           dependencyFlows :: [FlowID],
                           compositionFlows :: [FlowID],
-                          concreateInstance :: ConcreteInstance
+                          concreteInstance :: ConcreteInstance
                                          }
 
 {-
@@ -66,8 +93,8 @@ data AbstractInstance = AbstractInstance {
  - automaton.
  -}
 data Automaton = Automaton {
-                   index :: Int,
-                   name :: Name
+                   name :: Name,
+                   instances :: Int
                            }
 
 {-
@@ -77,6 +104,5 @@ data Automaton = Automaton {
  -}
 data Composition = Composition {
                      automatons :: [Automaton],
-                     abstractInstances :: [AbstractInstance],
                      compositionGraph :: CompositionGraph
                                }
