@@ -36,3 +36,5 @@ concreteAddress s
 -- 15 is an arbitrary number
 hashAndHex :: String -> String
 hashAndHex s = take 15 $ show $ H.hashWith H.SHA1 $ pack s
+
+{- ########################################################################## -}
