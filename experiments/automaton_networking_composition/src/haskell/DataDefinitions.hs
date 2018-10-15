@@ -9,23 +9,27 @@ module DataDefinitions (
   FlowID, ConcreteAddress,
   Mapping,
   FlowTable,
-  ConcreteInstance (..), Automaton (..)
+  ConcreteInstance (..), Automaton (..),
+  minFlowID, maxFlowID,
+  minConcreteAddress, maxConcreteAddress,
+  Stack, CounterState (..),
+  checkFlowID, checkCAddress
 ) where
 
 import Data.Hashable
 import qualified Data.HashMap.Strict as Map
-import qualified Data.IP as IP
+import Data.IP (IPv6)
 
-instance Hashable IP.IPv6
+import HelperFunctions (readIP)
 
 -- deterministically generated automaton name
 type Name = String
 -- flowID for a communication context
 -- flowIDs are of the IPv6 range fd00::/7 -> unique-local range
-type FlowID = IP.IPv6
+type FlowID = IPv6
 -- concrete address of an automaton
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
-type ConcreteAddress = IP.IPv6
+type ConcreteAddress = IPv6
 -- Automaton A will talk on FlowID in order to communicate with Automaton B
 type Mapping = (FlowID, Automaton) -- (FlowID, Automaton B)
 
@@ -40,7 +44,9 @@ type FlowTable = Map.HashMap FlowID Automaton
  - the kernel.
  -}
 data ConcreteInstance = ConcreteInstance {
+                          -- 256 bytes including trailing NULL
                           netns :: Name,
+                          -- IF namesize is 16 bytes with trailing NULL
                           veths :: (Name, Name),
                           gateway :: ConcreteAddress
                                          }
@@ -53,3 +59,27 @@ data Automaton = Automaton {
                    name :: Name,
                    instances :: Int
                            } deriving (Show)
+
+
+{-
+ - Data types and functions to keep track of resource allocation
+ -}
+type Stack c = [c]
+data CounterState c = CState c (Stack c) deriving (Show)
+
+minFlowID = readIP "fd00::"
+maxFlowID = readIP "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+minConcreteAddress = readIP "fc00::"
+maxConcreteAddress = readIP "fcff::ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+
+checkFlowID :: FlowID -> Bool
+checkFlowID f
+            | f >= minFlowID || f <= maxFlowID = True
+            | otherwise = False
+
+checkCAddress :: ConcreteAddress -> Bool
+checkCAddress a
+            | a >= minConcreteAddress || a <= maxConcreteAddress = True
+            | otherwise = False
+
+
