@@ -1,5 +1,5 @@
 { mkDerivation, algebraic-graphs, base, bytestring, cryptonite
-, hashable, hpack, iproute, mtl, network, stdenv
+, hashable, hpack, iproute, mtl, network, random, stdenv
 , unordered-containers
 }:
 mkDerivation {
@@ -10,16 +10,16 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     algebraic-graphs base bytestring cryptonite hashable iproute mtl
-    network unordered-containers
+    network random unordered-containers
   ];
   libraryToolDepends = [ hpack ];
   executableHaskellDepends = [
     algebraic-graphs base bytestring cryptonite hashable iproute mtl
-    network unordered-containers
+    network random unordered-containers
   ];
   testHaskellDepends = [
     algebraic-graphs base bytestring cryptonite hashable iproute mtl
-    network unordered-containers
+    network random unordered-containers
   ];
   preConfigure = "hpack";
   homepage = "https://github.com/MatrixAI/Relay#readme";

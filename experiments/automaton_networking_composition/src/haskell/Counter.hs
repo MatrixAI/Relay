@@ -1,49 +1,34 @@
 {-
+ - Simple resource counter.
  -
+ - ramwan <ray.wan@matrix.ai>
  -}
 
 module Counter (
-  pop, push,
-  count
+  allocate,
+  netnsName, vethNames
 ) where
 
-import Control.Monad.State
---import DataDefinitions (Stack, CounterState (CState) )
+import Control.Monad.State (State, state)
+import System.Random
 import DataDefinitions
 
-pop :: State (Stack c) (Maybe c)
-pop = state $ \a -> case a of []     -> (Nothing, [])
-                              (x:xs) -> (Just x, xs)
+-- no tracking of deallocated resources
+-- failure is NOT checked...
+allocate :: Enum a => State a a
+allocate = state $ \n -> (n, succ n)
 
-push :: c -> State (Stack c) ()
-push x = state $ \xs -> ((), x:xs)
+-- ISSUE: randomRs doesn't return a new generator
 
-{-
- - Function to increment a counter and its relevant state based depending on the
- - output of a function.
- -}
-count :: Enum a => (a -> Bool) -> State (CounterState a) (Maybe a)
-count f = state $ \(CState c cs) ->
-                      case runState pop cs of
-                        (Just c', cs') -> ((Just c'), (CState c cs'))
-                        (Nothing, _)   ->
-                            case f c of
-                                True  -> let c' = succ c
-                                         in ((Just c'), (CState c' cs))
-                                False -> (Nothing, (CState c cs))
+-- no tracking of allocated names
+netnsName :: State Name g
+netnsName = state $ \g -> take 20 $ randomRs ('a', 'z') g
 
+-- no tracking of allocated names
+vethNames :: State (Name, Name) g
+vethNames = do return ((n1, n2), g2)
+              where (n1, g1) = vethName' g
+                    (n2, g2) = vethName' g1
 
-{- Some sample stateful operations
-countTwice :: (FlowID -> Bool) -> (FlowID, FlowID)
-countTwice f = let (Just a, s) = runState (count f) (CState minFlowID [])
-                   (Just b, s') = runState (count f) (s)
-               in (a, b)
-
-pushTwice :: Stack Int -> ((Maybe Int, Maybe Int), Stack Int)
-pushTwice = runState $
-              push 3 >>
-              pop >>= \x ->
-                push 4 >>
-                pop >>= \y ->
-                  return (x, y)
--}
+vethName' :: State Name g
+vethName' = state $ \g -> take 15 $ randomRs ('A', 'Z') g

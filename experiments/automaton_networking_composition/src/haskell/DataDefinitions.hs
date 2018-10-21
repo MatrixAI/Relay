@@ -12,7 +12,6 @@ module DataDefinitions (
   ConcreteInstance (..), Automaton (..),
   minFlowID, maxFlowID,
   minConcreteAddress, maxConcreteAddress,
-  Stack, CounterState (..),
   checkFlowID, checkCAddress
 ) where
 
@@ -26,6 +25,8 @@ import HelperFunctions (readIP)
 type Name = String
 -- flowID for a communication context
 -- flowIDs are of the IPv6 range fd00::/7 -> unique-local range
+-- TODO: newtype FlowID and concreteaddress so we can create unique Bounded
+-- instances
 type FlowID = IPv6
 -- concrete address of an automaton
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
@@ -54,6 +55,8 @@ data ConcreteInstance = ConcreteInstance {
 {-
  - Generic Automaton structure containing high level information about the
  - automaton.
+ -
+ - TODO: perform checking on `instances` to make sure it's >= 0
  -}
 data Automaton = Automaton {
                    name :: Name,
@@ -64,8 +67,6 @@ data Automaton = Automaton {
 {-
  - Data types and functions to keep track of resource allocation
  -}
-type Stack c = [c]
-data CounterState c = CState c (Stack c) deriving (Show)
 
 minFlowID = readIP "fd00::"
 maxFlowID = readIP "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
@@ -81,5 +82,3 @@ checkCAddress :: ConcreteAddress -> Bool
 checkCAddress a
             | a >= minConcreteAddress || a <= maxConcreteAddress = True
             | otherwise = False
-
-

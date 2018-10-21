@@ -12,6 +12,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Labelled as LG
 
 import DataDefinitions
+import Counter
 
 {-
  - Graph of which automatons need to talk to what. Edges in graph are
@@ -40,12 +41,21 @@ type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
 {-
  - Create templates of automaton instances in a graph representation.
- -}
-populate :: Graph a -> Graph b
-populate Empty = Empty
-populate Vertex a = 
-populate Overlay x y = populate 
+ - foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> Graph a -> b
+ - foldg e v o c = go
+      where
+        go Empty         = e
+        go (Vertex  x  ) = v x
+        go (Overlay x y) = o (go x) (go y)
+        go (Connect x y) = c (go x) (go y)
 
-{-
+  eg. foldg G.empty
+            (f :: G.Graph Automaton -> G.Graph [Concrete Instance])
+            G.overlay
+            G.connect
+            (g :: G.Graph Automaton)
  -}
---label :: Graph a -> Graph e b
+aToCI :: Automaton -> [ConcreteInstance]
+aToCI (Automaton name x )
+          | x <= 0    = []
+          | otherwise = 
