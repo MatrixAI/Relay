@@ -39,21 +39,22 @@ type CompositionGraph = LG.Graph FlowID [ConcreteInstance] --placeholder--
  -}
 type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
+
 {-
  - Create templates of automaton instances in a graph representation.
  - foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> Graph a -> b
  - foldg e v o c = go
-      where
-        go Empty         = e
-        go (Vertex  x  ) = v x
-        go (Overlay x y) = o (go x) (go y)
-        go (Connect x y) = c (go x) (go y)
-
-  eg. foldg G.empty
-            (f :: G.Graph Automaton -> G.Graph [Concrete Instance])
-            G.overlay
-            G.connect
-            (g :: G.Graph Automaton)
+ -    where
+ -      go Empty         = e
+ -      go (Vertex  x  ) = v x
+ -      go (Overlay x y) = o (go x) (go y)
+ -      go (Connect x y) = c (go x) (go y)
+ -
+ - eg. foldg G.empty
+ -           (f :: G.Graph Automaton -> G.Graph [Concrete Instance])
+ -           G.overlay
+ -           G.connect
+ -           (g :: G.Graph Automaton)
  -}
 aToCI :: Automaton -> [ConcreteInstance]
 aToCI (Automaton name x )
