@@ -7,6 +7,7 @@ maintainer:          "ray.wan@matrix.ai"
 
 extra-source-files:
 - README.txt
+- package.yaml
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package

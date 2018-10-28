@@ -1,4 +1,8 @@
 {-
+ - Graph definitions and operations
+ -
+ - ramwan <ray.wan@matrix.ai>
+ -
  - https://blogs.ncl.ac.uk/andreymokhov/an-algebra-of-graphs/
  -}
 
@@ -10,6 +14,8 @@ module GraphDefinitions (
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Labelled as LG
+import Control.Monad.State
+import System.Random (RandomGen)
 
 import DataDefinitions
 import Counter
@@ -56,7 +62,24 @@ type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
  -           G.connect
  -           (g :: G.Graph Automaton)
  -}
-aToCI :: Automaton -> [ConcreteInstance]
-aToCI (Automaton name x )
-          | x <= 0    = []
-          | otherwise = 
+--aToCI :: Automaton -> [ConcreteInstance]
+--aToCI (Automaton _ x )
+--          | x <= 0    = []
+--          | otherwise = 
+
+
+makeConcreteInstance :: 
+makeConcreteInstance = let
+                         (nn, g1) = runState netnsName g
+                         (vn, g2) = runState vethNames g1
+
+
+{-
+genConcreteInstances :: (Eq n, Num n, RandomGen g) =>
+                          n -> State g [ConcreteInstance]
+genConcreteInstances n
+          | n<=0 = []
+          | otherwise = let 
+                          (ci, g') = runState genCI
+                        in [ci:genConcreteInstances (n-1) g']
+-}

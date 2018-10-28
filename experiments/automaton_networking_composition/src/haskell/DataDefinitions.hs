@@ -4,8 +4,11 @@
  - ramwan <ray.wan@matrix.ai>
  -}
 
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module DataDefinitions (
-  Name, IFChar,
+  Name, IFChar (..),
+  FlowID, ConcreteAddr,
   flowID, concreteAddr,
   Mapping,
   FlowTable,
@@ -16,7 +19,7 @@ module DataDefinitions (
 import Data.Hashable
 import qualified Data.HashMap.Strict as Map
 import Data.IP (IPv6)
-import System.Random (Random)
+import System.Random (Random, RandomGen, random, randomR, next)
 import Data.Maybe (fromJust)
 
 import HelperFunctions (readIP)
@@ -24,10 +27,12 @@ import HelperFunctions (readIP)
 -- deterministically generated automaton name
 type Name = String
 
--- Alternative Typeclass
+
+
 ifChars = ['0'..'9']++['A'..'Z']++['a'..'z']
 table = map IFChar ifChars
 zipTable = zip table [0..]
+
 newtype IFChar = IFChar Char deriving (Eq, Ord, Show, Read)
 instance Bounded IFChar where
   minBound = IFChar '0'
@@ -36,27 +41,34 @@ instance Bounded IFChar where
 instance Enum IFChar where
   fromEnum = fromJust . flip lookup zipTable
   toEnum = fromJust . flip lookup (map (\(x, y) -> (y, x)) zipTable)
-{-
+
 instance Random IFChar where
-  randomR = 
-  random = 
--}
+  randomR (l, h) g 
+      | l>h = randomR (h, l) g
+      |otherwise = (toEnum $ (a + v `mod` k), g')
+                 where (v, g') = next g
+                       a = fromEnum l
+                       b = fromEnum h
+                       k = b - a + 1
+  random g = randomR (minBound, maxBound) g
+
 
 
 -- flowID for a communication context
 -- flowIDs are of the IPv6 range fd00::/7 -> unique-local range
 -- TODO: newtype FlowID and ConcreteAddr so we can create unique Bounded
 -- instances
-newtype FlowID = FlowID IPv6 deriving (Eq, Show, Ord)
+newtype FlowID = FlowID IPv6
+                 deriving (Enum, Eq, Ord, Read, Show)
 instance Bounded FlowID where
   minBound = fID "fd00::"
   maxBound = fID "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
 
 
-
 -- concrete address of an automaton
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
-newtype ConcreteAddr = ConcreteAddr IPv6 deriving (Eq, Show, Ord)
+newtype ConcreteAddr = ConcreteAddr IPv6
+                       deriving (Enum, Eq, Ord, Read, Show)
 instance Bounded ConcreteAddr where
   minBound = cAddr "fc00::"
   maxBound = cAddr "fcff::ffff:ffff:ffff:ffff:ffff:ffff:ffff"
