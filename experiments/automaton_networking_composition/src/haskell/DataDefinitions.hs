@@ -7,7 +7,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module DataDefinitions (
-  Name, IFChar (..),
+  Name, AutomatonName, NetnsName, VethName, VethNames,
+  IFChar (..),
   FlowID, ConcreteAddr,
   flowID, concreteAddr,
   Mapping,
@@ -26,6 +27,10 @@ import HelperFunctions (readIP)
 
 -- deterministically generated automaton name
 type Name = String
+type AutomatonName = Name
+type NetnsName = Name
+type VethName = Name
+type VethNames = (VethName, VethName)
 
 
 
@@ -90,9 +95,9 @@ type FlowTable = Map.HashMap FlowID Automaton
  -}
 data ConcreteInstance = ConcreteInstance {
                           -- 256 bytes including trailing NULL
-                          netns :: Name,
+                          netns :: NetnsName,
                           -- IF namesize is 16 bytes with trailing NULL
-                          veths :: (Name, Name),
+                          veths :: (VethName, VethName),
                           gateway :: ConcreteAddr
                                          }
 
@@ -103,7 +108,7 @@ data ConcreteInstance = ConcreteInstance {
  - TODO: perform checking on `instances` to make sure it's >= 0
  -}
 data Automaton = Automaton {
-                   name :: Name,
+                   name :: AutomatonName,
                    instances :: Int
                            } deriving (Show)
 

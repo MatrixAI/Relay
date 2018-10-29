@@ -5,73 +5,95 @@
  -}
 
 module Counter (
+  NameSet,
   allocate,
   netnsName, vethNames
 ) where
 
 import Control.Monad.State (State, state, runState)
-import System.Random
+import Data.Hashable
+import Data.HashSet
+
 import DataDefinitions
+
+-- HashSet of all the taken kernel level resource names as far as the
+-- Orchestrator knows so we don't double up
+type NameSet = HashSet Name
+
 
 netnsNameLength = 20
 vethNameLength = 15
 
--- no tracking of deallocated resources
+
+infHash :: String -> [String]
+infHash s = drop 1 $ iterate showHash s
+
+showHash :: Hashable a => a -> String
+showHash = show . hash
+
+showSaltedHash :: Hashable a => Int -> a -> String
+showSaltedHash n a = show $ hashWithSalt n a
+
+
+
+nEmpty :: NameSet
+nEmpty = empty
+
+nMember :: Name -> NameSet -> Bool
+nMember = member
+
+nInsert :: Name -> NameSet -> NameSet
+nInsert = insert
+
+nSafeInsert :: Name -> NameSet -> Maybe NameSet
+nSafeInsert n ns
+        | n `nMember` ns = Nothing
+        | otherwise = Just $ nInsert n ns
+
+
+
+-- no tracking of allocated resources
 -- failure is NOT checked...
 allocate :: Enum a => State a a
 allocate = state $ \n -> (n, succ n)
 
 
--- no tracking of allocated names
--- failure is NOT checked
-netnsName :: RandomGen g => State g Name
-netnsName = state $ \g -> let
-                            (n, g') = randNIfChar netnsNameLength g
-                            n' = map (\(IFChar c) -> c) n
-                          in (n', g')
 
--- no tracking of allocated names
--- failure is NOT checked
-vethNames :: RandomGen g => State g (Name, Name)
-vethNames = state $ \g -> let
-                            (n1, g1) = runState vethName' g
-                            (n2, g2) = runState vethName' g1
-                          in ((n1, n2), g2)
-
--- no trackin gof allocated names
--- failure is NOT checked
-vethName' :: RandomGen g => State g Name
-vethName' = state $ \g -> let
-                            (n, g') = randNIfChar vethNameLength g
-                            n' = map (\(IFChar c) -> c) n
-                          in (n', g')
+-- Takes an infinite list of names and takes the first one that hasn't already
+-- been allocated.
+-- 
+-- eg. \n ns -> allocName (iterate showHash n) ns
+allocName :: [Name] -> NameSet -> Name
+allocName (n:ns) s
+          | nMember n s = allocName ns s
+          | otherwise   = n
 
 
 
+-- The network namespace name can be calculated by 
+-- netnsName = take 20 $ hash $ (name Automaton) ++ (show concreteAddr)
+-- This way the name is somewhat deterministic.
+netnsName :: Automaton -> ConcreteAddr -> State NameSet NetnsName
+netnsName a ca = state $
+                   \s -> let
+                           n = name a ++ show ca
+                           n' = take netnsNameLength $
+                                  allocName (drop 1 $ iterate showHash n) s
+                         in (n', nInsert n' s)
 
 
-randNIfChar :: (Eq n, Num n, RandomGen g) =>
-               n -> g -> ([IFChar], g)
-randNIfChar = randN
+vethName' :: Name -> State NameSet VethName
+vethName' n = state $
+                \s -> let
+                        n1 = take vethNameLength $
+                               allocName (drop 1 $ iterate showHash n) s
+                      in (n1, nInsert n1 s)
 
--- Defined in System.Random module but not exported.
---
--- ghc ticket #4218 says that System.Random is too lazy
--- https://ghc.haskell.org/trac/ghc/ticket/4218
--- hence the use of `seq` to make it less lazy
-buildRandoms :: (Eq n, Num n, RandomGen g) =>
-                  (g -> (a, g)) -> n -> g -> [(a, g)]
-buildRandoms randf 1 g =
-            x `seq` ((x, g'):[]) where (x, g') = randf g
-buildRandoms randf n g =
-            x `seq` ((x, g'):(buildRandoms randf (n-1) g'))
-            where (x, g') = randf g
-
--- Generates a list (of specified length) and returns the updated generator
-randRN :: (Eq n, Num n, Random a, RandomGen g) => (a, a) -> n -> g -> ([a], g)
-randRN ival n g = (map fst l, snd $ last l)
-                  where l = buildRandoms (randomR ival) n g
-
-randN :: (Eq n, Num n, Random a, RandomGen g) => n -> g -> ([a], g)
-randN n g = (map fst l, snd $ last l)
-            where l = buildRandoms random n g
+-- Veth endpoint names can be calculated by
+--   let n = netnsName ++ automatonName
+--   vethNames = (hash n, hash hash n)
+-- Like netns name generation, this is somewhat deterministic.
+vethNames :: Automaton -> NetnsName -> State NameSet VethNames
+vethNames a netn = vethName' (name a ++ netn)
+                   >>= \n1 -> vethName' n1
+                   >>= \n2 -> return (n1, n2)

@@ -46,40 +46,12 @@ type CompositionGraph = LG.Graph FlowID [ConcreteInstance] --placeholder--
 type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
 
-{-
- - Create templates of automaton instances in a graph representation.
- - foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> Graph a -> b
- - foldg e v o c = go
- -    where
- -      go Empty         = e
- -      go (Vertex  x  ) = v x
- -      go (Overlay x y) = o (go x) (go y)
- -      go (Connect x y) = c (go x) (go y)
- -
- - eg. foldg G.empty
- -           (f :: G.Graph Automaton -> G.Graph [Concrete Instance])
- -           G.overlay
- -           G.connect
- -           (g :: G.Graph Automaton)
- -}
---aToCI :: Automaton -> [ConcreteInstance]
---aToCI (Automaton _ x )
---          | x <= 0    = []
---          | otherwise = 
 
+toInstanceGraph :: AutomatonGraph -> InstanceGraph
+toInstanceGraph g = foldg G.empty f G.overlay G.connect
+                   -- f :: G.Graph Automaton -> G.Graph [ConcreteInstance]
+                where f = \ -> -- placeholder
 
-makeConcreteInstance :: 
-makeConcreteInstance = let
-                         (nn, g1) = runState netnsName g
-                         (vn, g2) = runState vethNames g1
+toCompositionGraph :: InstanceGraph -> CompositionGraph
 
-
-{-
-genConcreteInstances :: (Eq n, Num n, RandomGen g) =>
-                          n -> State g [ConcreteInstance]
-genConcreteInstances n
-          | n<=0 = []
-          | otherwise = let 
-                          (ci, g') = runState genCI
-                        in [ci:genConcreteInstances (n-1) g']
--}
+toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
