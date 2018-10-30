@@ -5,7 +5,7 @@
  -}
 
 module Counter (
-  NameSet,
+  NameSet, nEmpty,
   allocate,
   netnsName, vethNames
 ) where
@@ -24,7 +24,7 @@ type NameSet = HashSet Name
 netnsNameLength = 20
 vethNameLength = 15
 
-
+-- create an infinite list of hashed values
 infHash :: String -> [String]
 infHash s = drop 1 $ iterate showHash s
 
@@ -35,7 +35,7 @@ showSaltedHash :: Hashable a => Int -> a -> String
 showSaltedHash n a = show $ hashWithSalt n a
 
 
-
+-- hashset operations for convenience
 nEmpty :: NameSet
 nEmpty = empty
 
@@ -45,18 +45,14 @@ nMember = member
 nInsert :: Name -> NameSet -> NameSet
 nInsert = insert
 
-nSafeInsert :: Name -> NameSet -> Maybe NameSet
-nSafeInsert n ns
-        | n `nMember` ns = Nothing
-        | otherwise = Just $ nInsert n ns
+nDelete :: Name -> NameSet -> NameSet
+nDelete = delete
 
 
-
--- no tracking of allocated resources
+-- no tracking of deallocated resources
 -- failure is NOT checked...
 allocate :: Enum a => State a a
 allocate = state $ \n -> (n, succ n)
-
 
 
 -- Takes an infinite list of names and takes the first one that hasn't already
@@ -78,7 +74,7 @@ netnsName a ca = state $
                    \s -> let
                            n = name a ++ show ca
                            n' = take netnsNameLength $
-                                  allocName (drop 1 $ iterate showHash n) s
+                                  allocName (infHash n) s
                          in (n', nInsert n' s)
 
 
@@ -86,7 +82,7 @@ vethName' :: Name -> State NameSet VethName
 vethName' n = state $
                 \s -> let
                         n1 = take vethNameLength $
-                               allocName (drop 1 $ iterate showHash n) s
+                               allocName (infHash n) s
                       in (n1, nInsert n1 s)
 
 -- Veth endpoint names can be calculated by

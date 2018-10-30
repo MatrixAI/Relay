@@ -76,7 +76,7 @@ newtype ConcreteAddr = ConcreteAddr IPv6
                        deriving (Enum, Eq, Ord, Read, Show)
 instance Bounded ConcreteAddr where
   minBound = cAddr "fc00::"
-  maxBound = cAddr "fcff::ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+  maxBound = cAddr "fcff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
 
 
 
@@ -94,12 +94,12 @@ type FlowTable = Map.HashMap FlowID Automaton
  - the kernel.
  -}
 data ConcreteInstance = ConcreteInstance {
+                          gateway :: ConcreteAddr,
                           -- 256 bytes including trailing NULL
                           netns :: NetnsName,
                           -- IF namesize is 16 bytes with trailing NULL
-                          veths :: (VethName, VethName),
-                          gateway :: ConcreteAddr
-                                         }
+                          veths :: (VethName, VethName)
+                                         } deriving (Show)
 
 {-
  - Generic Automaton structure containing high level information about the
@@ -113,31 +113,29 @@ data Automaton = Automaton {
                            } deriving (Show)
 
 -- Helper functions
-fID   s = FlowID $ readIP s
-cAddr s = ConcreteAddr $ readIP s
+fID :: String -> FlowID
+fID = FlowID . readIP
+cAddr :: String -> ConcreteAddr
+cAddr = ConcreteAddr . readIP
 
 -- TODO: fix the flowID constructor check
 flowID :: String -> FlowID
-flowID s | let s' = fID s in
-           s' >= (minBound :: FlowID) ||
-           s' <= (maxBound :: FlowID)     = fID s
-         | otherwise                      = flowID "fd00::"
+flowID s | s' >= minBound && s' <= maxBound = s'
+         | otherwise                        = flowID "fd00::"
+         where s' = fID s
 
 -- TODO: fix the concreteAddr constructor check
 concreteAddr :: String -> ConcreteAddr
-concreteAddr s | let s' = cAddr s in
-                 s' >= (minBound :: ConcreteAddr) ||
-                 s' <= (maxBound :: ConcreteAddr)    = cAddr s
-               | otherwise                           = concreteAddr "fc00::"
+concreteAddr s | s' >= minBound && s' <= maxBound = s'
+               | otherwise                        = concreteAddr "fc00::"
+               where s' = cAddr s
 
 checkFlowID :: FlowID -> Bool
 checkFlowID f
-            | f >= (minBound :: FlowID) ||
-              f <= (maxBound :: FlowID)     = True
+            | f >= minBound&& f <= maxBound = True
             | otherwise                     = False
 
 checkConcAddr :: ConcreteAddr -> Bool
 checkConcAddr a
-            | a >= (minBound :: ConcreteAddr) ||
-              a <= (maxBound :: ConcreteAddr)     = True
-            | otherwise                           = False
+            | a >= minBound && a <= maxBound = True
+            | otherwise                      = False

@@ -16,6 +16,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Labelled as LG
 import Control.Monad.State
 import System.Random (RandomGen)
+import Data.List (mapAccumL)
 
 import DataDefinitions
 import Counter
@@ -48,10 +49,28 @@ type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
 
 toInstanceGraph :: AutomatonGraph -> InstanceGraph
-toInstanceGraph g = foldg G.empty f G.overlay G.connect
-                   -- f :: G.Graph Automaton -> G.Graph [ConcreteInstance]
-                where f = \ -> -- placeholder
+toInstanceGraph g = G.foldg G.empty f G.overlay G.connect g
+          -- f :: Automaton -> [ConcreteInstance]
+          -- without having `take (instances a)` inside the expression for
+          -- addrs, evaluation of `vethns` doesn't appear to stop
+          where f a = let
+                  caddrs = take (instances a) [minBound :: ConcreteAddr .. ]
+                  nf = map (netnsName a) caddrs -- :: [State NameSet NetnsName]
+                  nfs = map runState nf -- :: [NameSet -> (NetnsNae, NameSet)]
+                  -- :: (NameSet, [NetnsName])
+                  (s, netns) = mapAccumL (\s f -> let (n, s') = f s in (s', n)) nEmpty nfs
 
+                  vf = map (vethNames a) netns -- :: [State NameSet VethNames]
+                  vfs = map runState vf -- :: [NameSet -> (vethNames, NameSet)]
+                  -- :: (NameSet, [VethNames])
+                  (s', vethns) = mapAccumL (\s f -> let (ns, s') = f s in (s', ns)) s vfs
+
+                  cInstances = zipWith3 ConcreteInstance caddrs netns vethns
+                      in G.vertex cInstances
+
+
+{-
 toCompositionGraph :: InstanceGraph -> CompositionGraph
 
 toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
+-}
