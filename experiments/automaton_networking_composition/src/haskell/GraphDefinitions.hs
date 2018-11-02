@@ -20,6 +20,7 @@ import Data.List (mapAccumR, mapAccumL)
 import Data.Maybe (fromJust)
 import qualified Data.Set as DS (toList)
 import qualified Data.HashMap.Lazy as HM
+import Data.Hashable (Hashable)
 
 import DataDefinitions
 import Counter
@@ -56,8 +57,7 @@ type CompositionGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
 
--- TODO: fix ISSUE stated in the type declation of InstanceGraph
---       persist STATE across multiple calls of f
+
 toInstanceGraph :: AutomatonGraph -> InstanceGraph
 toInstanceGraph g = let
     v = DS.toList $ G.vertexSet g
@@ -70,30 +70,40 @@ toInstanceGraph g = let
     f v = G.vertex $ fromJust $ HM.lookup v m
       in G.foldg G.empty f G.overlay G.connect g
 
+-- type ConcreteInstances = [ConcreteInstance] ???
 
 -- State monad?
+-- state monad.
+-- flip :: (a->b->c)->b->a->c
+-- concreteAutomaton :: Automaton -> State GeneratorState [ConcreteInstance]
+-- concreteAutomaton = flip automatonToConcreteInstance
 -- not sure how lazy eval will go and whether we need `const` or `seq` anywhere
 automatonToConcreteInstance :: GeneratorState -> Automaton -> (GeneratorState, [ConcreteInstance])
 automatonToConcreteInstance gs@(ns, cas) a = let
+              -- State monad? something nicer and more elegant than this plz...
               caddrs = take (instances a) [cas .. ]
               cas' = succ $ last caddrs
+
               nf = map (netnsName a) caddrs
               nfs = map runState nf
+              -- abstract lambda function as it's used twice
               (ns', netns) = mapAccumR (\s f -> let (n, s') = f s in (s', n))
                              ns nfs
 
               vf = map (vethNames a) netns
               vfs = map runState vf
-              (ns'', vethns) = mapAccumR (\s f -> let (ns, s') = f s in (s', ns))
+              -- comment above
+              (ns'', vethns) = mapAccumR (\s f -> let (n, s') = f s in (s', n))
                                ns' vfs
 
               cInstances = zipWith3 ConcreteInstance caddrs netns vethns
                 in ((ns'', cas'), cInstances)
 
-createHashMap :: [Automaton] -> [[ConcreteInstance]] -> HM.HashMap Automaton [ConcreteInstance]
-createHashMap a ci = foldr f HM.empty aZipCI
-              where f e hm = (uncurry $ HM.insert) e hm
-                    aZipCI = zip a ci
+-- rename to something more meaningful
+createHashMap :: (Hashable k, Eq k) => [k] -> [v] -> HM.HashMap k v
+createHashMap ks vs = foldr f HM.empty kZipV
+              where f e m = (uncurry $ HM.insert) e m
+                    kZipV = zip ks vs
 
 -----------
 

@@ -5,6 +5,7 @@
  -}
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+-- what does this do?
 {-# LANGUAGE DeriveGeneric              #-}
 
 module DataDefinitions (
