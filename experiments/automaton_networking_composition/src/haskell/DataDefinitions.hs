@@ -5,6 +5,7 @@
  -}
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveGeneric              #-}
 
 module DataDefinitions (
   Name, AutomatonName, NetnsName, VethName, VethNames,
@@ -22,6 +23,7 @@ import qualified Data.HashMap.Strict as Map
 import Data.IP (IPv6)
 import System.Random (Random, RandomGen, random, randomR, next)
 import Data.Maybe (fromJust)
+import GHC.Generics (Generic)
 
 import HelperFunctions (readIP)
 
@@ -110,7 +112,8 @@ data ConcreteInstance = ConcreteInstance {
 data Automaton = Automaton {
                    name :: AutomatonName,
                    instances :: Int
-                           } deriving (Show)
+                           } deriving (Show, Eq, Ord, Generic)
+instance Hashable Automaton
 
 -- Helper functions
 fID :: String -> FlowID

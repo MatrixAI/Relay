@@ -6,6 +6,7 @@
 
 module Counter (
   NameSet, nEmpty,
+  GeneratorState,
   allocate,
   netnsName, vethNames
 ) where
@@ -19,7 +20,7 @@ import DataDefinitions
 -- HashSet of all the taken kernel level resource names as far as the
 -- Orchestrator knows so we don't double up
 type NameSet = HashSet Name
-
+type GeneratorState = (NameSet, ConcreteAddr)
 
 netnsNameLength = 20
 vethNameLength = 15
