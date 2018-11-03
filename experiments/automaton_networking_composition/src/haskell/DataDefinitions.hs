@@ -15,15 +15,16 @@ module DataDefinitions (
   flowID, concreteAddr,
   Mapping,
   FlowTable,
-  ConcreteInstance (..), Automaton (..),
+  ConcreteInstance (..), ConcreteInstances, Automaton (..),
   checkFlowID, checkConcAddr
 ) where
 
 import Data.Hashable
-import qualified Data.HashMap.Strict as Map
+import qualified Data.HashMap.Lazy as Map
 import Data.IP (IPv6)
 import System.Random (Random, RandomGen, random, randomR, next)
 import Data.Maybe (fromJust)
+import Algebra.Graph.Label (Semilattice, zero, (\/))
 import GHC.Generics (Generic)
 
 import HelperFunctions (readIP)
@@ -60,14 +61,16 @@ instance Random IFChar where
                        k = b - a + 1
   random g = randomR (minBound, maxBound) g
 
-
+instance Semilattice IPv6 where
+  zero = readIP "::"
+  x \/ y    = min x y
 
 -- flowID for a communication context
 -- flowIDs are of the IPv6 range fd00::/7 -> unique-local range
 -- TODO: newtype FlowID and ConcreteAddr so we can create unique Bounded
 -- instances
 newtype FlowID = FlowID IPv6
-                 deriving (Enum, Eq, Ord, Read, Show)
+                 deriving (Enum, Eq, Ord, Read, Show, Semilattice)
 instance Bounded FlowID where
   minBound = fID "fd00::"
   maxBound = fID "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
@@ -76,7 +79,7 @@ instance Bounded FlowID where
 -- concrete address of an automaton
 -- concrete addresses are of the IPv6 range fc00::7 -> unique-local range
 newtype ConcreteAddr = ConcreteAddr IPv6
-                       deriving (Enum, Eq, Ord, Read, Show)
+                       deriving (Enum, Eq, Ord, Read, Show, Semilattice)
 instance Bounded ConcreteAddr where
   minBound = cAddr "fc00::"
   maxBound = cAddr "fcff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
@@ -96,13 +99,15 @@ type FlowTable = Map.HashMap FlowID Automaton
  - Contains data related to the functionality of the automaton in relation to
  - the kernel.
  -}
+type ConcreteInstances = [ConcreteInstance]
 data ConcreteInstance = ConcreteInstance {
                           gateway :: ConcreteAddr,
                           -- 256 bytes including trailing NULL
                           netns :: NetnsName,
                           -- IF namesize is 16 bytes with trailing NULL
                           veths :: (VethName, VethName)
-                                         } deriving (Show)
+                                         } deriving (Show, Eq, Ord)
+
 
 {-
  - Generic Automaton structure containing high level information about the

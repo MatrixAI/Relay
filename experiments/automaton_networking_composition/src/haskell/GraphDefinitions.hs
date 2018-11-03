@@ -12,8 +12,9 @@ module GraphDefinitions (
   InstanceGraph (..)
 ) where
 
-import qualified Algebra.Graph as G
-import qualified Algebra.Graph.Labelled as LG
+import Algebra.Graph as G
+import Algebra.Graph.Labelled as LG
+import Algebra.Graph.Label
 import Control.Monad.State
 import System.Random (RandomGen)
 import Data.List (mapAccumR, mapAccumL)
@@ -24,6 +25,8 @@ import Data.Hashable (Hashable)
 
 import DataDefinitions
 import Counter
+
+type Edge a = (a, a)
 
 {-
  - Graph of which automatons need to talk to what. Edges in graph are
@@ -41,7 +44,7 @@ type AutomatonGraph = G.Graph Automaton
  - which would also mean that we're generating different ConcreteInstance
  - templates for what is actually the same Automaton.
  -}
-type InstanceGraph = G.Graph [ConcreteInstance]
+type InstanceGraph = G.Graph ConcreteInstances
 
 {-
  - Hypergraph representation of all possible connections of automaton intances
@@ -61,24 +64,24 @@ type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 toInstanceGraph :: AutomatonGraph -> InstanceGraph
 toInstanceGraph g = let
     v = DS.toList $ G.vertexSet g
-    e = DS.toList $ G.edgeSet g
+
 -- use mapAccumL instead of mapAccumR to preserve the correspondence of
--- Automaton to [ConcreteInstance] in their respective lists. If we used
+-- Automaton to ConcreteInstances in their respective lists. If we used
 -- mapAccumR we'd just need to `reverse` one of the lists
-    (gs', a) = mapAccumL automatonToConcreteInstance (nEmpty, minBound) v
+    (_, a) = mapAccumL automatonToConcreteInstance (nEmpty, minBound) v
     m = createHashMap v a
-    f v = G.vertex $ fromJust $ HM.lookup v m
+    f = \i -> G.vertex $ fromJust $ HM.lookup i m
       in G.foldg G.empty f G.overlay G.connect g
 
--- type ConcreteInstances = [ConcreteInstance] ???
+-- type ConcreteInstances = ConcreteInstances ???
 
 -- State monad?
 -- state monad.
 -- flip :: (a->b->c)->b->a->c
--- concreteAutomaton :: Automaton -> State GeneratorState [ConcreteInstance]
+-- concreteAutomaton :: Automaton -> State GeneratorState ConcreteInstances
 -- concreteAutomaton = flip automatonToConcreteInstance
 -- not sure how lazy eval will go and whether we need `const` or `seq` anywhere
-automatonToConcreteInstance :: GeneratorState -> Automaton -> (GeneratorState, [ConcreteInstance])
+automatonToConcreteInstance :: GeneratorState -> Automaton -> (GeneratorState, ConcreteInstances)
 automatonToConcreteInstance gs@(ns, cas) a = let
               -- State monad? something nicer and more elegant than this plz...
               caddrs = take (instances a) [cas .. ]
@@ -97,7 +100,7 @@ automatonToConcreteInstance gs@(ns, cas) a = let
                                ns' vfs
 
               cInstances = zipWith3 ConcreteInstance caddrs netns vethns
-                in ((ns'', cas'), cInstances)
+                in ((ns'' `seq` ns'', cas' `seq` cas'), cInstances)
 
 -- rename to something more meaningful
 createHashMap :: (Hashable k, Eq k) => [k] -> [v] -> HM.HashMap k v
@@ -105,11 +108,28 @@ createHashMap ks vs = foldr f HM.empty kZipV
               where f e m = (uncurry $ HM.insert) e m
                     kZipV = zip ks vs
 
------------
 
 
---toCompositionGraph :: InstanceGraph -> CompositionGraph
---toCompositionGraph g = G.foldg LG.empty f LG.overlay LG.connect g
+toCompositionGraph :: InstanceGraph -> CompositionGraph
+toCompositionGraph g = let
+        es = DS.toList $ G.edgeSet g
+        fs = [minBound :: FlowID ..]
+        fsANDes = zip es fs
+        fsANDes' = concat $ map
+                (\((a1, a2), f) -> zip (permute a1 a2) (repeat f)) fsANDes
+          in labelledEdges fsANDes'
+
+
+permute :: [a] -> [b] -> [(a, b)]
+permute as bs = [(x, y) | x<-as, y<-bs]
+
+-- Labelled graph version of G.edges
+-- probably could be optimsed but hey it works
+labelledEdges :: (Semilattice e, Ord e) => [(Edge a, e)] -> LG.Graph e a
+labelledEdges           []       = LG.empty
+labelledEdges (((a1, a2), e):xs) = ((LG.vertex a1) -<e>- (LG.vertex a2))
+                                        `LG.overlay` labelledEdges xs
+
 
 
 --toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
