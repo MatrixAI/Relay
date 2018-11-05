@@ -106,7 +106,11 @@ data ConcreteInstance = ConcreteInstance {
                           netns :: NetnsName,
                           -- IF namesize is 16 bytes with trailing NULL
                           veths :: (VethName, VethName)
-                                         } deriving (Show, Eq, Ord)
+                                         } deriving (Eq, Ord)
+
+instance Show ConcreteInstance where
+  show c = "ConcreteInstance " ++ (show a)
+            where (ConcreteAddr a) = gateway c
 
 
 {-

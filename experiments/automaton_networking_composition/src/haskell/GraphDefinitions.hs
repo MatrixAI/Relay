@@ -9,7 +9,8 @@
 module GraphDefinitions (
   AutomatonGraph (..),
   CompositionGraph (..),
-  InstanceGraph (..)
+  InstanceGraph (..),
+  toInstanceGraph, toCompositionGraph
 ) where
 
 import Algebra.Graph as G
@@ -51,7 +52,7 @@ type InstanceGraph = G.Graph ConcreteInstances
  - to each other. Each edge will have a flowID associated with it so we can pick
  - the best suited communication context.
  -}
-type CompositionGraph = LG.Graph FlowID ConcreteInstance --placeholder--
+type CompositionGraph = LG.Graph FlowID ConcreteInstance
 
 {-
  - Graph of which automatons are actually communicating to each other as well as
@@ -59,7 +60,7 @@ type CompositionGraph = LG.Graph FlowID ConcreteInstance --placeholder--
  -}
 type CommunicationsGraph = LG.Graph FlowID ConcreteInstance --placeholder--
 
-
+--------------------------------------------------------------------------------
 
 toInstanceGraph :: AutomatonGraph -> InstanceGraph
 toInstanceGraph g = let
@@ -69,11 +70,9 @@ toInstanceGraph g = let
 -- Automaton to ConcreteInstances in their respective lists. If we used
 -- mapAccumR we'd just need to `reverse` one of the lists
     (_, a) = mapAccumL automatonToConcreteInstance (nEmpty, minBound) v
-    m = createHashMap v a
+    m = kvToMap v a
     f = \i -> G.vertex $ fromJust $ HM.lookup i m
       in G.foldg G.empty f G.overlay G.connect g
-
--- type ConcreteInstances = ConcreteInstances ???
 
 -- State monad?
 -- state monad.
@@ -81,7 +80,8 @@ toInstanceGraph g = let
 -- concreteAutomaton :: Automaton -> State GeneratorState ConcreteInstances
 -- concreteAutomaton = flip automatonToConcreteInstance
 -- not sure how lazy eval will go and whether we need `const` or `seq` anywhere
-automatonToConcreteInstance :: GeneratorState -> Automaton -> (GeneratorState, ConcreteInstances)
+automatonToConcreteInstance ::
+        GeneratorState -> Automaton -> (GeneratorState, ConcreteInstances)
 automatonToConcreteInstance gs@(ns, cas) a = let
               -- State monad? something nicer and more elegant than this plz...
               caddrs = take (instances a) [cas .. ]
@@ -89,47 +89,55 @@ automatonToConcreteInstance gs@(ns, cas) a = let
 
               nf = map (netnsName a) caddrs
               nfs = map runState nf
-              -- abstract lambda function as it's used twice
-              (ns', netns) = mapAccumR (\s f -> let (n, s') = f s in (s', n))
-                             ns nfs
+              (ns', netns) = mapAccumR accumF ns nfs
 
               vf = map (vethNames a) netns
               vfs = map runState vf
-              -- comment above
-              (ns'', vethns) = mapAccumR (\s f -> let (n, s') = f s in (s', n))
-                               ns' vfs
+              (ns'', vethns) = mapAccumR accumF ns' vfs
 
               cInstances = zipWith3 ConcreteInstance caddrs netns vethns
                 in ((ns'' `seq` ns'', cas' `seq` cas'), cInstances)
 
+-- state/accumulator -> runState -> (accumulator, result)
+accumF :: s -> (s -> (a, s)) -> (s, a)
+accumF s f = let (n, s') = f s in (s', n)
+
 -- rename to something more meaningful
-createHashMap :: (Hashable k, Eq k) => [k] -> [v] -> HM.HashMap k v
-createHashMap ks vs = foldr f HM.empty kZipV
+kvToMap :: (Hashable k, Eq k) => [k] -> [v] -> HM.HashMap k v
+kvToMap ks vs = foldr f HM.empty kZipV
               where f e m = (uncurry $ HM.insert) e m
                     kZipV = zip ks vs
 
-
+--------------------------------------------------------------------------------
 
 toCompositionGraph :: InstanceGraph -> CompositionGraph
 toCompositionGraph g = let
-        es = DS.toList $ G.edgeSet g
+        es = DS.toList $ G.edgeSet g -- :: [Edge ConcreteInstances]
         fs = [minBound :: FlowID ..]
-        fsANDes = zip es fs
-        fsANDes' = concat $ map
-                (\((a1, a2), f) -> zip (permute a1 a2) (repeat f)) fsANDes
-          in labelledEdges fsANDes'
+        es' = concat $ map (\(x, y) -> permute x y) es -- :: [Edge ConcreteInstance]
+        fsANDes = zip es' fs
+          in labelledEdges fsANDes
 
 
 permute :: [a] -> [b] -> [(a, b)]
 permute as bs = [(x, y) | x<-as, y<-bs]
 
 -- Labelled graph version of G.edges
--- probably could be optimsed but hey it works
 labelledEdges :: (Semilattice e, Ord e) => [(Edge a, e)] -> LG.Graph e a
 labelledEdges           []       = LG.empty
 labelledEdges (((a1, a2), e):xs) = ((LG.vertex a1) -<e>- (LG.vertex a2))
                                         `LG.overlay` labelledEdges xs
 
+--------------------------------------------------------------------------------
+
+toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
+--toCommunicationsGraph g =
 
 
---toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
+
+
+--------------------------------------------------------------------------------
+-- Helper functions
+
+aConnect :: Automaton -> Automaton -> AutomatonGraph
+aConnect x y = G.connect (G.vertex x) (G.vertex y)

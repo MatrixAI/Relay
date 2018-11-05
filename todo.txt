@@ -44,7 +44,8 @@ of interest but at least are worth having a look at.
     . NFS
     . vehicle routing problems
 
-Things the next experiment may examine:
-  - lower level networking rules
-  - automaton composition rules specified from a file
-  - flowID representing an automaton's connection in a composition
+- zipper structure
+- incremental computing (DOM?)
+  game scenery rendering
+  FRP / GUIs
+- compilers
