@@ -114,6 +114,22 @@ toCompositionGraph :: InstanceGraph -> CompositionGraph
 toCompositionGraph g = let
         es = DS.toList $ G.edgeSet g -- :: [Edge ConcreteInstances]
         fs = [minBound :: FlowID ..]
+
+{-
+        we need the first element of each element in `es` to be paired up with a
+        flowID and then have (\(x, f)
+-}
+
+      map fst es
+
+      -- esMAPfs :: (s, [(ConcreteInstan
+          -- x :: ConcreteInstances
+          -- where x is taken as the first element of each element in `es`
+        esMAPfs = mapAccumL (\s x -> let
+                                (a, s') = runState allocate s
+                              in (s', (x, a))
+                        ) (minBound :: FlowID) $ map fst es
+
         es' = concat $ map (\(x, y) -> permute x y) es -- :: [Edge ConcreteInstance]
         fsANDes = zip es' fs
           in labelledEdges fsANDes
@@ -130,7 +146,7 @@ labelledEdges (((a1, a2), e):xs) = ((LG.vertex a1) -<e>- (LG.vertex a2))
 
 --------------------------------------------------------------------------------
 
-toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
+--toCommunicationsGraph :: CompositionGraph -> CommunicationsGraph
 --toCommunicationsGraph g =
 
 

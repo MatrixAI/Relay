@@ -28,6 +28,7 @@ dependencies:
 - hashable
 - mtl
 - algebraic-graphs
+- lens >= 4.16.1
 - random
 
 library:

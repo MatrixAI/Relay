@@ -71,8 +71,8 @@ function create() {
 }
 
 function clean() {
-  sudo ip netns delete $NS1
-  sudo ip netns delete $NS2
+  sudo ip netns del $NS1
+  sudo ip netns del $NS2
 }
 
 
