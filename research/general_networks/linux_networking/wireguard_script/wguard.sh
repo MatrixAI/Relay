@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 NS1="A"
 NS2="B"
@@ -9,31 +9,29 @@ WG3="wg3"
 
 function wg1_conf() {
   echo "[Interface]
-  #Address = 10.0.0.1
+  #Address = fc00::1/64
   PrivateKey = 8OvpW0vAQhv1hROUVlWl+uYo+3gg5zKA9za7mnaiPVQ=
   ListenPort = 51820
 
   [Peer]
   # wg3
   PublicKey = ULjvnWG/dSkSZL9VjIErrZCPoZI9H8+7FvvLkANVfEg=
-  AllowedIPs = 0.0.0.0/0
-  PersistentKeepalive = 25
-  Endpoint = 10.2.0.1:51822
+  AllowedIPs = ::/0
+  PersistentKeepalive = 3
+  Endpoint = [::1]:51822
   " > ~/wireguard/wg1.conf
 }
 
 function wg3_conf() {
   echo "[Interface]
-  #Address = 10.2.0.1
+  #Address = fc00::2/64
   PrivateKey = aKUS0H1LcdJ1Ut4dq4SrnZApZU7HPp24/QNADrxvIFs=
   ListenPort = 51822
   
   [Peer]
   # wg1
   PublicKey = YkE9YVB8NCiR6HDRXIcOOgHpVPmHOjTD+DxwcL7TzX0=
-  AllowedIPs = 0.0.0.0/0
-#  PersistentKeepalive = 25
-#  Endpoint = 10.0.0.1:51820
+  AllowedIPs = ::/0
   " > ~/wireguard/wg3.conf
 }
 
@@ -55,15 +53,19 @@ function create() {
   # establish wg1
   ip -n $NS2 link set dev $WG1 netns $NS1
   ip netns exec $NS1 wg setconf $WG1 ~/wireguard/wg1.conf
-  ip -n $NS1 address add 10.0.0.1/16 dev $WG1
+  ip -n $NS1 address add fe80::1/64 dev $WG1
+  ip -n $NS1 address add fc00::1/64 dev $WG1
   ip -n $NS1 link set dev $WG1 up
+  ip -n $NS1 link set lo up
   ip -n $NS1 route add default dev $WG1
 
   # establish wg3
   ip -n $NS2 link set dev $WG3 netns $NS3
   ip netns exec $NS3 wg setconf $WG3 ~/wireguard/wg3.conf
-  ip -n $NS3 address add 10.2.0.1/16 dev $WG3
+  ip -n $NS3 address add fe80::2/64 dev $WG3
+  ip -n $NS3 address add fc00::2/64 dev $WG3
   ip -n $NS3 link set dev $WG3 up
+  ip -n $NS3 link set lo up
   ip -n $NS3 route add default dev $WG3
 
   ip -n $NS2 link set dev lo up
@@ -85,15 +87,14 @@ function create() {
 #  ip netns exec $NS2 iptables -t nat -A POSTROUTING -p udp \
 #    --dport 51822 -j SNAT --to-source 10.0.0.1
 
-  ip -n $NS2 route add 10.0.0.0/16 dev lo
-  ip -n $NS2 route add 10.2.0.0/16 dev lo
+  ip -n $NS2 route add fc00::/64 dev lo
+  ip -n $NS2 route add fe80::/64 dev lo
 }
 
 function clean() {
   ip netns del $NS1
   ip netns del $NS2
   ip netns del $NS3
-#  ip link del dev $WG2
 }
 
 if [ "$1" == "create" ]; then
