@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# *description*
-# by Ramwan <ray@matrix.ai>
+#=============================================================#
+# *description*                                               #
+#                                                             #
+# by Ramwan <ray@matrix.ai>                                   #
+#=============================================================#
 
 SANE=true
 HOSTNET="NURSERY"
@@ -41,32 +44,43 @@ parseConfig () {
   IFNAME=$1
   IFNET=$2
 
-  cat $NETCONFIGS/$CONFIG_NAME/confs/$IFNAME.conf | tee >/dev/null \
-    >(ip -n $IFNET address add `sed -n -e 's/#Address = //p'` dev $IFNAME)
-    >(
+  VALS=`egrep -e '^#[A-Za-z]+ = .+$' \
+    "$NETCONFIGS"/"$CONFIG_NAME"/confs/"$IFNAME".conf | sed -e 's/^#//'`
+
+  i6addr=`echo "$VALS" | grep -e '^Address' | sed -e 's/^.* = //'`
+  table=`echo "$VALS" | grep -e '^Table' | sed -e 's/^.* = //'`
+
+  peernames=`awk '/^#/ && !/ = /' | sed -e 's/#//' | tail -n +2`
+
+  # add ipv6 address to interface
+  ip -n "$IFNET" address add $i6addr dev "$IFNAME"
+  # TODO:
+  #   This cannot be the case if we have multiple wireguard interfaces per netns
+  # ip -n "$IFNET" -6 route add default dev "$IFNAME"
+
+  if [[ "$table" == "on" ]]; then
+    echo "Setting routing table to 'on' does nothing for now."
+  fi
 }
 
-# setInterface(config_name, ifname, ifnet, i6addr)
+# setSapling(config_name, ifname, ifnet, i6addr)
+#
 setSapling () {
   CONFIG_NAME=$1
   IFNAME=$2
   IFNET=$3
   I6ADDR=$4
 
-  ip netns add $IFNET
-  ip -n $HOSTNET link add $IFNAME type wireguard
-  ip -n $HOSTNET link set $IFNAME netns $IFNET
+  ip netns add "$IFNET"
+  ip -n "$HOSTNET" link add "$IFNAME" type wireguard
+  ip -n "$HOSTNET" link set "$IFNAME" netns "$IFNET"
 
-  ip netns exec $IFNET \
-      wg setconf ${NETCONFIGS}/${CONFIG_NAME}/confs/${IFNAME}.conf
-  ip -n $IFNET link set lo up
-  ip -n $IFNET link set $IFNAME up
+  ip netns exec "$IFNET" \
+      wg setconf "$IFNAME" "$NETCONFIGS"/"$CONFIG_NAME"/confs/"$IFNAME".conf
+  ip -n "$IFNET" link set lo up
+  ip -n "$IFNET" link set "$IFNAME" up
   
-  #ip -n $IFNET address add $I6ADDR dev $IFNAME scope global
-
-  #add iptables and routing rules
-
-  ip -n $IFNET -6 route add default default dev $IFNAME
+  parseConfig $IFNAME $IFNET
 }
 
 ################################################################################
@@ -89,10 +103,14 @@ if [[ $2 = "clean" ]]; then
 fi
 
 # check if config dir exists
-ls ./network_configurations/${1} > /dev/null
-if [[ $? -ne 0 ]]; then
+if [[ ! -d ./network_configurations/${1} ]]; then
+  echo "Specified configuration doesn't exist."
+  echo "Exiting."
   exit
 fi
+
+type wg >/dev/null 2>&1 || \
+  { echo >&2 "\`wg(8)\` isn't installed. Please install."; exit; }
 
 # we `lsmod` and give it to `tee` where we then pipe the output of `lsmod` to
 # fd's as input to the function checkModule and then use `paste` to merge all
@@ -112,19 +130,26 @@ fi
 
 ################################################################################
 
-NUMBER_NETS=$(ls -l ${NETCONFIGS}/"${1}"/confs/ | wc -l)
-echo "Setting up configuration '${1}'" 
-echo "Total network namespaces needed: ${NUMBER_NETS}"
+NUMBER_NETS=`ls -l "$NETCONFIGS"/"$1"/confs/ | wc -l`
+TMP_DIR="$NETCONFIGS"/"$1"/tmp
+if [[ ! -d "$TMP_DIR" ]]; then
+  mkdir "$TMP_DIR"
+else
+  rm "$TMP_DIR"/*
+fi
+
+echo "Setting up configuration \"$1\"" 
+echo "Total network namespaces needed: $NUMBER_NETS"
 
 setNursery
 
 for f in ./network_configurations/"${1}"/confs/*; do
   [ -e "$f" ] || continue
-  IFNAME=$(echo "$f" | sed -e 's/\.conf$//' | sed -e 's/^.*\/confs\///')
+  IFNAME=$(echo "$f" | sed -e 's/\.conf$//; s/^.*\/confs\///')
   IFNET=(`cat "$f" | sha1sum | tr -d ' -'`)
   NETS+=( "$IFNET" )
 
-  setInterface "$1" "$IFNAME" "$IFNET"
+  setSapling "$1" "$IFNAME" "$IFNET"
 done
 
 for n in "${NETS[@]}"; do
