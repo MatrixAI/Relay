@@ -8,6 +8,7 @@
 
 SANE=true
 HOSTNET="NURSERY"
+HOST_HASH=`echo "$HOSTNET" | sha1sum | sed -e 's/ -$//'`
 NETS=( $HOSTNET )
 NUMBER_INTERFACES=0
 NUMBER_NETS=0
@@ -35,52 +36,59 @@ checkModule () {
 
 # setNursery()
 setNursery () {
-  ip netns add ${HOSTNET}
-  ip -n ${HOSTNET} link set lo up
+  ip netns add "$HOSTNET"
+  ip -n "$HOSTNET" link set lo up
 }
 
 # == Stage 1 ==
-#   setSapling(config_base_path, ifname, ifnet, tmp_dir)
+#   setSapling(config_base_path, tmp_dir, ifname, ifnet)
 #
 # - Create the orphan netns for the interface and move it there.
 # - Set the config file for the interface
 # - Add the ipv6 address to the interface
 # - Create a new routing table if specified
 setSapling () {
-  IFNAME=$2
-  IFNET=$3
-  TMP_DIR=$4
-  CONFIG_PATH="$1"/confs/"$IFNAME".conf
-  KEYS_DIR="$1"/keys
+  BASE_PATH=$1
+  TMP_DIR=$2
+  IFNAME=$3
+  IFNET=$4
+  CONFIG_PATH="$BASE_PATH"/confs/"$IFNAME".conf
+  KEYS_DIR="$BASE_PATH"/keys
   IFPORT=0
 
   ip netns add "$IFNET"
   ip -n "$HOSTNET" link add "$IFNAME" type wireguard
   ip -n "$HOSTNET" link set "$IFNAME" netns "$IFNET"
-
   ip netns exec "$IFNET" wg setconf "$IFNAME" "$CONFIG_PATH" 
   
-  i6addr=`grep -e '^#Address' "$CONFIG_PATH" | sed -e 's/^.* = //'`
   table=`grep -e '^Table' "$CONFIG_PATH" | sed -e 's/^.* = //'`
-
-  # add ipv6 address to interface and set default route
-  ip -n "$IFNET" address add $i6addr dev "$IFNAME"
   if [[ "$table" == "on" ]]; then
     echo "Setting routing table to \"on\" does nothing for now."
   fi
 
   ip -n "$IFNET" link set lo up
   ip -n "$IFNET" link set "$IFNAME" up
-  ip -n "$IFNET" route add default dev "$IFNAME"
   IFPORT=`ip netns exec "$IFNET" wg show "$IFNAME" listen-port`
+  IFADDR=`python3 address_generator.py "real" "$HOST_HASH" $IFPORT "$IFNET"`
 
-  python3 config_parser.py\
-    "$CONFIG_PATH" "$TMP_DIR" "$KEYS_DIR" "$HOSTNET" "$IFNET" "$IFNAME" "$IFPORT"
-  if [[ $? != 0 ]]; then
-    echo "Python config parser failed. Handle yourself please."
-    exit
-  fi
+  peers=`sed -n -e '/^ *#[^ ]*$/ p' "$CONFIG_PATH" \
+        | tail -n +2 | sed -e 's/^#//' | tr '[:upper:]' '[:lower:]'`
+  for peer in "${peers[@]}"; do
+    FLOW=$(python3 address_generator.py "flow" "$HOST_HASH" \
+              $IFPORT "`echo "$peer" | sha1sum | sed -e 's/ -$//'`")
+    echo "$IFNAME $peer $FLOW" >> "$TMP_DIR"/CONNS
+  done
+  echo "$IFNAME=[$IFADDR]:$IFPORT/$IFNET" >> "$TMP_DIR"/IFS
 }
+
+#  python3 config_parser.py\
+#    "$CONFIG_PATH" "$KEYS_DIR" "$IFNET" "$IFNAME" "$IFADDR" "$IFPORT" \
+#    >> "$TMP_DIR"/"$IFNAME"
+#  # If the config parser fails then we exit and clean up after ourselves.
+#  if [[ $? != 0 ]]; then
+#    echo "Python config parser failed on $IFNAME."
+#    exit && `bash intrahost_make.sh clean`
+#  fi
 
 ################################################################################
 # SANITY CHECKS
@@ -134,9 +142,9 @@ if [[ $SANE -ne true ]]; then
 fi
 
 ################################################################################
-
-NUMBER_NETS=`ls -l "$NETCONFIGS"/"$2"/confs/ | wc -l`
-TMP_DIR="$NETCONFIGS"/"$2"/tmp
+BASE_PATH="$NETCONFIGS"/"$2"
+NUMBER_NETS=`ls -l "$BASE_PATH"/confs/ | wc -l`
+TMP_DIR="$BASE_PATH"/tmp
 rm -r "$TMP_DIR" 2>/dev/null || true
 mkdir "$TMP_DIR"
 
@@ -151,13 +159,26 @@ setNursery
 #   namespaces and bring them up. 
 for f in ./network_configurations/"$2"/confs/*; do
   [ -e "$f" ] || continue
-  IFNAME=$(echo "$f" | sed -e 's/\.conf$//; s/^.*\/confs\///')
+  IFNAME=`echo "$f" | sed -e 's/\.conf$//; s/^.*\/confs\///' | \
+          tr '[:upper:]' '[:lower:]'`
   IFNET=(`cat "$f" | sha1sum | tr -d ' -'`)
   NETS+=( "$IFNET" )
-  BASE_PATH="$NETCONFIGS"/"$2"
 
-  setSapling "$BASE_PATH" "$IFNAME" "$IFNET" "$TMP_DIR"
+  setSapling "$BASE_PATH" "$TMP_DIR" "$IFNAME" "$IFNET"
 done
+
+python3 conn_uniq.py "$TMP_DIR"/CONNS
+
+# ip -n $HOSTNET route add $DEST dev lo
+
+# ip -n $HOSTNET iptables -6 -t nat -A PREROUTING -p udp -d $FLOW -s $SRC  -j DNAT --to-destination $DEST
+# ip -n $HOSTNET iptables -6 -t nat -A POSTROUTING -p udp -s $SRC -d $DEST -j SNAT --to-source $FLOW
+# ip -n $HOSTNET iptables -6 -t nat -A PREROUTING -p udp -d $FLOW -s $DEST -j DNAT --to-destination $SRC
+# ip -n $HOSTNET iptables -6 -t nat -A POSTROUTING -p udp -s $DEST -d $FLOW -j SNAT --to-source $FLOW
+
+sed -e "s/\([^ ]*\) \([^ ]*\) \([^ ]*\)$/ip -n \"$HOSTNET\" \
+  iptables -6 -t nat -A PREROUTING -p udp -d \3 -j DNAT \
+  --to-destination \2/" "$TMP_DIR"/CONNS.uniq
 
 for n in "${NETS[@]}"; do
   echo "$n"

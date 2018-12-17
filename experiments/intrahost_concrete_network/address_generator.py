@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
-import os
+import binascii
+import ipaddress
 
 '''
 Script which takes parameters and generates string ipv6 addresses based upon the
@@ -15,7 +16,7 @@ unique-local range of ipv6 (fc00::/7).
 
    8            40                16                      64
 +-----------------------------------------------------------------------------+
-| fc00 |     Host Hash     | listen port |          automaton hash            |
+| fc   |     Host Hash     | listen port |          automaton hash            |
 +-----------------------------------------------------------------------------+
                                 128 bits
 
@@ -24,11 +25,13 @@ A flow address in an abstract address representing a persistent peer that an
 automaton will be able to talk to. The automaton will send packets to the same
 flow address regardless of whether the peer is on the same real address or not.
 This address is part of the unique-local range of ipv6 (fc00::/7). This differs
-from a Real Address in that it starts with "fd00" rather than "fc00".
+from a Real Address in that it starts with "fd00" rather than "fc00". We have
+the host hash and listen port as the initiator's values because the receiving
+endpoint can change but this address should persist.
 
    8            40                        16                      64
 +-----------------------------------------------------------------------------+
-|fd00| initiator host hash | initiator listen port |   target automaton hash  |
+|fd  | initiator host hash | initiator listen port |   target automaton hash  |
 +-----------------------------------------------------------------------------+
                                 128 bits
 
@@ -39,37 +42,63 @@ with 0s.
 
 RETURN CODE of NOT 0 indicates error.
 '''
-
-if len(sys.argv) != 5:
-    sys.exit(1)
-if sys.argv[4] < 1024 or sys.argv[4] > 0xFFFF:
+if len(sys.argv) < 5:
+    print("Not enough arguments.")
     sys.exit(1)
 
-# Get address type
-address_type = ""
-if sys.argv[1] == "flow":
-    address_type = "fd00"
-elif sys.argv[1] == "real":
-    address_type = "fc00"
+TYPE_LEN  = 8
+HOST_LEN  = 40
+PORT_LEN  = 16
+AHASH_LEN = 64
 
-# Get host bits
-host = sys.argv[3]
-bytes_in_host = 40/8
-if len(host) < bytes_in_host:
-    host = host.rjust( bytes_in_host - len(host), '0')
-elif len(host) > bytes_in_host:
-    host = host[0:bytes_in_host]
 
-# Get port bits
-port = int(sys.argv[4])
+address_type = sys.argv[1]
+host_hash = int(sys.argv[2], 16)
+listen_port = int(sys.argv[3])
+automaton_hash = int(sys.argv[4], 16)
 
-# Get automaton hash bits
-a_hash = sys.argv[5]
-bytes_in_ahash = 64/8
-if len(a_hash) < bytes_in_ahash:
-    a_hash = a_hash.rjust( bytes_in_ahash - len(a_hash ), '0')
-elif len(a_hash) > bytes_in_ahash:
-    a_hash = a_hash[0:bytes_in_ahash]
+address = 0
+'''
+SANITY CHECKS
+'''
 
-address = address_type + host + port + a_hash
+# check address type
+if address_type == "flow":
+    address_type = 0xfd
+elif address_type == "real":
+    address_type = 0xfc
+else:
+    print("Address type unknown")
+    sys.exit(1)
 
+# check host bits
+max_val = 2**39 # 40bits
+for i in range(39):
+    tmp = max_val >> i
+    max_val |= tmp
+
+while host_hash > max_val:
+    host_hash >>= 1
+
+if listen_port <= 1024 or listen_port > 65535:
+    print("Port is incorrect")
+    sys.exit(1)
+
+# check automaton hash bits
+max_val = 2**63 # 64 bits
+for i in range(63):
+    tmp = max_val >> i
+    max_val |= tmp
+
+while automaton_hash > max_val:
+    automaton_hash >>= 1
+
+'''
+Piece it all together
+'''
+address |= address_type << (128-8)
+address |= host_hash << (120-40)
+address |= listen_port << (80-16)
+address |= automaton_hash
+
+print(ipaddress.IPv6Address(address))
