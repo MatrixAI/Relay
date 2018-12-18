@@ -71,24 +71,20 @@ setSapling () {
   IFPORT=`ip netns exec "$IFNET" wg show "$IFNAME" listen-port`
   IFADDR=`python3 address_generator.py "real" "$HOST_HASH" $IFPORT "$IFNET"`
 
-  peers=`sed -n -e '/^ *#[^ ]*$/ p' "$CONFIG_PATH" \
+  line=`sed -n -e '/^ *#[^ ]*$/ p' "$CONFIG_PATH" \
         | tail -n +2 | sed -e 's/^#//' | tr '[:upper:]' '[:lower:]'`
-  for peer in "${peers[@]}"; do
+
+  while read -r peer; do
     FLOW=$(python3 address_generator.py "flow" "$HOST_HASH" \
               $IFPORT "`echo "$peer" | sha1sum | sed -e 's/ -$//'`")
     echo "$IFNAME $peer $FLOW" >> "$TMP_DIR"/CONNS
-  done
-  echo "$IFNAME=[$IFADDR]:$IFPORT/$IFNET" >> "$TMP_DIR"/IFS
-}
+  done <<< "$line"
+  PUBKEY=`cat "$KEYS_DIR"/"$IFNAME".pub | sed -e 's!/!\\\/!g'`
+  echo "$IFNAME $IFADDR $IFPORT $IFNET $PUBKEY" >> "$TMP_DIR"/IFS
 
-#  python3 config_parser.py\
-#    "$CONFIG_PATH" "$KEYS_DIR" "$IFNET" "$IFNAME" "$IFADDR" "$IFPORT" \
-#    >> "$TMP_DIR"/"$IFNAME"
-#  # If the config parser fails then we exit and clean up after ourselves.
-#  if [[ $? != 0 ]]; then
-#    echo "Python config parser failed on $IFNAME."
-#    exit && `bash intrahost_make.sh clean`
-#  fi
+  ip -n "$IFNET" address add "$IFADDR" dev "$IFNAME"
+  ip -n "$IFNET" -6 route add default dev "$IFNAME"
+}
 
 ################################################################################
 # SANITY CHECKS
@@ -154,6 +150,7 @@ echo "Total network namespaces needed: $NUMBER_NETS"
 # Create main network namespace
 setNursery
 
+# ============== Stage 1 ==============
 # Create all the child network namespaces. This is a 3 step operation.
 # - The first step is to create and move all the interfaces into the correct
 #   namespaces and bring them up. 
@@ -167,20 +164,55 @@ for f in ./network_configurations/"$2"/confs/*; do
   setSapling "$BASE_PATH" "$TMP_DIR" "$IFNAME" "$IFNET"
 done
 
-python3 conn_uniq.py "$TMP_DIR"/CONNS
-
-# ip -n $HOSTNET route add $DEST dev lo
-
-# ip -n $HOSTNET iptables -6 -t nat -A PREROUTING -p udp -d $FLOW -s $SRC  -j DNAT --to-destination $DEST
-# ip -n $HOSTNET iptables -6 -t nat -A POSTROUTING -p udp -s $SRC -d $DEST -j SNAT --to-source $FLOW
-# ip -n $HOSTNET iptables -6 -t nat -A PREROUTING -p udp -d $FLOW -s $DEST -j DNAT --to-destination $SRC
-# ip -n $HOSTNET iptables -6 -t nat -A POSTROUTING -p udp -s $DEST -d $FLOW -j SNAT --to-source $FLOW
-
-sed -e "s/\([^ ]*\) \([^ ]*\) \([^ ]*\)$/ip -n \"$HOSTNET\" \
-  iptables -6 -t nat -A PREROUTING -p udp -d \3 -j DNAT \
-  --to-destination \2/" "$TMP_DIR"/CONNS.uniq
-
+echo "== Stage 1 ==  done"
+echo "Created network namespaces:"
 for n in "${NETS[@]}"; do
   echo "$n"
 done
 
+# ============== Stage 2 ==============
+# Set the routing and iptables rules necessary for namespaces to communicate.
+
+python3 conn_uniq.py "$TMP_DIR"/CONNS
+
+# each line of the CONNS.uniq file is of the format "wg1 wg2 flow"
+# Build a file of iptables rules pre transform.
+awk -f runscripts/iptables.awk "$TMP_DIR"/CONNS.uniq \
+  | sed -e "s/\$HOSTNET/$HOSTNET/" \
+  > "$TMP_DIR"/iptables.pre
+
+# Build a file of wg endpoint rules pre transform.
+awk -f runscripts/endpoints.awk "$TMP_DIR"/CONNS.uniq > "$TMP_DIR"/ifs_wg.pre
+
+# Build a sedscript used to substitute interface names with their relevant
+# addresses.
+echo "{" > "$TMP_DIR"/ifs_iptables.sed
+awk -f runscripts/interface.awk "$TMP_DIR"/IFS \
+  >> "$TMP_DIR"/ifs_iptables.sed
+echo "}" >> "$TMP_DIR"/ifs_iptables.sed
+
+# Build a sedscript used to substitute interface names with relevant values.
+echo "{" > "$TMP_DIR"/ifs_wg.sed
+awk -f runscripts/endpoints_sub.awk "$TMP_DIR"/IFS \
+  >> "$TMP_DIR"/ifs_wg.sed
+echo "}" >> "$TMP_DIR"/ifs_wg.sed
+
+# Run said sedscript and transform iptables rules
+sed -f "$TMP_DIR"/ifs_iptables.sed "$TMP_DIR"/iptables.pre \
+  | sort | uniq > "$TMP_DIR"/iptables.post
+
+# Run said sedscript and transform wg endpoint rules
+sed -f "$TMP_DIR"/ifs_wg.sed "$TMP_DIR"/ifs_wg.pre > "$TMP_DIR"/ifs_wg.post
+
+# ============== Stage 3 ==============
+# At this point we have 2 files that contain all the commands that we need to
+# run in order to set up the network - iptables.post and ifs_wg.post, both
+# residing in $TMP_DIR
+
+while read -r line; do
+  eval "$line"
+done <<< `cat "$TMP_DIR"/iptables.post`
+
+while read -r line; do
+  eval "$line"
+done <<< `cat "$TMP_DIR"/ifs_wg.post`
