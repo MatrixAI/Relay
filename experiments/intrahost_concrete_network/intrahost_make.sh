@@ -38,6 +38,9 @@ checkModule () {
 setNursery () {
   ip netns add "$HOSTNET"
   ip -n "$HOSTNET" link set lo up
+  ip -n "$HOSTNET" link add sink type veth peer name nan
+  ip -n "$HOSTNET" link set sink up
+  ip -n "$HOSTNET" link set nan up
 }
 
 # == Stage 1 ==

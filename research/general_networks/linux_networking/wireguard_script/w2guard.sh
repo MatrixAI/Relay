@@ -16,8 +16,10 @@ function wg1_conf() {
 
   [Peer]
   # wg2
-  PublicKey = ULjvnWG/dSkSZL9VjIErrZCPoZI9H8+7FvvLkANVfEg=
+  PublicKey = /bJqFLQ9fr4pIQYxtYBcjvu6RfivRe2EvxLk9xWldXc=
   AllowedIPs = 0.0.0.0/0
+  Endpoint = 10.1.0.1:51821
+  PersistentKeepalive = 25
 
   [Peer]
   # wg3
@@ -29,7 +31,7 @@ function wg1_conf() {
 function wg2_conf() {
   echo "[Interface]
   #Address = 10.1.0.1
-  PrivateKey = aKUS0H1LcdJ1Ut4dq4SrnZApZU7HPp24/QNADrxvIFs=
+  PrivateKey = OEoHe9Roxfjrcve/p0iyPXAms8Q7qOzbh3Y2e03550M=
   ListenPort = 51821
 
   [Peer]
