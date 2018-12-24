@@ -1,2 +1,0 @@
-3439 - Some Internet Architectural Guidelines and Philosophy
-7980 - A Framework for Defining Network Complexity

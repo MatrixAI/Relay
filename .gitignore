@@ -5,3 +5,4 @@ serval/
 iptables/
 **/.stack-work
 **/a.out
+**/tmp

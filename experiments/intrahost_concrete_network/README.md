@@ -24,3 +24,16 @@ current session."
 
 but the server is the current session so the client cannot restart the handshake
 and so the server is stuck in this dodgy position.
+
+
+
+Furthermore, in logs/ I ran a bunch of `iperf` tests which compares a simple
+veth setup using veth pairs and linux bridges to the wireguard setup. Even
+though the wireguard setup won't be actually used, I was still interested in
+seeing how the performance of the 2 compared. For both UDP and TCP connections,
+veth pairs performed better by far. So much better in fact that even if
+wireguard didn't have the issue related with server/client connection states, it
+would be worth considering replacing wireguard with plain veth connections.
+However do note that the bitrate for wireguard links for UDP connections was
+actually the slightest bit higher for some reason but the latency was
+significantly higher than a veth connection.

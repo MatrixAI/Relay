@@ -30,7 +30,7 @@ printHelp () {
 checkModule () {
   if [[ $(grep -e "^$1" | wc -l) -eq 0 ]]; then
     echo "$1 not present."
-    SANEfalse
+    SANE=false
   fi
 }
 

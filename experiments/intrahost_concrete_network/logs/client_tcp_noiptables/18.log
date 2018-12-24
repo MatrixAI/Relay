@@ -1,0 +1,19 @@
+Connecting to host fcd6:fa4c:26e5:aada:a2c1:f603:e524:df90, port 5201
+[  5] local fcd6:fa4c:26e5:bf94:8069:cf6f:f0ec:fc49 port 34840 connected to fcd6:fa4c:26e5:aada:a2c1:f603:e524:df90 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   390 MBytes  3.27 Gbits/sec    2   1.02 MBytes       
+[  5]   1.00-2.00   sec   370 MBytes  3.11 Gbits/sec    8    812 KBytes       
+[  5]   2.00-3.00   sec   372 MBytes  3.13 Gbits/sec    0   1.25 MBytes       
+[  5]   3.00-4.00   sec   364 MBytes  3.05 Gbits/sec   91    943 KBytes       
+[  5]   4.00-5.00   sec   361 MBytes  3.03 Gbits/sec   51    811 KBytes       
+[  5]   5.00-6.00   sec   375 MBytes  3.14 Gbits/sec    0   1.24 MBytes       
+[  5]   6.00-7.00   sec   372 MBytes  3.13 Gbits/sec    7   1.08 MBytes       
+[  5]   7.00-8.00   sec   352 MBytes  2.96 Gbits/sec  235    875 KBytes       
+[  5]   8.00-9.00   sec   375 MBytes  3.15 Gbits/sec    0   1.29 MBytes       
+[  5]   9.00-10.00  sec   371 MBytes  3.11 Gbits/sec    3   1.13 MBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  3.62 GBytes  3.11 Gbits/sec  397             sender
+[  5]   0.00-10.04  sec  3.61 GBytes  3.09 Gbits/sec                  receiver
+
+iperf Done.

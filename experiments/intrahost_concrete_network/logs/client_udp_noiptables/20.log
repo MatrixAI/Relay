@@ -1,0 +1,19 @@
+Connecting to host fcd6:fa4c:26e5:aada:a2c1:f603:e524:df90, port 5201
+[  5] local fcd6:fa4c:26e5:bf94:8069:cf6f:f0ec:fc49 port 60064 connected to fcd6:fa4c:26e5:aada:a2c1:f603:e524:df90 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   129 KBytes  1.06 Mbits/sec  98  
+[  5]   1.00-2.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   2.00-3.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   3.00-4.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   4.00-5.00   sec   129 KBytes  1.06 Mbits/sec  98  
+[  5]   5.00-6.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   6.00-7.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   7.00-8.00   sec   128 KBytes  1.05 Mbits/sec  97  
+[  5]   8.00-9.00   sec   129 KBytes  1.06 Mbits/sec  98  
+[  5]   9.00-10.00  sec   128 KBytes  1.05 Mbits/sec  97  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  1.25 MBytes  1.05 Mbits/sec  0.000 ms  0/973 (0%)  sender
+[  5]   0.00-10.04  sec  1.25 MBytes  1.05 Mbits/sec  0.047 ms  0/973 (0%)  receiver
+
+iperf Done.
