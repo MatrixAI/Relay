@@ -1,4 +1,4 @@
-#Intrahost Experiment 2
+# Intrahost Experiment 2
 
 The first intrahost experiment (found at ../intrahost_concrete_network)
 investigated the possibilities of using [Wireguard](https://www.wireguard.com/)
@@ -11,7 +11,7 @@ servers cannot initiate connections with clients. Despite Wireguard being a poor
 choice for intrahost communications, Wireguard is still an option for interhost
 communications across cloud vendors.
 
-##Purpose
+## Purpose
 
 The purpose of this experiment is to determine the effect of NATs on the
 throughput of TCP connections and the latency of UDP connections. This
@@ -19,7 +19,7 @@ experiment follows on from the previous intrahost experiment as we'll be using
 veth pairs as the network instantiation and [Iperf](https://iperf.fr/) again as
 the benchmarking tool.
 
-####Cases to test
+#### Cases to test
 
 * NAT in each network namespace
 * NAT in the nursery namespace
