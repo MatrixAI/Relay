@@ -1,0 +1,285 @@
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 33583 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   351 MBytes  2.94 Gbits/sec  257530  
+[  5]   1.00-2.00   sec   348 MBytes  2.92 Gbits/sec  255670  
+[  5]   2.00-3.00   sec   345 MBytes  2.90 Gbits/sec  253610  
+[  5]   3.00-4.00   sec   340 MBytes  2.85 Gbits/sec  249700  
+[  5]   4.00-5.00   sec   354 MBytes  2.97 Gbits/sec  259960  
+[  5]   5.00-6.00   sec   333 MBytes  2.80 Gbits/sec  244860  
+[  5]   6.00-7.00   sec   344 MBytes  2.88 Gbits/sec  252500  
+[  5]   7.00-8.00   sec   342 MBytes  2.87 Gbits/sec  251180  
+[  5]   8.00-9.00   sec   343 MBytes  2.88 Gbits/sec  251770  
+[  5]   9.00-10.00  sec   319 MBytes  2.68 Gbits/sec  234180  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.34 GBytes  2.87 Gbits/sec  0.000 ms  0/2510960 (0%)  sender
+[  5]   0.00-10.04  sec  3.33 GBytes  2.85 Gbits/sec  0.001 ms  8452/2510960 (0.34%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 37815 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   337 MBytes  2.82 Gbits/sec  247290  
+[  5]   1.00-2.00   sec   347 MBytes  2.91 Gbits/sec  254570  
+[  5]   2.00-3.00   sec   342 MBytes  2.87 Gbits/sec  251230  
+[  5]   3.00-4.00   sec   352 MBytes  2.96 Gbits/sec  258830  
+[  5]   4.00-5.00   sec   346 MBytes  2.90 Gbits/sec  254020  
+[  5]   5.00-6.00   sec   347 MBytes  2.91 Gbits/sec  254890  
+[  5]   6.00-7.00   sec   340 MBytes  2.85 Gbits/sec  249890  
+[  5]   7.00-8.00   sec   346 MBytes  2.90 Gbits/sec  254190  
+[  5]   8.00-9.00   sec   348 MBytes  2.92 Gbits/sec  255240  
+[  5]   9.00-10.00  sec   351 MBytes  2.94 Gbits/sec  257660  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.38 GBytes  2.90 Gbits/sec  0.000 ms  0/2537810 (0%)  sender
+[  5]   0.00-10.04  sec  3.37 GBytes  2.88 Gbits/sec  0.002 ms  3340/2537810 (0.13%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 51743 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   344 MBytes  2.89 Gbits/sec  252610  
+[  5]   1.00-2.00   sec   344 MBytes  2.89 Gbits/sec  252550  
+[  5]   2.00-3.00   sec   348 MBytes  2.92 Gbits/sec  255870  
+[  5]   3.00-4.00   sec   354 MBytes  2.97 Gbits/sec  259710  
+[  5]   4.00-5.00   sec   346 MBytes  2.90 Gbits/sec  254060  
+[  5]   5.00-6.00   sec   339 MBytes  2.85 Gbits/sec  249230  
+[  5]   6.00-7.00   sec   345 MBytes  2.90 Gbits/sec  253580  
+[  5]   7.00-8.00   sec   344 MBytes  2.89 Gbits/sec  252840  
+[  5]   8.00-9.00   sec   348 MBytes  2.92 Gbits/sec  255170  
+[  5]   9.00-10.00  sec   335 MBytes  2.81 Gbits/sec  246080  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.37 GBytes  2.89 Gbits/sec  0.000 ms  0/2531700 (0%)  sender
+[  5]   0.00-10.04  sec  3.36 GBytes  2.87 Gbits/sec  0.002 ms  6438/2531700 (0.25%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 33562 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   350 MBytes  2.94 Gbits/sec  257010  
+[  5]   1.00-2.00   sec   332 MBytes  2.78 Gbits/sec  243430  
+[  5]   2.00-3.00   sec   344 MBytes  2.89 Gbits/sec  252890  
+[  5]   3.00-4.00   sec   336 MBytes  2.82 Gbits/sec  246620  
+[  5]   4.00-5.00   sec   335 MBytes  2.81 Gbits/sec  246350  
+[  5]   5.00-6.00   sec   321 MBytes  2.70 Gbits/sec  236000  
+[  5]   6.00-7.00   sec   340 MBytes  2.85 Gbits/sec  249870  
+[  5]   7.00-8.00   sec   351 MBytes  2.94 Gbits/sec  257610  
+[  5]   8.00-9.00   sec   343 MBytes  2.88 Gbits/sec  251960  
+[  5]   9.00-10.00  sec   349 MBytes  2.93 Gbits/sec  256090  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.32 GBytes  2.85 Gbits/sec  0.000 ms  0/2497830 (0%)  sender
+[  5]   0.00-10.04  sec  3.31 GBytes  2.84 Gbits/sec  0.002 ms  5393/2497830 (0.22%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 59167 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   342 MBytes  2.87 Gbits/sec  251170  
+[  5]   1.00-2.00   sec   336 MBytes  2.82 Gbits/sec  246670  
+[  5]   2.00-3.00   sec   346 MBytes  2.90 Gbits/sec  254020  
+[  5]   3.00-4.00   sec   342 MBytes  2.87 Gbits/sec  251230  
+[  5]   4.00-5.00   sec   340 MBytes  2.85 Gbits/sec  249620  
+[  5]   5.00-6.00   sec   346 MBytes  2.90 Gbits/sec  253860  
+[  5]   6.00-7.00   sec   341 MBytes  2.86 Gbits/sec  250640  
+[  5]   7.00-8.00   sec   346 MBytes  2.90 Gbits/sec  254060  
+[  5]   8.00-9.00   sec   337 MBytes  2.82 Gbits/sec  247220  
+[  5]   9.00-10.00  sec   338 MBytes  2.83 Gbits/sec  248130  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.33 GBytes  2.86 Gbits/sec  0.000 ms  0/2506620 (0%)  sender
+[  5]   0.00-10.04  sec  3.33 GBytes  2.85 Gbits/sec  0.002 ms  5145/2506620 (0.21%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 34309 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   340 MBytes  2.85 Gbits/sec  249430  
+[  5]   1.00-2.00   sec   335 MBytes  2.81 Gbits/sec  246090  
+[  5]   2.00-3.00   sec   332 MBytes  2.79 Gbits/sec  243960  
+[  5]   3.00-4.00   sec   353 MBytes  2.96 Gbits/sec  258940  
+[  5]   4.00-5.00   sec   350 MBytes  2.93 Gbits/sec  256830  
+[  5]   5.00-6.00   sec   346 MBytes  2.91 Gbits/sec  254320  
+[  5]   6.00-7.00   sec   343 MBytes  2.88 Gbits/sec  251730  
+[  5]   7.00-8.00   sec   339 MBytes  2.85 Gbits/sec  249170  
+[  5]   8.00-9.00   sec   341 MBytes  2.86 Gbits/sec  250080  
+[  5]   9.00-10.00  sec   350 MBytes  2.93 Gbits/sec  256880  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.35 GBytes  2.88 Gbits/sec  0.000 ms  0/2517430 (0%)  sender
+[  5]   0.00-10.04  sec  3.34 GBytes  2.86 Gbits/sec  0.002 ms  2789/2517430 (0.11%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 40007 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   339 MBytes  2.84 Gbits/sec  249000  
+[  5]   1.00-2.00   sec   344 MBytes  2.89 Gbits/sec  252910  
+[  5]   2.00-3.00   sec   338 MBytes  2.84 Gbits/sec  248170  
+[  5]   3.00-4.00   sec   342 MBytes  2.87 Gbits/sec  251290  
+[  5]   4.00-5.00   sec   348 MBytes  2.92 Gbits/sec  255390  
+[  5]   5.00-6.00   sec   347 MBytes  2.91 Gbits/sec  254920  
+[  5]   6.00-7.00   sec   338 MBytes  2.84 Gbits/sec  248400  
+[  5]   7.00-8.00   sec   335 MBytes  2.81 Gbits/sec  245840  
+[  5]   8.00-9.00   sec   351 MBytes  2.95 Gbits/sec  257990  
+[  5]   9.00-10.00  sec   349 MBytes  2.93 Gbits/sec  256560  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.35 GBytes  2.88 Gbits/sec  0.000 ms  0/2520470 (0%)  sender
+[  5]   0.00-10.04  sec  3.35 GBytes  2.86 Gbits/sec  0.002 ms  3561/2520470 (0.14%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 48160 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   344 MBytes  2.89 Gbits/sec  252890  
+[  5]   1.00-2.00   sec   349 MBytes  2.92 Gbits/sec  255930  
+[  5]   2.00-3.00   sec   342 MBytes  2.87 Gbits/sec  250890  
+[  5]   3.00-4.00   sec   334 MBytes  2.80 Gbits/sec  244960  
+[  5]   4.00-5.00   sec   344 MBytes  2.88 Gbits/sec  252450  
+[  5]   5.00-6.00   sec   343 MBytes  2.88 Gbits/sec  251700  
+[  5]   6.00-7.00   sec   343 MBytes  2.88 Gbits/sec  252010  
+[  5]   7.00-8.00   sec   345 MBytes  2.89 Gbits/sec  253040  
+[  5]   8.00-9.00   sec   347 MBytes  2.91 Gbits/sec  255150  
+[  5]   9.00-10.00  sec   347 MBytes  2.91 Gbits/sec  255150  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.36 GBytes  2.88 Gbits/sec  0.000 ms  0/2524170 (0%)  sender
+[  5]   0.00-10.04  sec  3.35 GBytes  2.87 Gbits/sec  0.002 ms  3846/2524170 (0.15%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 36800 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   342 MBytes  2.87 Gbits/sec  250800  
+[  5]   1.00-2.00   sec   342 MBytes  2.87 Gbits/sec  251040  
+[  5]   2.00-3.00   sec   346 MBytes  2.90 Gbits/sec  254270  
+[  5]   3.00-4.00   sec   350 MBytes  2.93 Gbits/sec  256790  
+[  5]   4.00-5.00   sec   348 MBytes  2.92 Gbits/sec  255480  
+[  5]   5.00-6.00   sec   351 MBytes  2.95 Gbits/sec  258030  
+[  5]   6.00-7.00   sec   351 MBytes  2.94 Gbits/sec  257570  
+[  5]   7.00-8.00   sec   334 MBytes  2.80 Gbits/sec  245250  
+[  5]   8.00-9.00   sec   344 MBytes  2.89 Gbits/sec  252660  
+[  5]   9.00-10.00  sec   339 MBytes  2.84 Gbits/sec  248620  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.37 GBytes  2.89 Gbits/sec  0.000 ms  0/2530510 (0%)  sender
+[  5]   0.00-10.04  sec  3.36 GBytes  2.87 Gbits/sec  0.002 ms  6068/2530510 (0.24%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 33726 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   343 MBytes  2.88 Gbits/sec  251870  
+[  5]   1.00-2.00   sec   352 MBytes  2.95 Gbits/sec  258210  
+[  5]   2.00-3.00   sec   340 MBytes  2.85 Gbits/sec  249420  
+[  5]   3.00-4.00   sec   323 MBytes  2.71 Gbits/sec  236870  
+[  5]   4.00-5.00   sec   356 MBytes  2.98 Gbits/sec  261070  
+[  5]   5.00-6.00   sec   341 MBytes  2.86 Gbits/sec  250320  
+[  5]   6.00-7.00   sec   343 MBytes  2.88 Gbits/sec  251750  
+[  5]   7.00-8.00   sec   347 MBytes  2.91 Gbits/sec  254730  
+[  5]   8.00-9.00   sec   348 MBytes  2.92 Gbits/sec  255790  
+[  5]   9.00-10.00  sec   338 MBytes  2.84 Gbits/sec  248210  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.35 GBytes  2.88 Gbits/sec  0.000 ms  0/2518240 (0%)  sender
+[  5]   0.00-10.04  sec  3.33 GBytes  2.85 Gbits/sec  0.001 ms  12988/2518240 (0.52%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 54538 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   355 MBytes  2.98 Gbits/sec  260540  
+[  5]   1.00-2.00   sec   344 MBytes  2.89 Gbits/sec  252740  
+[  5]   2.00-3.00   sec   351 MBytes  2.94 Gbits/sec  257730  
+[  5]   3.00-4.00   sec   333 MBytes  2.79 Gbits/sec  244390  
+[  5]   4.00-5.00   sec   330 MBytes  2.77 Gbits/sec  242240  
+[  5]   5.00-6.00   sec   343 MBytes  2.87 Gbits/sec  251520  
+[  5]   6.00-7.00   sec   352 MBytes  2.95 Gbits/sec  258640  
+[  5]   7.00-8.00   sec   348 MBytes  2.92 Gbits/sec  255520  
+[  5]   8.00-9.00   sec   346 MBytes  2.90 Gbits/sec  254010  
+[  5]   9.00-10.00  sec   332 MBytes  2.78 Gbits/sec  243620  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.35 GBytes  2.88 Gbits/sec  0.000 ms  0/2520950 (0%)  sender
+[  5]   0.00-10.04  sec  3.34 GBytes  2.86 Gbits/sec  0.002 ms  6776/2520950 (0.27%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 59451 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   344 MBytes  2.88 Gbits/sec  252310  
+[  5]   1.00-2.00   sec   351 MBytes  2.94 Gbits/sec  257500  
+[  5]   2.00-3.00   sec   335 MBytes  2.81 Gbits/sec  245920  
+[  5]   3.00-4.00   sec   347 MBytes  2.91 Gbits/sec  254920  
+[  5]   4.00-5.00   sec   336 MBytes  2.82 Gbits/sec  247000  
+[  5]   5.00-6.00   sec   350 MBytes  2.94 Gbits/sec  257030  
+[  5]   6.00-7.00   sec   342 MBytes  2.87 Gbits/sec  251050  
+[  5]   7.00-8.00   sec   332 MBytes  2.79 Gbits/sec  243970  
+[  5]   8.00-9.00   sec   341 MBytes  2.86 Gbits/sec  250420  
+[  5]   9.00-10.00  sec   350 MBytes  2.94 Gbits/sec  257070  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.35 GBytes  2.88 Gbits/sec  0.000 ms  0/2517190 (0%)  sender
+[  5]   0.00-10.04  sec  3.34 GBytes  2.86 Gbits/sec  0.002 ms  5236/2517190 (0.21%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 45591 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   345 MBytes  2.89 Gbits/sec  253390  
+[  5]   1.00-2.00   sec   343 MBytes  2.87 Gbits/sec  251510  
+[  5]   2.00-3.00   sec   356 MBytes  2.99 Gbits/sec  261360  
+[  5]   3.00-4.00   sec   350 MBytes  2.93 Gbits/sec  256730  
+[  5]   4.00-5.00   sec   346 MBytes  2.90 Gbits/sec  254270  
+[  5]   5.00-6.00   sec   336 MBytes  2.82 Gbits/sec  246560  
+[  5]   6.00-7.00   sec   335 MBytes  2.81 Gbits/sec  245710  
+[  5]   7.00-8.00   sec   347 MBytes  2.91 Gbits/sec  254800  
+[  5]   8.00-9.00   sec   343 MBytes  2.87 Gbits/sec  251650  
+[  5]   9.00-10.00  sec   350 MBytes  2.94 Gbits/sec  257340  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.37 GBytes  2.89 Gbits/sec  0.000 ms  0/2533320 (0%)  sender
+[  5]   0.00-10.04  sec  3.36 GBytes  2.88 Gbits/sec  0.002 ms  5020/2533320 (0.2%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 36738 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   351 MBytes  2.94 Gbits/sec  257650  
+[  5]   1.00-2.00   sec   351 MBytes  2.95 Gbits/sec  258070  
+[  5]   2.00-3.00   sec   326 MBytes  2.73 Gbits/sec  239260  
+[  5]   3.00-4.00   sec   339 MBytes  2.85 Gbits/sec  249050  
+[  5]   4.00-5.00   sec   349 MBytes  2.93 Gbits/sec  256570  
+[  5]   5.00-6.00   sec   346 MBytes  2.90 Gbits/sec  254270  
+[  5]   6.00-7.00   sec   339 MBytes  2.84 Gbits/sec  248900  
+[  5]   7.00-8.00   sec   342 MBytes  2.87 Gbits/sec  251210  
+[  5]   8.00-9.00   sec   336 MBytes  2.82 Gbits/sec  246650  
+[  5]   9.00-10.00  sec   341 MBytes  2.86 Gbits/sec  250750  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.34 GBytes  2.87 Gbits/sec  0.000 ms  0/2512380 (0%)  sender
+[  5]   0.00-10.04  sec  3.34 GBytes  2.85 Gbits/sec  0.002 ms  3482/2512380 (0.14%)  receiver
+
+iperf Done.
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 54026 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   340 MBytes  2.85 Gbits/sec  249600  
+[  5]   1.00-2.00   sec   339 MBytes  2.84 Gbits/sec  248970  
+[  5]   2.00-3.00   sec   343 MBytes  2.88 Gbits/sec  252190  
+[  5]   3.00-4.00   sec   334 MBytes  2.80 Gbits/sec  245190  
+[  5]   4.00-5.00   sec   349 MBytes  2.93 Gbits/sec  256180  
+[  5]   5.00-6.00   sec   343 MBytes  2.88 Gbits/sec  251900  
+[  5]   6.00-7.00   sec   329 MBytes  2.76 Gbits/sec  241630  
+[  5]   7.00-8.00   sec   339 MBytes  2.84 Gbits/sec  248640  
+[  5]   8.00-9.00   sec   347 MBytes  2.91 Gbits/sec  254910  
+[  5]   9.00-10.00  sec   348 MBytes  2.92 Gbits/sec  255350  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.33 GBytes  2.86 Gbits/sec  0.000 ms  0/2504560 (0%)  sender
+[  5]   0.00-10.04  sec  3.32 GBytes  2.84 Gbits/sec  0.002 ms  5244/2504560 (0.21%)  receiver
+
+iperf Done.

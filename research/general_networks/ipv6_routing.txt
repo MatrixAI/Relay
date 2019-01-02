@@ -1,0 +1,8 @@
+IPv6 routing is done differently compared to IPv4.
+
+https://stackoverflow.com/questions/36438102/ping-external-ipv6-address-from-a-network-namespace
+
+The answers in the above link explain that if a host doesn't know the location
+of the destination address, it will need to be sent via a router. Otherwise if
+it isn't sent via a router, it will attempt to find the MAC address of the
+destination link.

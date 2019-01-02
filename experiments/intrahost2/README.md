@@ -17,10 +17,23 @@ The purpose of this experiment is to determine the effect of NATs on the
 throughput of TCP connections and the latency of UDP connections. This
 experiment follows on from the previous intrahost experiment as we'll be using
 veth pairs as the network instantiation and [Iperf](https://iperf.fr/) again as
-the benchmarking tool.
+the benchmarking tool. However in this experiment we will not be using a bridge.
 
 #### Cases to test
 
 * NAT in each network namespace
 * NAT in the nursery namespace
 * no NAT
+
+Note that we cannot use NAT without Netfilter conntrack.
+
+## Test setup
+
+The tests will be done on Linux 4.14.66 x86_64 disconnected to all other
+networks and will show the effect of various NAT setups across a single link.
+
+Dependencies:
+* ip (iproute2-ss180129 or higher although any modern version should work fine)
+* ip6tables v1.6.2 (although any modern version should work fine)
+* iperf 3.5 (although any modern version should work fine)
+
