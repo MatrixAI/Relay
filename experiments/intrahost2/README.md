@@ -11,6 +11,8 @@ servers cannot initiate connections with clients. Despite Wireguard being a poor
 choice for intrahost communications, Wireguard is still an option for interhost
 communications across cloud vendors.
 
+All following graphs are made with [plotly](https://plot.ly/create/).
+
 ## Purpose
 
 The purpose of this experiment is to determine the effect of NATs on the
@@ -203,12 +205,82 @@ translation.
 However of course practically it would also be impossible to have each active
 NAT rule at the bottom.
 
-Another expectation I had was that the bitrate 
+Another expectation I had was that the initial bitrate would be significantly
+different for different amounts of NAT entries but this was not noticeable.
 __Comparison of TCP bitrate on interval 0.00-1.00 for Append Nat10 and Nat1000__
 ![9](https://web.archive.org/web/20190103065330im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/append_nat10_nat1k_tcp_01_comparison.png)
 
-'''
+```
 Key for above graph
 1. Append Nat10 TCP on interval 0.00-1.00
 2. Append Nat1000 TCP on interval 0.00-1.00
-'''
+
+Note: there was a huge outlier for the Nat10 entry in this graph (bitrate of
+27 Gbits/sec) which I have cut off in the image).
+```
+
+__Comparison of UDP bitrate on interval 0.00-1.00 for Append Nat10 and Nat1000__
+![10](https://web.archive.org/web/20190103070248im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/append_nat10_nat1k_udp_01_comparison.png)
+```
+Key for above graph
+1. Append Nat 10 UDP on interval 0.00-1.00
+2. Append Nat1000 UDP on interval 0.00-1.00
+```
+
+Overall compared to the previous experiment regarding Wireguard performance, it
+can be seen that iptables with veth pairs provides a much better choice for
+intrahost communication between automatons. The number of NAT rules in iptables
+appears to not affect the throughput and latency which means having the NAT
+rules in the nursery should theoretically continue to give higher performance
+than having each automaton's namespace contain the rules for the automaton
+(because the nursery would have all the rules for the physical host whereas each
+automaton would only have rules specific to itself).
+
+I haven't tested how the system behaves if we were to have many connections
+traversing the nursery although I'm pretty sure this will have a negative impact
+on the throughput and latency but at that point I believe that iptables won't be
+the bottleneck - rather it should be external network or the automatons won't be
+outputting that many packets.
+
+The results of this experiment show that iptables is able to be used but should
+probably be investigated further.
+
+An example of the abstract flow transformations is shown below. All commands
+need to be run with root privilege.
+```
+ip -all netns del
+ip netns add A
+ip netns add B
+ip netns add C
+ip -n B link add vA type veth peer name vAB
+ip -n B link add vC type veth peer name vCB
+ip -n B link set dev vA netns A
+ip -n B link set dev vC netns C
+ip -n A link set dev lo up
+ip -n A link set dev vA up
+ip -n B link set dev lo up
+ip -n B link set dev vAB up
+ip -n B link set dev vCB up
+ip -n C link set dev lo up
+ip -n C link set dev vC up
+
+ip -n A address add fc00::1/64 dev vA
+ip -n C address add fd00::1/64 dev vC
+ip -n B address add fc00::2/64 dev vAB
+ip -n B address add fd00::2/64 dev vCB
+
+ip netns exec B sysctl net.ipv6.conf.all.forwarding=1
+
+ip -n A -6 route add default dev vA via fc00::2
+ip -n C -6 route add default dev vC via fd00::2
+
+ip netns exec B ip6tables -t nat -A PREROUTING -d fe00::1 -j DNAT \
+  --to-destination fd00::1
+ip netns exec B ip6tables -t nat -A POSTROUTING -s fc00::1 -j SNAT \
+  --to-source fe00::1
+```
+From this point, you can run `ip netns exec A ping fe00::1` and `ip netns exec C
+tcpdump` in separate terminals and watch the traffic.
+
+* As an aside on the above setup, iptables rules are able to actually change but
+  the change won't be actually implemented until the conntrack entry is removed.
