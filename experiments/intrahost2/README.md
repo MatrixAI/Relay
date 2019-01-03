@@ -37,8 +37,3 @@ Dependencies:
 * ip6tables v1.6.2 (although any modern version should work fine)
 * iperf 3.5 (although any modern version should work fine)
 
-https://web.archive.org/web/20190102094856im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/ping_latency.png
-
-https://web.archive.org/web/20190102094936if_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/tcp_throughput_comparison.png
-
-https://web.archive.org/web/20190102094958if_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/udp_throughput.png
