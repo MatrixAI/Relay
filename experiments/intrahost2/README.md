@@ -83,14 +83,14 @@ running `conntrack -F` in each of the network namespaces.
 
 ## Results
 
-https://web.archive.org/web/20190103053925/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_natappend.png
-https://web.archive.org/web/20190103053953/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_natmiddle.png
-https://web.archive.org/web/20190103054019/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_nattop.png
-https://web.archive.org/web/20190103054051/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png
-https://web.archive.org/web/20190103054113/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_append_comparison.png
-https://web.archive.org/web/20190103054141/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_middle_comparison.png
-https://web.archive.org/web/20190103054203/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_top_comparison.png
-https://web.archive.org/web/20190103054224/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png
-https://web.archive.org/web/20190103054243/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_append_comparison.png
-https://web.archive.org/web/20190103054303/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_middle_comparison.png
-https://web.archive.org/web/20190103054326/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_top_comparison.png
+![](https://web.archive.org/web/20190103053925/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_natappend.png)
+![]https://web.archive.org/web/20190103053953/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_natmiddle.png)
+![]https://web.archive.org/web/20190103054019/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/ping_latency_nattop.png)
+![]https://web.archive.org/web/20190103054051/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png)
+![]https://web.archive.org/web/20190103054113/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_append_comparison.png)
+![]https://web.archive.org/web/20190103054141/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_middle_comparison.png)
+![]https://web.archive.org/web/20190103054203/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/tcp_throughput_top_comparison.png)
+![]https://web.archive.org/web/20190103054224/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png)
+![]https://web.archive.org/web/20190103054243/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_append_comparison.png)
+![]https://web.archive.org/web/20190103054303/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_middle_comparison.png)
+![]https://web.archive.org/web/20190103054326/https://github.com/MatrixAI/Relay/blob/master/experiments/intrahost2/graphs/udp_throughput_top_comparison.png)
