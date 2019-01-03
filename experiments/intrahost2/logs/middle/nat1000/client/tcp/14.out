@@ -1,0 +1,19 @@
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 40552 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  3.98 GBytes  34.2 Gbits/sec    0    770 KBytes       
+[  5]   1.00-2.00   sec  4.01 GBytes  34.5 Gbits/sec    0    777 KBytes       
+[  5]   2.00-3.00   sec  4.06 GBytes  34.8 Gbits/sec  421    411 KBytes       
+[  5]   3.00-4.00   sec  4.20 GBytes  36.1 Gbits/sec    0    453 KBytes       
+[  5]   4.00-5.00   sec  4.15 GBytes  35.7 Gbits/sec    0    487 KBytes       
+[  5]   5.00-6.00   sec  3.58 GBytes  30.8 Gbits/sec    0    508 KBytes       
+[  5]   6.00-7.00   sec  3.51 GBytes  30.1 Gbits/sec    0    527 KBytes       
+[  5]   7.00-8.00   sec  3.51 GBytes  30.1 Gbits/sec    0    594 KBytes       
+[  5]   8.00-9.00   sec  3.51 GBytes  30.2 Gbits/sec   95    406 KBytes       
+[  5]   9.00-10.00  sec  3.60 GBytes  31.0 Gbits/sec    0    459 KBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  38.1 GBytes  32.7 Gbits/sec  516             sender
+[  5]   0.00-10.04  sec  38.1 GBytes  32.6 Gbits/sec                  receiver
+
+iperf Done.

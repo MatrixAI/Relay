@@ -3,26 +3,26 @@
 
 NUM_RULES=0
 LOCATION="client"
+POSITION="append"
 
 usage () {
   echo "Run with root privilege."
   echo "bash make_config.sh -h"
   echo "  display this help message."
-  echo "bash make_config.sh [-n num] -l [client | nursery]"
+  echo "bash make_config.sh -n num -l [client | nursery] -p [top | middle | append]"
   echo "  -n num sets the number of iptables rules in the client namespace."
-  echo ""
-  echo "NOTE: the NAT entry in iptables to reach the server from the client is"
-  echo "added at the end of all other bogus entries."
+  echo "  -l sets the location of the iptables nat rules"
+  echo "  -p sets the position of the correct nat mapping in the nat list"
 }
 
-while getopts ":l:n:h:" o; do
+while getopts ":l:n:h:p:" o; do
   case "${o}" in
     h)
       usage
       exit
       ;;
     l)
-      if [[ "$OPTARG" -eq "client" ]] || [[ "$OPTARG" -eq "nursery" ]]; then
+      if [[ "$OPTARG" == "client" ]] || [[ "$OPTARG" == "nursery" ]]; then
         LOCATION=$OPTARG
       else
         echo "Bad location."
@@ -35,6 +35,15 @@ while getopts ":l:n:h:" o; do
         exit 1
       fi
       NUM_RULES=$OPTARG
+      ;;
+    p)
+      if [[ "$OPTARG" == "append" ]] ||  [[ "$OPTARG" == "middle" ]] || \
+        [[ "$OPTARG" == "top" ]]; then
+        POSITION=$OPTARG
+      else
+        echo "Bad position."
+        exit 1
+      fi
       ;;
     *)
       ;;
@@ -84,28 +93,66 @@ echo "Client endpoint at fc00::1/64"
 
 BASE_FLOW="fe00::"
 SUBNET_RANGE="/64"
+MIDDLE=$(( (NUM_RULES / 2 )+ 1 ))
+
+if [[ "$POSITION" == "top" ]]; then
+  if [[ $NUM_RULES -gt 0 ]]; then
+    echo "Created $NUM_RULES ip6tables entries in client netns."
+    echo "The server can now also be found at fe00::1."
+
+    if [[ "$LOCATION" == "client" ]]; then
+      eval $(\
+        ip netns exec client ip6tables -t nat -A OUTPUT -d "${BASE_FLOW}1" \
+        -j DNAT --to-destination fd00::1)
+    elif [[ "$LOCATION" == "nursery" ]]; then
+      eval $(\
+        ip netns exec nursery ip6tables -t nat -A PREROUTING -d "${BASE_FLOW}1" \
+        -j DNAT --to-destination fd00::1)
+    fi
+  fi
+fi
+
 for i in `seq 2 $((NUM_RULES+1))`; do
   if [[ "$LOCATION" == "client" ]]; then
+    if [[ $i == $MIDDLE ]] && [[ "$POSITION" == "middle" ]] ; then
+      echo "Created $NUM_RULES ip6tables entries in client netns."
+      echo "The server can now also be found at fe00::1."
+
+      eval $(\
+        ip netns exec client ip6tables -t nat -A OUTPUT -d "${BASE_FLOW}1" \
+        -j DNAT --to-destination fd00::1)
+    fi
     eval $(\
       ip netns exec client ip6tables -t nat -A OUTPUT -d "${BASE_FLOW}${i}" \
       -j DNAT --to-destination fc00::10)
   elif [[ "$LOCATION" == "nursery" ]]; then
+    if [[ $i == $MIDDLE ]] && [[ "$POSITION" == "middle" ]] ; then
+      echo "Created $NUM_RULES ip6tables entries in client netns."
+      echo "The server can now also be found at fe00::1."
+
+      eval $(\
+        ip netns exec nursery ip6tables -t nat -A PREROUTING -d "${BASE_FLOW}1"\
+         -j DNAT --to-destination fd00::1)
+    fi
     eval $(\
       ip netns exec nursery ip6tables -t nat -A PREROUTING -d "${BASE_FLOW}${i}" \
       -j DNAT --to-destination fc00::10)
   fi
 done
-if [[ $NUM_RULES -gt 0 ]]; then
-  echo "Created $NUM_RULES ip6tables entries in client netns."
-  echo "The server can now also be found at fe00::1."
 
-  if [[ "$LOCATION" == "client" ]]; then
-    eval $(\
-      ip netns exec client ip6tables -t nat -A OUTPUT -d "${BASE_FLOW}1" \
-      -j DNAT --to-destination fd00::1)
-  elif [[ "$LOCATION" == "nursery" ]]; then
-    eval $(\
-      ip netns exec nursery ip6tables -t nat -A PREROUTING -d "${BASE_FLOW}1" \
-      -j DNAT --to-destination fd00::1)
+if [[ "$POSITION" == "append" ]]; then
+  if [[ $NUM_RULES -gt 0 ]]; then
+    echo "Created $NUM_RULES ip6tables entries in client netns."
+    echo "The server can now also be found at fe00::1."
+
+    if [[ "$LOCATION" == "client" ]]; then
+      eval $(\
+        ip netns exec client ip6tables -t nat -A OUTPUT -d "${BASE_FLOW}1" \
+        -j DNAT --to-destination fd00::1)
+    elif [[ "$LOCATION" == "nursery" ]]; then
+      eval $(\
+        ip netns exec nursery ip6tables -t nat -A PREROUTING -d "${BASE_FLOW}1" \
+        -j DNAT --to-destination fd00::1)
+    fi
   fi
 fi

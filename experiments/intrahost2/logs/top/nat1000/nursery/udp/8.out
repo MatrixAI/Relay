@@ -1,0 +1,19 @@
+Connecting to host fe00::1, port 5201
+[  5] local fc00::1 port 38991 connected to fe00::1 port 5201
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   321 MBytes  2.70 Gbits/sec  236050  
+[  5]   1.00-2.00   sec   332 MBytes  2.78 Gbits/sec  243510  
+[  5]   2.00-3.00   sec   321 MBytes  2.69 Gbits/sec  235380  
+[  5]   3.00-4.00   sec   326 MBytes  2.73 Gbits/sec  239310  
+[  5]   4.00-5.00   sec   310 MBytes  2.60 Gbits/sec  227380  
+[  5]   5.00-6.00   sec   325 MBytes  2.73 Gbits/sec  238720  
+[  5]   6.00-7.00   sec   315 MBytes  2.64 Gbits/sec  231500  
+[  5]   7.00-8.00   sec   299 MBytes  2.51 Gbits/sec  219310  
+[  5]   8.00-9.00   sec   311 MBytes  2.61 Gbits/sec  228050  
+[  5]   9.00-10.00  sec   317 MBytes  2.66 Gbits/sec  232770  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec  3.10 GBytes  2.66 Gbits/sec  0.000 ms  0/2331980 (0%)  sender
+[  5]   0.00-10.04  sec  3.08 GBytes  2.64 Gbits/sec  0.002 ms  12346/2331980 (0.53%)  receiver
+
+iperf Done.
