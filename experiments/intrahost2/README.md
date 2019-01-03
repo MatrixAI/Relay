@@ -30,6 +30,15 @@ mean that throughput is higher and latency is lower.
 
 ## Experiment Design
 
+#### Terms
+When I mention 'nursery', it's just a name I've given to an intermediary network
+namespace which acts as a router between 2 other network namespaces.
+
+Top, middle and append are positions that refer to the position of an element in
+a list if the list is traversed from top to bottom in sequential order.
+
+NAT - network address translation
+
 #### Cases to test
 
 * NAT in each network namespace
@@ -79,13 +88,37 @@ where fe00::1 is the server endpoint via NAT, false indicates we don't want a
 UDP test and the log_file_directory is where you want to save (1..15).out.
 
 Following each run of iperf, __run_client.sh__ will clear the conntrack table by
-running `conntrack -F` in each of the network namespaces.
+running `conntrack -F` in each of the network namespaces. __run_client.sh__
+tests each setup with both NAT entries in the nursery and client side with
+__15 runs per test__. This can be modified if you wish in __run_client.sh__. I
+picked 15 because I didn't want to spend forever waiting for all the tests to
+finish. :)
 
 ## Results
 
+Firstly let's talk about ping latency. In all the tests, the control (no nat)
+had the least jitter which was interesting but also had the lowest or roughly
+equally lowest mean latency. This was pretty much expected.
+
+* Latency comparison of No Nat with rule appended to list
 ![1](https://web.archive.org/web/20190103053925im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/ping_latency_natappend.png)
+* Latency comparison of No Nat with rule in the middle of the list
 ![2](https://web.archive.org/web/20190103053953im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/ping_latency_natmiddle.png)
+# Latency comparison of No Nat with rule prepended to the list
 ![3](https://web.archive.org/web/20190103054019im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/ping_latency_nattop.png)
+
+```
+Key for above graphs
+1. No nat
+2. 10 nat entries in client side
+3. 10 nat entries in nursery
+4. 100 nat entries in client side
+5. 100 nat entries in nursery
+6. 1000 nat entries in client side
+7. 1000 nat entries in nursery
+```
+
+
 ![4](https://web.archive.org/web/20190103054051im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/tcp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png)
 ![5](https://web.archive.org/web/20190103054113im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/tcp_throughput_append_comparison.png)
 ![6](https://web.archive.org/web/20190103054141im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/tcp_throughput_middle_comparison.png)
