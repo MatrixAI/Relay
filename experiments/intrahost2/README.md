@@ -24,6 +24,10 @@ the benchmarking tool. However in this experiment we will not be using a bridge.
 I expect that the ordering of the iptables rules will have some sort of effect
 on the throughput and latency of the tests.
 
+I expect that the initial bitrate of
+tests with a lesser amount of rules will be higher than those with a large
+amount of rules consistently.
+
 I don't expect there to be a difference in terms of having the NAT rules in the
 nursery or the client namespace but the lack of NAT rules in the control should
 mean that throughput is higher and latency is lower.
@@ -190,3 +194,13 @@ Key for above graph
 3. 1000 nat entries in nursery at middle of list
 4. 1000 nat entries in nursery at bottom of list
 ```
+
+It seems that having the rule at the very bottom of the list gives a higher
+throughput for the test although the difference isn't really significant,
+especially once the machine starts talking with an external network where the
+network link will be the limiting factor rather than the network address
+translation.
+However of course practically it would also be impossible to have each active
+NAT rule at the bottom.
+
+
