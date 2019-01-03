@@ -95,6 +95,8 @@ picked 15 because I didn't want to spend forever waiting for all the tests to
 finish. :)
 
 ## Results
+`Note the title of the graph is actually the bold text above the graph, not the
+text in the graph :)`
 
 Firstly let's talk about ping latency. In all the tests, the control (no nat)
 had the least jitter which was interesting but also had the lowest or roughly
@@ -152,8 +154,39 @@ Key for above graph
 3. 1000 nat entries in nursery at middle of list
 4. 1000 nat entries in nursery at bottom of list
 ```
+Another thing to note as shown clearer in that last graph was that appending the
+actual nat rule to the bottom of the list appears to give slightly better
+throughput.
 
-![8](https://web.archive.org/web/20190103054224im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/udp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png)
+Following are the UDP results. The UDP results follow a similar pattern to the
+TCP results, showing that having NAT rules instantiated in the nursery namespace
+gives a higher throughput with no nat entries giving the highest throughput.
+
+__UDP throughput comparison between No Nat and appended to list__
 ![9](https://web.archive.org/web/20190103054243im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/udp_throughput_append_comparison.png)
+__UDP throughput comparison between No Nat and middle of list__
 ![10](https://web.archive.org/web/20190103054303im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/udp_throughput_middle_comparison.png)
+__UDP throughput comparison between No Nat and top of list__
 ![11](https://web.archive.org/web/20190103054326im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/udp_throughput_top_comparison.png)
+
+```
+Key for above graphs
+1. No nat
+2. 10 nat entries in client side
+3. 10 nat entries in nursery
+4. 100 nat entries in client side
+5. 100 nat entries in nursery
+6. 1000 nat entries in client side
+7. 1000 nat entries in nursery
+```
+
+__UDP throughput comparison between No Nat and various positions in the list__
+![8](https://web.archive.org/web/20190103054224im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/udp_nonat_vs_topmiddleappend_nursery_nat1k_comparison.png)
+
+```
+Key for above graph
+1. No nat
+2. 1000 nat entries in nursery at top of list
+3. 1000 nat entries in nursery at middle of list
+4. 1000 nat entries in nursery at bottom of list
+```
