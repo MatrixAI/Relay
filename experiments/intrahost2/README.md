@@ -203,4 +203,12 @@ translation.
 However of course practically it would also be impossible to have each active
 NAT rule at the bottom.
 
+Another expectation I had was that the bitrate 
+__Comparison of TCP bitrate on interval 0.00-1.00 for Append Nat10 and Nat1000__
+![9](https://web.archive.org/web/20190103065330im_/https://raw.githubusercontent.com/MatrixAI/Relay/master/experiments/intrahost2/graphs/append_nat10_nat1k_tcp_01_comparison.png)
 
+'''
+Key for above graph
+1. Append Nat10 TCP on interval 0.00-1.00
+2. Append Nat1000 TCP on interval 0.00-1.00
+'''
