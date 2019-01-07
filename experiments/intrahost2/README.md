@@ -282,5 +282,10 @@ ip netns exec B ip6tables -t nat -A POSTROUTING -s fc00::1 -j SNAT \
 From this point, you can run `ip netns exec A ping fe00::1` and `ip netns exec C
 tcpdump` in separate terminals and watch the traffic.
 
+A potential result of this is that we'd have Automaton to Automaton load
+balancing rather than load balancing per connection. Whether this is an issue or
+not (or in what situations it becomes an issue and when it's ok) will have to
+wait until future experiments when requirements are more concretely defined.
+
 * As an aside on the above setup, iptables rules are able to actually change but
   the change won't be actually implemented until the conntrack entry is removed.
