@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 DEST="C"
 
 if [[ $EUID -ne 0 ]]; then
