@@ -1,1 +1,3 @@
-./design/design.md
+# Relay
+
+This project is now closed source until further notice.
